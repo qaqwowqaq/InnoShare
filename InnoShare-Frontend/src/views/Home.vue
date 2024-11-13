@@ -1,14 +1,14 @@
 <template>
   <div class="home min-h-screen bg-gray-50">
     <!-- 头部搜索区域 -->
-    <div class="hero py-16 px-4 bg-white border-b">
+    <div class="hero py-16 px-4 bg-white border-b shadow-md">
       <div class="max-w-4xl mx-auto text-center">
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">学术成果分享平台</h1>
+        <h1 class="text-4xl font-bold text-gray-800 mb-8">学术成果分享平台</h1>
         <div class="search-box mb-8">
           <el-input
             v-model="searchQuery"
             placeholder="搜索论文、专利、研究成果..."
-            class="max-w-2xl"
+            class="max-w-2xl mx-auto"
             :prefix-icon="Search"
           >
             <template #append>
@@ -23,27 +23,27 @@
     <div class="features max-w-6xl mx-auto py-12 px-4">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
         <div class="feature-card text-center">
-          <AcademicCapIcon class ="w-8 h-8 text-blue-600 mx-auto mb-3" />
-          <h3 class="text-sm font-medium text-gray-900">学术成果</h3>
-          <p class="text-xs text-gray-500 mt-1">发布与浏览研究成果</p>
+          <AcademicCapIcon class="icon" />
+          <h3 class="text-lg font-semibold text-gray-900 mt-4">学术成果</h3>
+          <p class="text-sm text-gray-500 mt-1">发布与浏览研究成果</p>
         </div>
 
         <div class="feature-card text-center">
-          <DocumentTextIcon class="w-8 h-8 text-blue-600 mx-auto mb-3" />
-          <h3 class="text-sm font-medium text-gray-900">专业文献</h3>
-          <p class="text-xs text-gray-500 mt-1">获取最新研究文献</p>
+          <DocumentTextIcon class="icon" />
+          <h3 class="text-lg font-semibold text-gray-900 mt-4">专业文献</h3>
+          <p class="text-sm text-gray-500 mt-1">获取最新研究文献</p>
         </div>
 
         <div class="feature-card text-center">
-          <UserGroupIcon class="w-8 h-8 text-blue-600 mx-auto mb-3" />
-          <h3 class="text-sm font-medium text-gray-900">学者社区</h3>
-          <p class="text-xs text-gray-500 mt-1">连接全球研究者</p>
+          <UserGroupIcon class="icon" />
+          <h3 class="text-lg font-semibold text-gray-900 mt-4">学者社区</h3>
+          <p class="text-sm text-gray-500 mt-1">连接全球研究者</p>
         </div>
 
         <div class="feature-card text-center">
-          <ChartBarIcon class="w-8 h-8 text-blue-600 mx-auto mb-3" />
-          <h3 class="text-sm font-medium text-gray-900">数据分析</h3>
-          <p class="text-xs text-gray-500 mt-1">研究趋势与统计</p>
+          <ChartBarIcon class="icon" />
+          <h3 class="text-lg font-semibold text-gray-900 mt-4">数据分析</h3>
+          <p class="text-sm text-gray-500 mt-1">研究趋势与统计</p>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@
     <!-- 最新成果展示 -->
     <div class="latest-works max-w-6xl mx-auto py-12 px-4">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-medium text-gray-900">最新研究成果</h2>
+        <h2 class="text-2xl font-semibold text-gray-900">最新研究成果</h2>
         <el-button 
           type="text" 
           @click="navigateToAchievements"
@@ -85,7 +85,6 @@ import {
   MagnifyingGlassIcon as Search
 } from '@heroicons/vue/24/outline';
 import AchievementList from '@/components/modules/AchievementList.vue';
-//import '../assets/index.css';
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -105,16 +104,43 @@ const navigateToAchievements = () => {
 </script>
 
 <style scoped>
-.feature-card {
+.hero {
+  background-image: linear-gradient(to right, #4f46e5, #3b82f6);
+  color: white;
+}
 
+.icon {
+  width: 3rem;
+  height: 3rem;
+  color: #3b82f6;
+  transition: transform 0.3s;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+.feature-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-0.5rem);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
 }
 
 .el-input {
-
+  max-width: 100%;
 }
 
-.size6 {
-  width: 6rem;
-  height: 6rem;
+.latest-works {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 </style>
