@@ -9,7 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.12"
+    "element-plus": "^2.8.7",
+    "fullpage.js": "^4.0.30",
+    "vue": "^3.5.12",
+    "vue-fullpage": "^2.0.5",
+    "vue-fullpage.js": "^0.2.20",
+    "vue-router": "^4.4.5",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
