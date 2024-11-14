@@ -31,14 +31,17 @@
         </div>
       </div>
     </div>
-      <div class="section">数据统计界面</div>
-      <div class="section">推荐界面</div>
-      <div class="section">其他服务</div>
+      <div class="section" style="background-color: rgba(139,143,243,0.7)">数据统计界面</div>
+      <div class="section" style="background-color: #cedcab">推荐界面</div>
+      <div class="section" style="background-color: #abcddc">其他服务</div>
   </div>
 </template>
 <script>
 import { onMounted } from 'vue';
 import fullpage from 'fullpage.js';
+import navigationBar from "../components/NavigationBar.vue";
+import { mapActions, mapGetters } from 'vuex';
+
 export default {
   name: "home",
   components: {
@@ -51,17 +54,20 @@ export default {
       viewHeight: 0,
       pageNum: 4,
       currentPosition: 0,
+      sections:[]
     }
   },
   setup() {
 
   },
+  computed:{
+    ...mapGetters(['navigationBar']),
+  },
   mounted() {
     this.viewHeight = document.documentElement.clientHeight;
     const container = this.$el.querySelector('.home');
-
+    this.sections  = document.querySelectorAll(".section")
     this.currentPosition = 0;
-    // firefox的页面滚动事件其他浏览器不一样
     const handlerWheel = this.throttle(this.scrollMove, 1000);
     if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
       document.addEventListener('mousewheel', handlerWheel);
@@ -70,6 +76,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['changeStyle']),
     goDown() {
       if (this.currentPosition > -this.viewHeight * (this.pageNum - 1)) {
         this.currentPosition -= this.viewHeight;
@@ -80,14 +87,21 @@ export default {
       if (this.currentPosition < 0) {
         this.currentPosition += this.viewHeight;
         this.updateContainerPosition();
+
       }
     },
     updateContainerPosition() {
       const container = document.getElementById("fullpage")
       container.style.top = this.currentPosition + 'px';
+      if(this.currentPosition!==0){
+          this.changeStyle(1)
+      }else {
+        this.changeStyle(0)
+      }
+      console.log(this.currentPosition)
+      console.log(this.navigationBar)
     },
     scrollMove(e) {
-      console.log(this.currentPosition)
       if (e.deltaY > 0) {
         this.goDown();
       } else {

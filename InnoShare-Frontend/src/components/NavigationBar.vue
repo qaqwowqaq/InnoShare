@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import {mapGetters } from "vuex";
+
 export default {
   name: "NavigationBar",
   data(){
@@ -24,20 +26,31 @@ export default {
     }
 
   },
+  computed: {
+  ...mapGetters(['navigationBar']),
+  },
+  watch:{
+    navigationBar(newValue) {
+       // 监听全局变量变化
+      setTimeout(() => {
+        this.update(newValue);
+      }, 500);
+    }
+  },
   mounted() {
-    window.addEventListener('scroll',this.update);
+
 
   },
   methods: {
     guideTo(path){
       this.$router.push(path);
     },
-    update(){
+    update(newvalue){
       const header = document.getElementById('guideBar');
       const searchBar = document.getElementById('searchBar');
       const home = this.$refs.guideHome;
       const about = this.$refs.guideAbout;
-      if (window.scrollY > 50) { // 滚动超过50px时
+      if (newvalue===1) { // 改变状态
         header.style.backgroundColor = 'rgb(255,255,255)'; // 改变为有色背景
         this.isVisible = true;
         header.style.color = 'rgb(28,30,30)';
@@ -88,7 +101,7 @@ export default {
   right: 0;
   z-index: 999;
   color: rgb(235, 238, 238);
-  transition:  0.5s;
+  transition:  0.5s ease-in;
 }
 #guideBar>*{
   max-width: 1800px;

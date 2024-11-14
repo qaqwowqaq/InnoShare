@@ -31,7 +31,7 @@ export default {
 body {
   margin: 0;
   display: block;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 0;
   height: 100vh;
 }

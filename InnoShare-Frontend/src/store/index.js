@@ -3,31 +3,21 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     // 应用的全局状态
-    count: 0
+    navigationBar:0,
   },
   mutations: {
-    // 修改状态的方法（同步）
-    increment(state) {
-      state.count++;
-    },
-    decrement(state) {
-      state.count--;
+    UPDATE_VARIABLE(state, newValue) {
+      state.navigationBar = newValue; // 修改共享变量
     }
   },
   actions: {
-    // 异步操作后提交 mutation
-    incrementAsync({ commit }) {
-      setTimeout(() => {
-        commit('increment');
-      }, 1000);
+    changeStyle({ commit }, newValue) {
+      commit('UPDATE_VARIABLE', newValue); // 提交 mutation
     }
   },
   getters: {
-    // 获取状态的派生值
-    doubleCount(state) {
-      return state.count * 2;
-    }
-  },
+    navigationBar:(state)=>state.navigationBar,
+},
   modules: {
   }
 })
