@@ -11,6 +11,7 @@
   "dependencies": {
     "element-plus": "^2.8.7",
     "fullpage.js": "^4.0.30",
+    "pinia": "^2.2.6",
     "vue": "^3.5.12",
     "vue-fullpage": "^2.0.5",
     "vue-fullpage.js": "^0.2.20",

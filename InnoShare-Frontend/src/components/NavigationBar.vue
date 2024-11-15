@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import {mapGetters } from "vuex";
-
+import {mainStore} from "../store/modules/pageStyleStore.ts";
+import {watch} from "vue";
 export default {
   name: "NavigationBar",
   data(){
@@ -26,20 +26,24 @@ export default {
     }
 
   },
+  setup() {
+    const myStore = mainStore(); // 使用 Pinia store
+
+    return { myStore }; // 返回 store 以便在模板中使用
+  },
   computed: {
-  ...mapGetters(['navigationBar']),
+
   },
   watch:{
-    navigationBar(newValue) {
-       // 监听全局变量变化
-      setTimeout(() => {
-        this.update(newValue);
-      }, 500);
-    }
+
   },
   mounted() {
-
-
+    watch(() => this.myStore.getNavigationBar,
+        (newValue, oldValue) => {
+          setTimeout(() => {
+            this.update(newValue);
+          }, 500);
+        });
   },
   methods: {
     guideTo(path){

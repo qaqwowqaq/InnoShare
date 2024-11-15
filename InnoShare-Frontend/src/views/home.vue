@@ -31,16 +31,13 @@
         </div>
       </div>
     </div>
-      <div class="section" style="background-color: rgba(139,143,243,0.7)">数据统计界面</div>
-      <div class="section" style="background-color: #cedcab">推荐界面</div>
-      <div class="section" style="background-color: #abcddc">其他服务</div>
+      <div class="section recommendPage" style="background-color: #cedcab">推荐界面</div>
+      <div class="section dataPage"  style="background-color: rgba(139,143,243,0.7)">数据统计界面</div>
+      <div class="section otherPage" style="background-color: #abcddc">其他服务</div>
   </div>
 </template>
 <script>
-import { onMounted } from 'vue';
-import fullpage from 'fullpage.js';
-import navigationBar from "../components/NavigationBar.vue";
-import { mapActions, mapGetters } from 'vuex';
+import { mainStore } from "../store/modules/pageStyleStore.ts";
 
 export default {
   name: "home",
@@ -54,14 +51,16 @@ export default {
       viewHeight: 0,
       pageNum: 4,
       currentPosition: 0,
-      sections:[]
+      sections:[],
+      store: null,
     }
   },
   setup() {
-
+    const myStore = mainStore(); // 使用 Pinia store
+    return { myStore }; // 返回 store 以便在模板中使用
   },
   computed:{
-    ...mapGetters(['navigationBar']),
+
   },
   mounted() {
     this.viewHeight = document.documentElement.clientHeight;
@@ -76,7 +75,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['changeStyle']),
     goDown() {
       if (this.currentPosition > -this.viewHeight * (this.pageNum - 1)) {
         this.currentPosition -= this.viewHeight;
@@ -94,12 +92,13 @@ export default {
       const container = document.getElementById("fullpage")
       container.style.top = this.currentPosition + 'px';
       if(this.currentPosition!==0){
-          this.changeStyle(1)
+          this.myStore.changeStyle(1);
+          console.log(this.myStore.getNavigationBar)
       }else {
-        this.changeStyle(0)
+        this.myStore.changeStyle(0);
+        console.log(this.myStore.getNavigationBar)
       }
       console.log(this.currentPosition)
-      console.log(this.navigationBar)
     },
     scrollMove(e) {
       if (e.deltaY > 0) {
@@ -292,9 +291,6 @@ export default {
   transition: 1.0s;
   transform: rotate(0deg);
 }
-/*.searchType:hover .swapicon{*/
-/*  transform: rotate(360deg);*/
-/*}*/
 
 
 .type---search div {
@@ -329,6 +325,10 @@ export default {
   transition: 0.5s;
 }
 
+
+.dataPage{
+
+}
 
 input {
   /* 取消搜索栏边框 */
