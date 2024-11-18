@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
+import UserDashboard from "@/views/UserDashboard.vue";
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -20,6 +21,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Register',
     component: Register
   },
+  {
+    path: '/userDashboard',
+    name: 'UserDashboard',
+    component: UserDashboard
+  }
 ];
 
 const router = createRouter({
