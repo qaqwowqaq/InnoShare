@@ -1,20 +1,32 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-  <body>
   <div id="drag" class="cv instaFade wrap">
     <div class="mainDetails">
+      <div id="editButton" class="quickFade delayThree" v-if="isCurrentUser">
+        <el-button @click="editClick"> {{ editButtonText }} </el-button>
+      </div>
+      <div v-if="isCurrentUser && isEditMode">
+        <el-button @click="confirmEdit"> 保存修改 </el-button>
+      </div>
       <div id="headshot" class="">
-        <img :src= "profileURL" :title="'Hi, I\'m ' + fullname + '!'" 
-             :alt= "fullname" />
+        <img v-if="!isEditMode" :src="personalInfo.profileURL" :title="'Hi, I\'m ' + personalInfo.fullname + '!'" :alt="personalInfo.fullname" />
+        <el-upload v-else :limit="1" :show-file-list="false" :before-upload="validateAvatarFile">
+          <img :src="personalInfo.profileURL" :title="'Hi, I\'m ' + personalInfo.fullname + '!'" :alt="personalInfo.fullname" />
+        </el-upload>
       </div>
 
       <div id="name">
-        <h1 class="quickFade delayTwo">{{ fullname }}</h1>
-        <h4 class="quickFade delayThree">{{ username }}</h4>
-        <h4 class="quickFade delayThree">email: {{ email }}</h4>
+        <h1 class="quickFade delayTwo">
+          {{ personalInfo.fullname }}
+        </h1>
+
+        <h4 class="quickFade delayThree" v-if="!isEditMode">username: {{ personalInfo.username }}</h4>
+        <h4 v-else>
+          <el-input v-model="personalInfo.username" placeholder="请输入用户名"></el-input>
+        </h4>
+        <h4 class="quickFade delayThree" v-if="!isEditMode">email: {{ personalInfo.email }}</h4>
+        <h4 v-else>
+          <el-input v-model="personalInfo.email" placeholder="请输入电子邮箱"></el-input>
+        </h4>
       </div>
 
       <!-- <div id="contactDetails" class="quickFade delayFour">
@@ -32,14 +44,14 @@
         </div>
 
         <div class="sectionContent">
-          <div v-if="isAuthenticated">
+          <div v-if="personalInfo.isVerified">
             <h1>已认证</h1>
           </div>
           <div v-else>
             <article>
               <h1>未认证</h1>
             </article>
-          <el-button>去认证</el-button>
+            <el-button v-if="isCurrentUser && !isEditMode">去认证</el-button>
           </div>
         </div>
         <div class="clear"></div>
@@ -47,18 +59,19 @@
       <section>
         <article>
           <div class="sectionTitle">
-            <h1>院校</h1>
+            <h1>所属机构</h1>
           </div>
 
           <div class="sectionContent">
-            <article>
-              <h3>{{ instituition }}</h3>
-            </article>
+            <h3 v-if="!isEditMode">{{ personalInfo.institution }}</h3>
+            <h3 v-else>
+              <el-input v-model="personalInfo.institution" placeholder="请输入所属机构"></el-input>
+            </h3>
           </div>
         </article>
-      <div class="clear"></div>
+        <div class="clear"></div>
       </section>
-      
+
       <section>
         <div class="sectionTitle">
           <h1>研究领域</h1>
@@ -66,21 +79,26 @@
 
         <div class="sectionContent">
           <article>
-            <h3>{{ fieldOfStudy }}</h3>
+            <h3 v-if="!isEditMode">{{ personalInfo.fieldOfStudy }}</h3>
+            <h3 v-else>
+              <el-input v-model="personalInfo.fieldOfStudy" type="textarea" placeholder="请输入研究领域"></el-input>
+            </h3>
           </article>
         </div>
         <div class="clear"></div>
       </section>
 
-
       <section>
         <div class="sectionTitle">
-          <h1>个人经历</h1>
+          <h1>个人履历</h1>
         </div>
 
         <div class="sectionContent">
           <article>
-            <h3>{{ experience }}</h3>
+            <h3 v-if="!isEditMode">{{ personalInfo.experience }}</h3>
+            <h3 v-else>
+              <el-input v-model="personalInfo.experience" placeholder="请输入个人履历" type="textarea"></el-input>
+            </h3>
           </article>
         </div>
         <div class="clear"></div>
@@ -92,29 +110,145 @@
         </div>
 
         <div class="sectionContent">
-          <el-button>查看学术成果</el-button>
-          <el-button>上传学术成果</el-button>
+          <el-button v-if="!isEditMode">查看学术成果</el-button>
+          <el-button v-if="!isEditMode">上传学术成果</el-button>
         </div>
         <div class="clear"></div>
       </section>
-      
     </div>
   </div>
-  </body>
+  <el-dialog v-model="editSaveVisible" title="Tips" width="500">
+    <span>是否需要保存当前修改？</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="cancelEdit">不保存</el-button>
+        <el-button type="primary" @click="confirmEdit">
+          保存
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  
-  const username = ref('PlutoFX');
-  const fullname = ref('Ibuki Ayapa');
-  const email = ref('exaple@gmail.com');
-  const isAuthenticated = ref(false);
-  const profileURL = ref('https://th.bing.com/th/id/OIP.EyNjv0tcjuB_E5RFnPrw3wAAAA?w=203&h=145&c=7&r=0&o=5&dpr=1.5&pid=1.7');
-  const instituition = ref('Beihang University');
-  const experience = ref('Working / Studying Experience');
-  const fieldOfStudy = ref('Software Engineer');
+import { computed, reactive, ref } from 'vue';
+import { ElMessage } from 'element-plus'
+import type { UploadProps } from 'element-plus'
+import { useRouter } from 'vue-router';
+
+// information of user
+class PersonInfo {
+  username: string = 'PlutoFX';
+  fullname: string = 'Ibuki Ayapa';
+  email: string = 'example@gmail.com';
+  // 是否已认证
+  isVerified: boolean = false;
+  profileURL: string = 'https://th.bing.com/th/id/OIP.EyNjv0tcjuB_E5RFnPrw3wAAAA?w=203&h=145&c=7&r=0&o=5&dpr=1.5&pid=1.7';
+  institution: string = 'Beihang University';
+  experience: string = 'Working / Studying Experience';
+  fieldOfStudy: string = 'Software Engineer';
+  // username: string, fullname: string, email: string, isVerified: boolean,
+  // profileURL: string, institution: string, experience: string, fieldOfStudy: string
+  constructor(other?: PersonInfo) {
+    if (other !== undefined) {
+      this.deepClone(other);
+    }
+  }
+
+  deepClone(other: PersonInfo) {
+      this.username = other.username;
+      this.fullname = other.fullname;
+      this.email = other.email;
+      this.isVerified = other.isVerified;
+      this.profileURL = other.profileURL;
+      this.institution = other.institution;
+      this.experience = other.experience;
+      this.fieldOfStudy = other.fieldOfStudy;
+  }
+}
+
+const personalInfo = reactive(new PersonInfo());
+const backedPersonalInfo = reactive(new PersonInfo());
+// const username = ref('PlutoFX');
+// const fullname = ref('Ibuki Ayapa');
+// const email = ref('exaple@gmail.com');
+// const isAuthenticated = ref(false);
+// const profileURL = ref('https://th.bing.com/th/id/OIP.EyNjv0tcjuB_E5RFnPrw3wAAAA?w=203&h=145&c=7&r=0&o=5&dpr=1.5&pid=1.7');
+// const institution = ref('Beihang University');
+// const experience = ref('Working / Studying Experience');
+// const fieldOfStudy = ref('Software Engineer');
+
+const formData = ref(new FormData());
+
+
+
+// logic of controlling
+const isCurrentUser = computed(() => {
+  return true;
+})
+const isEditMode = ref(false);
+
+// 编辑时，确认是否需要保存的提示窗
+const editSaveVisible = ref(false);
+
+// static information for web page
+const editButtonText = computed(() => {
+  if (isEditMode.value) {
+    return '退出编辑'
+  } else {
+    return '编辑个人信息'
+  }
+})
+
+// functions
+const editClick = (): void => {
+  if (isEditMode.value) {
+    // true, check if we need to save
+    editSaveVisible.value = true;
+  } else {
+    isEditMode.value = true;
+    editSave();
+  }
+}
+
+const editSave = (): void => {
+  // all information backed up
+  backedPersonalInfo.deepClone(personalInfo);
+  // todo: send update request
+}
+
+const cancelEdit = () => {
+  // todo: recover backed up info
+  personalInfo.deepClone(backedPersonalInfo);
+  isEditMode.value = false;
+  editSaveVisible.value = false;
+}
+
+const confirmEdit = () => {
+  // send the edit request
+  ElMessage({
+    message: "个人信息修改成功！",
+    type: "success",
+  });
+  isEditMode.value = false;
+  editSaveVisible.value = false;
+}
+
+const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('上传图像必须是JPG / PNG格式');
+    return false;
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('图像文件不能超过2MB');
+    return false;
+  }
+  personalInfo.profileURL = URL.createObjectURL(rawFile);
+
+  // Do not upload to server, but add to the file list while confirming editting
+  return false;
+}
+
+// request function
 
 
 </script>
@@ -148,7 +282,7 @@ html,
 body {
   background: #fff;
   font-family: "Lato", Helvetica, Arial, sans-serif;
-  font-feature-settings: "calt","liga","hist","onum","pnum";
+  font-feature-settings: "calt", "liga", "hist", "onum", "pnum";
   font-size: 1rem;
   color: #222;
 }
@@ -229,17 +363,25 @@ a {
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
+#editButton {
+  padding: 1%;
+  margin: 1%;
+}
+
 #headshot {
-  width: 12.5%;
+  width: 15%;
   float: left;
   margin-right: 30px;
+  overflow: hidden;
+  position: relative;
+
 }
 
 #headshot img {
   width: 100%;
-  height: auto;
-  -webkit-border-radius: 50px;
-  border-radius: 50px;
+  aspect-ratio: 3 / 4;
+  border: 1px solid #066ccb;
+  object-fit: cover;
 }
 
 #name {
@@ -438,6 +580,7 @@ section:last-child {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 0;
   }
@@ -447,9 +590,11 @@ section:last-child {
   0% {
     opacity: 0;
   }
+
   40% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -459,6 +604,7 @@ section:last-child {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 0;
   }
@@ -468,9 +614,11 @@ section:last-child {
   0% {
     opacity: 0;
   }
+
   40% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -480,6 +628,7 @@ section:last-child {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 0;
   }
@@ -489,9 +638,11 @@ section:last-child {
   0% {
     opacity: 0;
   }
+
   40% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -554,5 +705,4 @@ section:last-child {
   -moz-animation-delay: 0, 2.5s;
   animation-delay: 0, 2.5s;
 }
-
 </style>

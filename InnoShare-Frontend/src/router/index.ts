@@ -22,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Register
   },
   {
-    path: '/userDashboard',
+    path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
   }
