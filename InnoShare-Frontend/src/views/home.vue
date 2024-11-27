@@ -1,6 +1,6 @@
 <template>
   <div class="home" id="fullpage">
-      <div class="section">
+    <div class="section">
       <div class="backImage backImage1" ref="Img"></div>
       <div ref="search1" class="centerFlex">
         <div class="text--search">
@@ -31,27 +31,27 @@
         </div>
       </div>
     </div>
-       <div class="section recommendPage" style="background-color: transparent">
-         <div class="recommend">
-           <div class="recommend-list">
-             <paperComponent/>
-           </div>
-           <div class="new-list">
-             <paperComponent/>
-           </div>
-           <div class="hot-list">
-             <paperComponent/>
-           </div>
-         </div>
-       </div>
-      <div class="section dataPage"  style="background-color: transparent">
-        <div class="backImage backImage3"></div>
-        <div class="data"></div>
+    <div class="section recommendPage" style="background-color: transparent">
+      <div class="recommend">
+        <div class="recommend-list">
+          <paperComponent/>
+        </div>
+        <div class="new-list">
+          <paperComponent/>
+        </div>
+        <div class="hot-list">
+          <paperComponent/>
+        </div>
       </div>
-      <div class="section otherPage" style="background-color: transparent">
-        <div class="backImage backImage4"></div>
-        <div class="other"></div>
-      </div>
+    </div>
+    <div class="section dataPage"  style="background-color: transparent">
+      <div class="backImage backImage3"></div>
+      <div class="data"></div>
+    </div>
+    <div class="section otherPage" style="background-color: transparent">
+      <div class="backImage backImage4"></div>
+      <div class="other"></div>
+    </div>
   </div>
 </template>
 <script>
@@ -124,8 +124,8 @@ export default {
       container.style.top = this.currentPosition + 'px';
       if(this.currentPosition!==0){
 
-          this.myStore.changeStyle(1);
-          console.log(this.myStore.getNavigationBar)
+        this.myStore.changeStyle(1);
+        console.log(this.myStore.getNavigationBar)
       }else {
         this.myStore.changeStyle(0);
         console.log(this.myStore.getNavigationBar)
