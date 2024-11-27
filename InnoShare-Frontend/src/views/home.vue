@@ -1,7 +1,7 @@
 <template>
   <div class="home" id="fullpage">
       <div class="section">
-      <div class="backImage" ref="Img"></div>
+      <div class="backImage backImage1" ref="Img"></div>
       <div ref="search1" class="centerFlex">
         <div class="text--search">
           <div class="text1">
@@ -31,17 +31,36 @@
         </div>
       </div>
     </div>
-      <div class="section recommendPage" style="background-color: #cedcab">推荐界面</div>
-      <div class="section dataPage"  style="background-color: rgba(139,143,243,0.7)">数据统计界面</div>
-      <div class="section otherPage" style="background-color: #abcddc">其他服务</div>
+       <div class="section recommendPage" style="background-color: transparent">
+         <div class="recommend">
+           <div class="recommend-list">
+             <paperComponent/>
+           </div>
+           <div class="new-list">
+             <paperComponent/>
+           </div>
+           <div class="hot-list">
+             <paperComponent/>
+           </div>
+         </div>
+       </div>
+      <div class="section dataPage"  style="background-color: transparent">
+        <div class="backImage backImage3"></div>
+        <div class="data"></div>
+      </div>
+      <div class="section otherPage" style="background-color: transparent">
+        <div class="backImage backImage4"></div>
+        <div class="other"></div>
+      </div>
   </div>
 </template>
 <script>
 import { mainStore } from "../store/modules/pageStyleStore.ts";
-
+import paperComponent from "../components/paperComponent.vue";
 export default {
   name: "home",
   components: {
+    paperComponent
   },
   data() {
     return{
@@ -51,8 +70,10 @@ export default {
       viewHeight: 0,
       pageNum: 4,
       currentPosition: 0,
+      handlerWheel:null,
       sections:[],
       store: null,
+      searchType:[],//搜索类型论文专利等
     }
   },
   setup() {
@@ -67,12 +88,22 @@ export default {
     const container = this.$el.querySelector('.home');
     this.sections  = document.querySelectorAll(".section")
     this.currentPosition = 0;
-    const handlerWheel = this.throttle(this.scrollMove, 1000);
+    this.handlerWheel = this.throttle(this.scrollMove, 1000);
     if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
-      document.addEventListener('mousewheel', handlerWheel);
+      document.addEventListener('mousewheel', this.handlerWheel);
     } else {
-      document.addEventListener('DOMMouseScroll', handlerWheel);
+      document.addEventListener('DOMMouseScroll', this.handlerWheel);
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    this.currentPosition=0;
+    // 在路由切换之前移除事件监听器
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
+      document.removeEventListener('mousewheel', this.handlerWheel);
+    } else {
+      document.removeEventListener('DOMMouseScroll', this.handlerWheel);
+    }
+    next(); // 继续路由切换
   },
   methods: {
     goDown() {
@@ -92,6 +123,7 @@ export default {
       const container = document.getElementById("fullpage")
       container.style.top = this.currentPosition + 'px';
       if(this.currentPosition!==0){
+
           this.myStore.changeStyle(1);
           console.log(this.myStore.getNavigationBar)
       }else {
@@ -122,7 +154,10 @@ export default {
       this.index++;
       if (this.index === 6) this.index = 1;
       const img = this.$refs.Img;
-      img.style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
+      //img.style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
+      const image= document.getElementsByClassName("backImage");
+      console.log(image)
+      image.item(0).style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
       console.log(this.rotated * 360)
     },
   },
@@ -134,8 +169,8 @@ export default {
 <style scoped>
 @font-face {
   font-family: 'myFont';
-  src: url('../assets/AlimamaDaoLiTi.woff2') format('woff2'),
-  url('../assets/AlimamaDaoLiTi.woff') format('woff');
+  src: url('../assets/AlimamaFangYuanTiVF-Thin.woff2') format('woff2'),
+  url('../assets/AlimamaFangYuanTiVF-Thin.woff') format('woff');
   font-display: swap;
 }
 .fp-overflow{
@@ -154,10 +189,12 @@ export default {
   width: 100%; /* 确保宽度为100% */
   position: relative; /* 如果需要定位 */
 }
+.section p{
+  margin: 0;
+}
 .backImage{
   width: 100%;
   height: 100%;
-  background-image: url('../assets/BackgroundImg/back1.jpg');
   background-size: cover;
   filter: brightness(0.7);
   position: absolute;
@@ -165,6 +202,22 @@ export default {
   border-radius: 0 0 5px 5px;
   opacity: 1;
   transition: 0.5s ease-in;
+
+}
+.backImage1{
+  height: 100%;
+  background-image: url('../assets/BackgroundImg/back1.jpg');
+}
+.backImage2 {
+  background-color: transparent;
+}
+.backImage3 {
+  background-color: transparent;
+
+}
+.backImage4 {
+  background-color: transparent;
+
 }
 .overlay {
   position: absolute;
@@ -326,10 +379,23 @@ export default {
 }
 
 
-.dataPage{
-
+.recommendPage ,.dataPage ,.otherPage{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
+.recommend,.data,.other {
+  height: 100%;
+  background-color: rgba(246, 246, 248, 0.47);
+  width: 99%;
+  margin-top: 64px;
+}
+.data,.other {
+  height: 100%;
+  margin-top: 0;
+}
 input {
   /* 取消搜索栏边框 */
   outline: none;

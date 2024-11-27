@@ -5,7 +5,7 @@
 
 
 <script type="ts">
-import NavigationBar from "./components/NavigationBar.vue";
+import NavigationBar from "./components/layout/NavigationBar.vue";
 export default {
   components: {NavigationBar}
 }
@@ -14,8 +14,8 @@ export default {
 <style>
 @font-face {
   font-family: 'myFont';
-  src: url('./assets/AlimamaDaoLiTi.woff2') format('woff2'),
-  url('./assets/AlimamaDaoLiTi.woff') format('woff');
+  src: url('./assets/AlimamaFangYuanTiVF-Thin.woff2') format('woff2'),
+  url('./assets/AlimamaFangYuanTiVF-Thin.woff') format('woff');
   font-display: swap;
 }
 #app {
@@ -34,6 +34,7 @@ body {
   overflow: hidden;
   padding: 0;
   height: 100vh;
+  min-width: 1000px;
 }
 ::-webkit-scrollbar {
   display: none;
