@@ -34,10 +34,18 @@ body {
   overflow: hidden;
   padding: 0;
   height: 100vh;
-  min-width: 1000px;
 }
-::-webkit-scrollbar {
-  display: none;
+.scroll-container::-webkit-scrollbar {
+  height: 15px; /* 设置滚动条高度 */
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #c9c8c8; /* 滚动条颜色 */
+  border-radius: 5px; /* 圆角 */
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #969696;
 }
 
 

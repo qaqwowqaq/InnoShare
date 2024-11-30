@@ -8,7 +8,7 @@
             SEARCH.
           </div>
           <div class="text2">
-            Search everything you are interested.
+            Search everything you are interested in.
           </div>
           <div class="container---s-RT standard--OWAow padded--l0Z01 heroSearch--0FfMR">
             <form class="searchForm--XoxyI" >
@@ -17,7 +17,7 @@
                   <path d="M716.29895 806.808621C641.509798 862.822176 548.629446 896 448 896 200.576432 896 0 695.423565 0 448 0 200.576432 200.576432 0 448 0 695.423565 0 896 200.576432 896 448 896 548.629446 862.822176 641.509798 806.808621 716.29895L946.011456 855.501786C970.889978 880.380314 970.970976 920.635366 945.803174 945.803174 920.809619 970.79673 879.927322 970.436992 855.501786 946.011456L716.29895 806.808621ZM448 768C624.73112 768 768 624.73112 768 448 768 271.26888 624.73112 128 448 128 271.26888 128 128 271.26888 128 448 128 624.73112 271.26888 768 448 768Z" fill="#666666" p-id="6177"></path>
                 </svg>
               </button>
-              <input type="search" name="search" placeholder="Search for all images on Pixabay" value="">
+              <input type="search" name="search" placeholder="Search for all " value="">
             </form>
             <div class="container--YKYLB">
               <div class="triggerWrapper--NACCC">
@@ -33,20 +33,28 @@
     </div>
     <div class="section recommendPage" style="background-color: transparent">
       <div class="recommend">
-        <div class="recommend-list">
-          <paperComponent/>
+        <div class="recommend-title">
+          <div ref="recTitle" class="initTitle" @click="changeTitle(1)">
+            <h2>推荐</h2>
+            <p>RECOMMEND</p>
+          </div>
+          <div ref="newTitle" @click="changeTitle(2)">
+            <h2>最新</h2>
+            <p>NEW</p>
+          </div>
+          <div ref="hotTitle" @click="changeTitle(3)">
+            <h2>热门</h2>
+            <p>HOT</p>
+          </div>
         </div>
-        <div class="new-list">
-          <paperComponent/>
-        </div>
-        <div class="hot-list">
-          <paperComponent/>
-        </div>
+        <router-view />
       </div>
     </div>
     <div class="section dataPage"  style="background-color: transparent">
       <div class="backImage backImage3"></div>
-      <div class="data"></div>
+      <div class="data">
+
+      </div>
     </div>
     <div class="section otherPage" style="background-color: transparent">
       <div class="backImage backImage4"></div>
@@ -125,17 +133,17 @@ export default {
       if(this.currentPosition!==0){
 
         this.myStore.changeStyle(1);
-        console.log(this.myStore.getNavigationBar)
       }else {
         this.myStore.changeStyle(0);
-        console.log(this.myStore.getNavigationBar)
       }
-      console.log(this.currentPosition)
     },
     scrollMove(e) {
+      this.myStore.changeOpen(false);//关闭下拉列表
+      console.log(e.deltaY+" "+e.deltaX+ ""+this.isOpen);
       if (e.deltaY > 0) {
         this.goDown();
-      } else {
+      }
+      else if(e.deltaY<0) {
         this.goUp();
       }
     },
@@ -160,6 +168,27 @@ export default {
       image.item(0).style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
       console.log(this.rotated * 360)
     },
+    changeTitle(type){
+      const rec=this.$refs.recTitle;
+      const newRec=this.$refs.newTitle;
+      const hot=this.$refs.hotTitle;
+      if(type===1){
+        rec.style.borderColor=`initial`;
+        newRec.style.borderColor=`transparent`;
+        hot.style.borderColor=`transparent`;
+        this.$router.push({ path: '/home/recommend' });
+      }else if(type===2){
+        rec.style.borderColor=`transparent`;
+        newRec.style.borderColor=`initial`;
+        hot.style.borderColor=`transparent`;
+        this.$router.push({ path: '/home/hot' });
+      }else {
+        rec.style.borderColor=`transparent`;
+        newRec.style.borderColor=`transparent`;
+        hot.style.borderColor=`initial`;
+        this.$router.push({ path: '/home/new' });
+      }
+    }
   },
 
 
@@ -319,6 +348,7 @@ export default {
   background: none;
   margin: 0;
   min-width: 30px;
+  font-size: 18px;
 }
 .searchType {
   transition: 1.0s;
@@ -390,7 +420,7 @@ export default {
   height: 100%;
   background-color: rgba(246, 246, 248, 0.47);
   width: 99%;
-  margin-top: 64px;
+
 }
 .data,.other {
   height: 100%;
@@ -401,4 +431,43 @@ input {
   outline: none;
 
 }
+.recommend{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+.recommend-title h2{
+  margin: 0;
+}
+.recommend-title p{
+  font-size: 14px;
+}
+.recommend-title .initTitle{
+  padding-right: 5px;
+  border: solid black;
+  border-width: 0 4px 0 0;
+}
+.recommend-title div{
+  padding-right: 5px;
+  border: solid transparent;
+  border-width: 0 4px 0 0;
+  transition: 0.2s;
+}
+.recommend-title div:hover {
+  cursor: pointer;
+
+}
+.recommend-title{
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 21px 0px 16px -18px rgba(219,219,219,0.69);
+  padding: 0 5px 0 0;
+  gap:10px;
+}
+
+
+
 </style>
