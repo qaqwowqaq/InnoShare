@@ -4,12 +4,14 @@ import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import PaperDetail from '@/views/PaperDetail.vue';
 import AchiManage from '@/views/AchiManage.vue';
+import UserDashboard from "@/views/UserDashboard.vue";
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
     component: Home
   },
+
   {
     path: '/login',
     name: 'Login',
@@ -31,6 +33,10 @@ const routes: Array<RouteRecordRaw> = [
     name: 'AchiManage',
     component: AchiManage,
   },
+    path: '/userDashboard/:userId',
+    name: 'UserDashboard',
+    component: UserDashboard
+  }
 ];
 
 const router = createRouter({

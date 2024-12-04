@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 <template>
   <div class="register">
     <h1>Register</h1>
@@ -20,7 +21,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script >
 import { defineComponent, ref } from 'vue';
 import { useUserStore } from '../store/modules/user';
 import { useRouter } from 'vue-router';
