@@ -217,14 +217,13 @@ const editSave = (): void => {
   // todo: send update request
 }
 
-const cancelEdit = () => {
-  // todo: recover backed up info
+const cancelEdit = () : void=> {
   personalInfo.deepClone(backedPersonalInfo);
   isEditMode.value = false;
   editSaveVisible.value = false;
 }
 
-const confirmEdit = () => {
+const confirmEdit = () : void => {
   // send the edit request
   ElMessage({
     message: "个人信息修改成功！",
@@ -234,7 +233,7 @@ const confirmEdit = () => {
   editSaveVisible.value = false;
 }
 
-const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) => {
+const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) : boolean => {
   if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
     ElMessage.error('上传图像必须是JPG / PNG格式');
     return false;
@@ -244,11 +243,11 @@ const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) => {
   }
   personalInfo.profileURL = URL.createObjectURL(rawFile);
 
-  // Do not upload to server, but add to the file list while confirming editting
+  //  todo: Do not upload to server, but add to the file list while confirming editting
   return false;
 }
 
-// request function
+// todo: request function
 
 
 </script>
