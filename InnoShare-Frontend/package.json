@@ -6,14 +6,28 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "vue-tsc --noEmit && eslint --ext .ts,.js,.vue src",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "tailwindcss": "^3.4.14",
-    "vue": "^3.5.12"
+    "@heroicons/vue": "^2.1.5",
+    "amqplib": "^0.10.4",
+    "axios": "^1.7.7",
+    "echarts": "^5.5.1",
+    "element-plus": "^2.8.7",
+    "pinia": "^2.2.6",
+    "tailwind": "^4.0.0",
+    "vue": "^3.5.12",
+    "vue-router": "^4.0.12",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.1.4",
+    "@types/node": "^22.9.0",
+    "@vitejs/plugin-vue": "^5.1.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
     "typescript": "~5.6.2",
     "vite": "^5.4.10",
     "vue-tsc": "^2.1.8"
