@@ -1,8 +1,9 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/home.vue'
+import Home from '../views/Home.vue';
 import SearchResults from '../views/SearchResults.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import UserDashboard from '../views/UserDashboard.vue'
 
 const routes = [
   {
@@ -13,7 +14,7 @@ const routes = [
   {
     path: '/home',
     name: 'home',
-    component: HomeView,
+    component: Home,
     children: [
       {
         path: '', // 默认子路由
@@ -54,6 +55,11 @@ const routes = [
     name: 'Register',
     component: Register
   },
+  {
+    path: '/userDashboard/:userId',
+    name: 'UserDashboard',
+    component: UserDashboard
+  }
 
 ]
 

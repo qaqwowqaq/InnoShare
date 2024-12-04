@@ -33,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'AchiManage',
     component: AchiManage,
   },
-    path: '/userDashboard/:userId',
+    {path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
   }
