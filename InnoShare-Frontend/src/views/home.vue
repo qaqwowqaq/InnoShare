@@ -206,7 +206,7 @@ export default {
 }
 .backImage1{
   height: 100%;
-  background-image: url('../assets/BackgroundImg/back1.jpg');
+  background-image: url('../assets/BackgroundImg/back2.jpg');
 }
 .backImage2 {
   background-color: transparent;

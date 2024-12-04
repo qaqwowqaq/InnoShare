@@ -7,7 +7,7 @@ export const mainStore = defineStore('mainStore', {
         isAtHome: 0,//在主页下滑时状态栏才变化？
     }),
     actions: {
-        changeStyle(newValue) {
+        changeStyle(newValue: number) {
             this.navigationBar = newValue; // 在主页则修改状态
         }
     },

@@ -9,9 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "element-plus": "^2.8.7",
+    "autoprefixer": "^10.4.20",
+    "element-plus": "^2.9.0",
     "fullpage.js": "^4.0.30",
     "pinia": "^2.2.6",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
     "vue": "^3.5.12",
     "vue-fullpage": "^2.0.5",
     "vue-fullpage.js": "^0.2.20",
@@ -19,6 +22,7 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.1",
     "@vitejs/plugin-vue": "^5.1.4",
     "typescript": "~5.6.2",
     "vite": "^5.4.10",

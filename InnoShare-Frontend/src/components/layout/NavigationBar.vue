@@ -45,6 +45,7 @@
 </template>
 
 <script>
+
 import {mainStore} from "../../store/modules/pageStyleStore.ts";
 import {useUserStore} from "../../store/modules/user.ts"
 import {watch} from "vue";
