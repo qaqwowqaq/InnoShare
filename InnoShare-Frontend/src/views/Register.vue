@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 <template>
   <div class="register">
     <h1>Register</h1>
