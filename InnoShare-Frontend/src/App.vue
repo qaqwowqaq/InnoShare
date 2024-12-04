@@ -1,21 +1,52 @@
 <template>
-  <div id="app">
-    <!-- 全局的布局，导航栏等可以放在这里 -->
-    <router-view>  </router-view><!-- 路由视图，根据路由动态渲染组件 -->
-  </div>
+    <NavigationBar />
+    <router-view  />
 </template>
 
-<script lang="ts">
+
+<script type="ts">
+import NavigationBar from "./components/layout/NavigationBar.vue";
 export default {
-  name: 'App'
+  components: {NavigationBar}
 }
 </script>
 
 <style>
-/* 可以放一些全局样式 */
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  text-align: center;
-  color: #2c3e50;
+@font-face {
+  font-family: 'myFont';
+  src: url('./assets/AlimamaFangYuanTiVF-Thin.woff2') format('woff2'),
+  url('./assets/AlimamaFangYuanTiVF-Thin.woff') format('woff');
+  font-display: swap;
 }
+#app {
+  width: 100%;
+  height: 100%;
+  font-family: myFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  margin: 0;
+  background-color: white;
+}
+body {
+  margin: 0;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  height: 100vh;
+}
+.scroll-container::-webkit-scrollbar {
+  height: 15px; /* 设置滚动条高度 */
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #c9c8c8; /* 滚动条颜色 */
+  border-radius: 5px; /* 圆角 */
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #969696;
+}
+
+
 </style>

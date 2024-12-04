@@ -21,7 +21,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script >
 import { defineComponent, ref } from 'vue';
 import { useUserStore } from '../store/modules/user';
 import { useRouter } from 'vue-router';

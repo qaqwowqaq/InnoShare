@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', {
     getUserInfo(state) {
       return state.userInfo;
     },
-    isAuthenticated(state) {
+    getIsAuthenticated(state) {
       return state.isAuthenticated;
     }
   }

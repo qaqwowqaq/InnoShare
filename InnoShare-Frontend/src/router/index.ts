@@ -11,6 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Home',
     component: Home
   },
+
   {
     path: '/login',
     name: 'Login',
