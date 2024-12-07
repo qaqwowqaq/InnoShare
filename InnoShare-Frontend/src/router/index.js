@@ -3,10 +3,10 @@ import Home from '../views/Home.vue';
 import SearchResults from '../views/SearchResults.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import Verify from'../views/Verify.vue';
 import UserDashboard from '../views/UserDashboard.vue'
 import PaperDetail from '@/views/PaperDetail.vue';
 import AchiManage from '@/views/AchiManage.vue';
-import Verify from'../views/Verify.vue';
 
 const routes = [
   {
