@@ -6,6 +6,7 @@ import Register from '../views/Register.vue'
 import UserDashboard from '../views/UserDashboard.vue'
 import PaperDetail from '@/views/PaperDetail.vue';
 import AchiManage from '@/views/AchiManage.vue';
+import Verify from'../views/Verify.vue';
 
 const routes = [
   {
@@ -49,13 +50,18 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: Login
   },
   {
     path: '/register',
-    name: 'Register',
+    name: 'register',
     component: Register
+  },
+  {
+    path: '/verify',
+    name: 'verify',
+    component: Verify
   },
   {
     path: '/userDashboard/:userId',
@@ -73,7 +79,8 @@ const routes = [
     name: 'AchiManage',
     component: AchiManage,
   },
-    {path: '/userDashboard/:userId',
+  {
+    path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
   }
