@@ -1,488 +1,676 @@
 <template>
+
+  <div class="h-screen flex">
+    <!-- 左侧固定栏 -->
+
+    <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
+      style="height: 92%; width: 16%;">
+      <!-- 顶部部分 -->
+      <div>
+
+        <!-- 研究主题 -->
+        <div class="study-subjects text-left">
+          <h3 class="text-2xl font-bold mb-4 text-center">研究主题</h3>
+          <ul class="overflow-y-auto h-80 fixxed custom-scrollbar border border-gray-200 rounded-md p-2 ">
+            <li v-for="subject in subjects" :key="subject.link" class="mb-5 ">
+              <a :href="subject.link" class="text-gray-300 hover:text-blue-600 underline">
+                {{ subject.name }}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- 底部部分 -->
+      <div>
+        <!-- 下载量和引用量 -->
+        <div class="mb-6">
+          <el-card class="mb-4">
+            <el-statistic :title="'下载量'" :value="downloadValue" value-style="font-size: 1.5rem; color: #409eff;" />
+          </el-card>
+
+          <el-card>
+            <el-statistic :title="'引用量'" :value="citationValue" value-style="font-size: 1.5rem; " />
+          </el-card>
+        </div>
+        <!-- 操作按钮 -->
+        <div class="space-y-3">
+          <button
+            class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-black w-full flex justify-between items-center"
+            @click="openPreview">
+            <i class="fas fa-eye mr-2"></i>
+            在线预览
+          </button>
+          <button class=" text-white px-4 py-2 rounded hover:bg-black w-full flex justify-between items-center"
+            @click="downloadPDF">
+            <i class="fas fa-download mr-2"></i>
+            下载论文
+          </button>
+
+        </div>
+
+        <!-- PDF 预览窗口 -->
+        <div v-if="isPreviewOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ">
+          <div class="bg-white w-11/12 md:w-3/4 h-4/5 rounded-lg shadow-lg flex flex-col">
+            <!-- 标题栏 -->
+            <div class="p-4 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
+              <h2 class="text-lg font-semibold text-gray-700">PDF 预览</h2>
+              <button @click="closePreview" class="text-gray-600 hover:text-gray-800">
+                ×
+              </button>
+            </div>
+
+            <!-- PDF 内容区域 -->
+            <div class="flex-1 overflow-auto p-4 bg-gray-200">
+              <PdfPreview :src="pdfUrl" theme="light" page-scale="page-fit" @loaded="onLoaded" />
+            </div>
+
+            <!-- 加载中提示 -->
+            <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
+              <div class="loader"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧瀑布流内容 -->
+    <div class="content  p-4 bg-white overflow-y-auto " style="height: 92%; padding-left: 16%; width: 100%;">
+      <section id="section1" class="mb-8 flex justify-center items-center w-full">
+        <div class=" flex flex-col w-3/4 max-w-screen-md shadow-2xl bg-green-100">
+          <!-- 单篇论文展示 -->
+          <div class="rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 leading-loose">
+              <h3 class="text-lg font-medium mb-2">{{ paper.title }}</h3>
+              <p class="text-sm text-gray-500 mb-2 text-left">
+                <span class="font-bold  ">摘要：</span>{{ paper.abstract }}
+              </p>
+              <div class="flex flex-col items-start text-sm text-gray-500 text-left">
+                <div>
+                  <span class="font-bold">作者：</span>
+                  <span>{{ paper.author }}</span>
+                </div>
+                <div>
+                  <span class="font-bold">出版社：</span>
+                  <span>{{ paper.publisher }}</span>
+                </div>
+                <div>
+                  <span class="font-bold">出版时间：</span>
+                  <span>{{ paper.publishedDate }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex justify-end">
+              <!-- 修改后的按钮，用于复制引用链接到剪贴板 -->
+              <button @click="copyToClipboard"
+                class="flex items-center text-blue-500 hover:text-blue-600 cursor-pointer">
+                引用 <i class="fas fa-quote-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section2" class=" mb-8 flex justify-center items-center w-full">
+
+        <div class=" flex flex-col w-3/4 max-w-screen-md shadow-2xl z-1  bg-green-100">
+          <div class="text-lg font-medium mb-2 p-4">
+            <h3>论文关系网络拓扑图</h3>
+          </div>
+          <div ref="chartRef" class="tooltip" v-show="!isPreviewOpen" style="height: 400px; width: 100%;  z-index: 1;">
+          </div> <!-- 使用echarts渲染图表 -->
+        </div>
+      </section>
+
+      <section id="section3" class="mb-8 flex flex-col justify-start items-center w-full">
+
+
+        <div class="text-left flex flex-col w-3/4 max-w-screen-md shadow-2xl  bg-green-100" style="height: 400px;">
+
+          <!-- 导航栏 -->
+          <div class="bg-gray-500 w-full">
+            <button v-for="(item, index) in navItems" :key="index"
+              class="px-4 py-2 text-white  bg-gray-500 hover:bg-gray-700 focus:outline-none"
+              :class="{ 'bg-gray-700': currentSelection === item.name }" @click="setSelection(item.name)">
+              {{ item.label }}
+            </button>
+          </div>
+          <!-- 本篇论文参考文献 -->
+          <div v-if="currentSelection === 'paper'">
+            <ul>
+              <li v-for="(ref, index) in paperData.thisPaper.primaryRefs" :key="index" class="mb-2">
+                【{{ index + 1 }}】<span class="text-gray-600">{{ paperData.references[ref].id }}</span> -
+                <button @click="showSecondaryReferences(ref)" class="ml-2 text-gray-500 hover:text-blue-700">
+                  查看二级参考文献
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 二级参考文献 -->
+          <div v-if="currentSelection === 'secondary'">
+            <ul>
+              <li v-for="(cit, index) in selectedReferences.secondaryCitations" :key="index" class="mb-2">
+                【{{ index + 1 }}】{{ cit }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- 共引文献 -->
+          <div v-if="currentSelection === 'commonCitations'">
+            <ul>
+              <li v-for="(cit, index) in commonCitations" :key="index" class="mb-2">
+                【{{ index + 1 }}】<span class="text-gray-600">{{ cit }}</span> -
+                <button @click="showReferencesForCitation(cit)" class="ml-2 text-gray-500 hover:text-blue-700">
+                  查看引用该文献的参考文献
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <section id="section4" class="mb-8 flex flex-col justify-start items-center w-full">
+        <div class="text-left   max-w-screen-md shadow-2xl bg-green-100" style="height: 400px;width: 80%;">
+          <div class="flex justify-between mx-auto w-full max-w-screen-lg">
+            <div v-for="(subjects, category, index) in categorizedSubjects" :key="category">
+              <div class="flex h-full">
+                <el-card class=" px-12 card-container">
+
+                  <div slot="header" class="text-center">
+                    <h2 class="text-xl font-medium">
+                      {{ category === 'researchStart'
+                        ? '研究起点'
+                        : category === 'researchSource'
+                          ? '研究来源'
+                          : '研究领域' }}
+                    </h2>
+                  </div>
+                  <el-list class="center-list" style="height:300px;">
+                    <el-list-item v-for="subject in subjects" :key="subject.name" class="list-item">
+                      <el-link :href="subject.link" target="_blank">{{ subject.name }}</el-link>
+                    </el-list-item>
+                  </el-list><!-- 添加箭头 -->
+
+                </el-card>
+                <div v-if="category !== 'paper'" class=" " style=' position: relative; width:0;height:400px;'>
+
+                  <div class="arrow arrow-right">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+
+    </div>
+
+
+  </div>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
-  <div class="container mx-auto py-8 px-4">
-    <div class="border rounded-lg p-6 bg-white shadow-md mb-6">
-      <!-- 标题与作者信息 -->
-      <div class="mb-6">
-        <h1 class="text-3xl font-bold mb-2">{{ paperDetails.title }}</h1>
-        <p class="text-gray-600">作者: {{ paperDetails.author }} | {{ paperDetails.institution }}</p>
-      </div>
-
-      <!-- 摘要与关键词 -->
-      <div class="mb-6">
-        <h2 class="text-2xl font-semibold mb-3">摘要</h2>
-        <p class="text-gray-800">{{ paperDetails.abstract }}</p>
-        <div class="mt-3">
-          <span class="text-gray-600 font-semibold">关键词:</span>
-          <span class="text-blue-500" v-for="(keyword, index) in paperDetails.keywords" :key="index">
-            {{ keyword }}{{ index < paperDetails.keywords.length - 1 ? ',' : '' }}
-          </span>
-        </div>
-      </div>
-    </div>
-
- <!-- 下载与引用 -->
- <div class="border mb-6 flex items-center space-x-6 p-4 rounded-lg bg-gray-50 shadow">
-    <button 
-      class="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
-      @click="openPDFPreview"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m3.75 4.5v4.5m0-4.5a3 3 0 01-3-3v1.5m3 4.5a3 3 0 003-3v1.5M9 12h6" />
-      </svg>
-      <span>在线预览</span>
-    </button>
-
-    <button 
-      class="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition"
-      @click="downloadPDF"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0 0V4m0 8l3-3m-6 0l3 3m9 5.25V18a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 18v-1.75m9 5.25h3M6 21h3" />
-      </svg>
-      <span>PDF 下载</span>
-    </button>
-
-    <div class="text-sm text-gray-700">
-      下载量: <span class="font-bold">{{ paperDetails.downloadCount }}</span>
-      引用量: <span class="font-bold">{{ paperDetails.citationCount }}</span>
-    </div>
-  </div>
-
-  <!-- PDF 预览弹窗 -->
-  <div 
-    v-if="showPDFPreview" 
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-  >
-    <div 
-      class="relative w-11/12 max-w-4xl bg-white rounded-lg shadow-lg p-6 mx-auto"
-    >
-      <!-- 关闭按钮 -->
-      <button 
-        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
-        @click="closePDFPreview"
-      >
-        &times;
-      </button>
-
-      <!-- PDF 预览内容 -->
-      <iframe 
-        src="/path/to/your/pdf/document.pdf" 
-        class="w-full h-[70vh] border rounded-lg" 
-        title="PDF 预览"
-      ></iframe>
-    </div>
-  </div>
-
-
-    
-
-    <!-- 引文网络 -->
-    <div class="container mx-auto py-8 px-4">
-    <!-- 导航栏 -->
-    <nav class="flex justify-around mb-4 border-b-2">
-      <button
-        v-for="tab in tabs"
-        :key="tab.type"
-        class="py-2 px-4 hover:bg-gray-200"
-        :class="{ 'font-bold border-b-4 border-blue-500': selectedTab === tab.type }"
-        @click="changeTab(tab.type)"
-      >
-        {{ tab.label }}
-      </button>
-    </nav>
-
-    <!-- ECharts 图表 -->
-    <div id="citation-network" class="w-full h-96 mb-6"></div>
-
-<!-- 文献列表 -->
-<div class="bg-white p-6 rounded-lg shadow-lg">
-  <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ tabTitle }}</h2>
-  <ul class="space-y-2">
-    <li 
-      v-for="(paper, index) in filteredPapers"
-      :key="paper.id"
-      class="text-gray-700 text-sm"
-    >
-      <!-- 序号和文献信息 -->
-      <a 
-        :href="'/papers/' + paper.id" 
-        target="_blank" 
-        class="flex text-left items-center hover:text-blue-600 transition"
-      >
-        <span class="font-semibold">[{{ index + 1 }}]
-          <span class="ml-2 font-medium">
-          {{ paper.title }} {{ paper.author }}. {{ paper.institution }}
-        </span></span>    
-      </a>
-    </li>
-  </ul>
-</div>
-
-
-
-  </div>
-
-    <div class="container mx-auto py-8 px-4">
-    <!-- 核心文献推荐 -->
-    <div>
-      <h2 class="text-2xl font-semibold mb-4">核心文献推荐</h2>
-
-      <!-- 五部分在一行布局 -->
-      <div class="flex space-x-6">
-        <!-- 研究起点 -->
-        <div class="flex-1 border rounded-lg p-6 bg-yellow-100">
-          <div class="flex justify-center ">
-    <h3 class="font-semibold text-lg mb-3 text-center w-full">研究起点</h3>
-  </div>
-          <div>
-            <span 
-              v-for="keyword in researchStartKeywords" 
-              :key="keyword" 
-              class="block bg-yellow-300 text-gray-700 py-1 px-2 rounded-full mb-2 cursor-pointer hover:bg-yellow-400"
-              @click="showPapers(keyword)"
-            >
-              {{ keyword }}
-            </span>
-          </div>
-        </div>
-        <!-- 研究来源 -->
-        <div class="flex-1 border rounded-lg p-6 bg-orange-100">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-lg mb-3 w-full">研究来源</h3>
-            
-          </div>
-          <div>
-            <span 
-              v-for="keyword in researchSourceKeywords" 
-              :key="keyword" 
-              class="block bg-orange-300 text-gray-700 py-1 px-3 rounded-full mb-2 cursor-pointer hover:bg-orange-400"
-              @click="showPapers(keyword)"
-            >
-              {{ keyword }}
-            </span>
-          </div>
-        </div>
-        <!-- 节点文献 -->
-        <div class="flex-1 border rounded-lg p-6 bg-white">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-lg mb-3 w-full">节点文献</h3>
-          </div>
-          <div>
-            <span 
-              v-for="keyword in coreLiteratureKeywords" 
-              :key="keyword" 
-              class="block bg-gray-200 text-gray-700 py-1 px-3 rounded-full mb-2 cursor-pointer hover:bg-gray-300"
-              @click="showPapers(keyword)"
-            >
-              {{ keyword }}
-            </span>
-          </div>
-        </div>
-
-        <!-- 研究分支 -->
-        <div class="flex-1 border rounded-lg p-6 bg-blue-100">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-lg mb-3 w-full">研究分支</h3>
-          </div>
-          <div>
-            <span 
-              v-for="keyword in researchBranchKeywords" 
-              :key="keyword" 
-              class="block bg-blue-300 text-gray-700 py-1 px-3 rounded-full mb-2 cursor-pointer hover:bg-blue-400"
-              @click="showPapers(keyword)"
-            >
-              {{ keyword }}
-            </span>
-          </div>
-        </div>
-
-        <!-- 研究去脉 -->
-        <div class="flex-1 border rounded-lg p-6 bg-blue-200">
-          <div class="flex items-center justify-between ">
-              <h3 class="font-semibold text-lg mb-3  w-full">研究去脉</h3>
-
-          </div>
-          <div>
-            <span 
-              v-for="keyword in researchTrackbackKeywords" 
-              :key="keyword" 
-              class="block bg-blue-400 text-gray-700 py-1 px-3 rounded-full mb-2 cursor-pointer hover:bg-blue-500"
-              @click="showPapers(keyword)"
-            >
-              {{ keyword }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 推荐论文展示 -->
-<div v-if="selectedKeyword" class="mt-8">
-  <h3 class="text-xl font-semibold">推荐论文 (关键词: {{ selectedKeyword }})</h3>
-  <ul class="space-y-4 mt-4">
-    <li 
-      v-for="(paper, index) in filteredPapers1" 
-      :key="paper.id" 
-      class="border-b pb-4 cursor-pointer hover:bg-gray-100"
-    >
-      <!-- 推荐论文条目 -->
-      <a 
-        :href="'/paper/' + paper.id" 
-        target="_blank" 
-        class="flex text-left items-start hover:text-blue-600 transition"
-      >
-        <span class="font-semibold mr-2">[{{ index + 1 }}]
-          <span class="font-medium">
-          {{ paper.title }} {{ paper.author }}. {{ paper.institution }}
-        </span></span>
-        
-      </a>
-    </li>
-  </ul>
-</div>
-
-  </div>
-  </div>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, nextTick, computed } from "vue";
+import PdfPreview from '@/components/PdfPreview/index.vue';
+const pdfUrl = ref("https://arxiv.org/pdf/2401.01098");
+import * as echarts from 'echarts'; // 引入echarts库
+import { useTransition } from '@vueuse/core'
+//下载与统计
+const downloadSource = ref(0)
+const citationSource = ref(0)
 
-import * as echarts from "echarts";
-const router = useRouter();
-// 导航栏选项
-// 导航栏选项
-const tabs = [
-  { type: "all", label: "所有引用关系" },
-  { type: "references", label: "参考文献" },
-  { type: "citations", label: "引证文献" },
-  { type: "co-citations", label: "共引关系" },
-  { type: "co-references", label: "同被引用" },
-];
+// 动态过渡效果，分别对下载量和引用量进行设置
+const downloadValue = useTransition(downloadSource, {
+  duration: 1500,
+  type: 'number',
+})
+const citationValue = useTransition(citationSource, {
+  duration: 1500,
+  type: 'number',
+})
 
-const selectedTab = ref("all");
-const tabTitle = ref("所有引用关系");
-
-// 示例文献和引用关系数据
-const citationData = {
-  nodes: [
-    { id: "current", name: "节点文献", category: 0, value: 10 },
-    { id: "ref1", name: "参考文献1", category: 1, value: 5 },
-    { id: "ref2", name: "参考文献2", category: 1, value: 5 },
-    { id: "cite1", name: "引证文献1", category: 2, value: 5 },
-    { id: "cite2", name: "引证文献2", category: 2, value: 5 },
-    { id: "co1", name: "共引文献1", category: 3, value: 5 },
-    { id: "co2", name: "共引文献2", category: 3, value: 5 },
-    { id: "coref1", name: "同被引文献1", category: 4, value: 5 },
-    { id: "coref2", name: "同被引文献2", category: 4, value: 5 },
-  ],
-  links: [
-    { source: "current", target: "ref1" },
-    { source: "current", target: "ref2" },
-    { source: "cite1", target: "current" },
-    { source: "cite2", target: "current" },
-    { source: "ref1", target: "co1" },
-    { source: "ref2", target: "co2" },
-    { source: "ref1", target: "coref1" },
-    { source: "ref2", target: "coref2" },
-  ],
+// 设置目标值
+downloadSource.value = 1234
+citationSource.value = 567
+// 定义 chartRef 引用
+const chartRef = ref(null);
+const currentSelection = ref('paper'); // 控制显示哪个部分
+const selectedReferences = ref({}); // 存储当前选中的参考文献
+const paperData = {
+  thisPaper: {
+    id: 'paper1',
+    primaryRefs: ['ref1', 'ref2', 'ref3'],
+    secondaryRefs: []
+  },
+  references: {
+    ref1: {
+      id: 'ref1',
+      secondaryCitations: ['cit1', 'cit2']
+    },
+    ref2: {
+      id: 'ref2',
+      secondaryCitations: ['cit2', 'cit3']
+    },
+    cit1: { id: 'cit1' },
+    cit2: { id: 'cit2' },
+    cit3: { id: 'cit3' },
+    ref3: {
+      id: 'ref3',
+      secondaryCitations: ['cit4']
+    },
+  }
 };
 
-// 动态过滤后的文献列表
-const filteredPapers = ref([]);
+// 定义一个计算共引文献的函数
+function findCommonCitations(primaryRefs, references) {
+  const commonCitations = new Set();
 
-// 切换导航栏选项
-const changeTab = (type) => {
-  selectedTab.value = type;
-  tabTitle.value = tabs.find((tab) => tab.type === type)?.label || "文献列表";
+  for (const refId of primaryRefs) {
+    const secondaryCitations = references[refId].secondaryCitations;
+    for (const citId of secondaryCitations) {
+      let isCommon = false;
+      for (const otherRefId of primaryRefs) {
+        if (refId !== otherRefId && references[otherRefId].secondaryCitations.includes(citId)) {
+          isCommon = true;
+          break;
+        }
+      }
+      if (isCommon) {
+        commonCitations.add(citId);
+      }
+    }
+  }
 
-  // 根据选项更新图表链接
-  const newLinks =
-    type === "all"
-      ? citationData.links
-      : citationData.links.filter((link) => {
-          if (type === "references") return link.source === "current";
-          if (type === "citations") return link.target === "current";
-          if (type === "co-citations") return link.target.startsWith("co");
-          if (type === "co-references") return link.target.startsWith("coref");
-        });
+  return Array.from(commonCitations);
+}
 
-  updateChart({ nodes: citationData.nodes, links: newLinks });
+// 响应式变量保存共引文献列表
+const commonCitations = ref([]);
 
-  // 根据选项更新文献列表
-  const nodeIds =
-    type === "all"
-      ? citationData.nodes.map((node) => node.id)
-      : newLinks.map((link) =>
-          type === "references" || type === "co-references"
-            ? link.target
-            : link.source
-        );
+// 初始化图表配置
+const chartOptions = {
 
-  filteredPapers.value = citationData.nodes
-    .filter((node) => nodeIds.includes(node.id))
-    .map((node) => ({
-      id: node.id,
-      title: node.name,
-      author: `作者 ${node.id}`, // 模拟数据
-      institution: `机构 ${node.id}`, // 模拟数据
-    }));
-};
-
-// 初始化 ECharts 图表
-let chartInstance;
-const initChart = () => {
-  const container = document.getElementById("citation-network");
-  chartInstance = echarts.init(container);
-
-  const options = {
-  tooltip: {},
-  legend: {
-    data: ["节点文献", "参考文献", "引证文献", "共引关系", "同被引文献"],
-    bottom: 0,
+  tooltip: {
+    extraCssText: 'z-index:1',
   },
   series: [
     {
-      type: "graph",
-      layout: "force",
-      force: {
-        repulsion: 200, // 增大排斥力以防止重叠
-        edgeLength: [50, 200], // 调整边的长度范围
-        gravity: 0.1, // 调整重力参数，让节点自然分布
-      },
-      data: citationData.nodes.map((node) => ({
-        ...node,
-        symbolSize: node.value * 2, // 根据节点值动态调整大小
-        itemStyle: {
-          borderColor: "#333",
-          borderWidth: 1,
-        },
-      })),
-      links: citationData.links,
-      categories: [
-        { name: "节点文献" },
-        { name: "参考文献" },
-        { name: "引证文献" },
-        { name: "共引关系" },
-        { name: "同被引文献" },
-      ],
-      roam: true, // 允许缩放和平移
-      focusNodeAdjacency: true, // 高亮与节点相关的边
-      lineStyle: {
-        color: "source", // 根据 source 节点颜色设置边的颜色
-        curveness: 0.3, // 设置边的曲率
-      },
-      label: {
-        show: true,
-        position: "right",
-        formatter: "{b}", // 显示节点名称
-      },
-    },
-  ],
-};
-chartInstance.setOption(options);
-
+      type: 'graph',
+      layout: 'force',
+      data: [],
+      links: [],
+      roam: true,
+      label: { show: true },
+      force: { repulsion: 1000 }
+    }
+  ]
 };
 
-// 更新图表
-const updateChart = (data) => {
-  chartInstance.setOption({
-    series: [
-      {
-        data: data.nodes,
-        links: data.links,
-      },
-    ],
-  });
-};
-
-// 初始化
+// 组件挂载后，初始化图表数据
 onMounted(() => {
-  initChart();
-  changeTab("all"); // 初始化为显示所有引用关系
+  // 计算共引文献
+  commonCitations.value = findCommonCitations(paperData.thisPaper.primaryRefs, paperData.references);
+
+  // 初始化节点和边的数据
+  const nodes = [];
+  const links = [];
+
+  // 添加本篇论文节点
+  nodes.push({ name: 'paper1', value: 10, symbolSize: 50 });
+
+  // 添加一级参考文献节点
+  paperData.thisPaper.primaryRefs.forEach(refId => {
+    const ref = paperData.references[refId];
+    nodes.push({ name: ref.id, value: 30 });
+    links.push({ source: 'paper1', target: ref.id });
+
+    // 添加二级参考文献节点
+    ref.secondaryCitations.forEach(citId => {
+      if (!nodes.some(node => node.name === citId)) {
+        nodes.push({ name: citId, value: 20 });
+      }
+      links.push({ source: ref.id, target: citId });
+    });
+  });
+  // 添加共引文献的节点和边
+  commonCitations.value.forEach(citId => {
+    // 检查节点是否已存在，如果存在则跳过
+    if (!nodes.some(node => node.name === citId)) {
+      nodes.push({ name: citId, value: 25 }); // 共引文献节点
+    }
+
+    // 共引文献链接到所有包含该共引文献的一级参考文献
+    paperData.thisPaper.primaryRefs.forEach(refId => {
+      const ref = paperData.references[refId];
+      if (ref.secondaryCitations.includes(citId)) {
+        links.push({ source: citId, target: ref.id });
+      }
+    });
+  });
+  // 设置图表的节点和边
+  chartOptions.series[0].data = nodes;
+  chartOptions.series[0].links = links;
+
+  // 初始化echarts图表
+  const chartInstance = echarts.init(chartRef.value);
+  chartInstance.setOption(chartOptions);
+
+  // 调整图表大小
+  nextTick(() => {
+    if (chartInstance) {
+      chartInstance.resize();
+    }
+
+  });
+
+  // 打印chartOptions的内容，确保配置正确
+  console.log(JSON.stringify(chartOptions));
 });
-
-const researchStartKeywords = ['社交焦虑', '中介作用', '消费者', '大学生自尊', '外显/内隐自尊', '错失恐惧', '性别差异', '老年化'];
-const researchSourceKeywords = ['消费者', '元分析', '测量工具', '因果关系', 'Facebook', '信号检测论', '代际变迁'];
-const coreLiteratureKeywords = ['营销干预策略', '有效性探索', '情感导向', '认知导向', '次优食品', '食品营销'];
-const researchBranchKeywords = ['新领域探索', '延伸研究'];
-const researchTrackbackKeywords = ['理论修正', '实践追溯'];
-
-// 模拟推荐论文数据
-const papers = [
-  { id: 1, title: '次优食品营销干预策略的有效性探究', author: '刘红波 等', institution: '贵州大学管理学院' },
-  { id: 2, title: '社交焦虑对消费者行为的影响', author: '张三', institution: '北京大学' },
-  { id: 3, title: '消费者心理特征与购买意图', author: '李四', institution: '清华大学' },
-  { id: 4, title: '基于元分析的社交媒体广告效果', author: '王五', institution: '复旦大学' },
+//论文信息
+//文献列表
+// 导航按钮项
+const navItems = [
+  { name: 'paper', label: '一级参考文献' },
+  { name: 'secondary', label: '二级参考文献' },
+  { name: 'commonCitations', label: '共引文献' }
 ];
-const selectedKeyword = ref('');
-const filteredPapers1 = ref(papers);
 
-const showPapers = (keyword) => {
-  selectedKeyword.value = keyword;
-  // 根据关键词过滤推荐论文，实际开发中应根据API返回的论文数据来动态加载
-  filteredPapers1.value = papers.filter(paper => paper.title.includes(keyword));
+// 设置当前选择的参考文献类型
+function setSelection(selection) {
+  currentSelection.value = selection;
+  if (selection === 'secondary') {
+    // 点击“二级参考文献”时显示所有二级文献
+    selectedReferences.value = {
+      secondaryCitations: paperData.thisPaper.primaryRefs.flatMap(refId =>
+        paperData.references[refId].secondaryCitations
+      )
+    };
+  }
+}
+function setSelection1(selection, refId) {
+  currentSelection.value = selection;
+
+}
+
+// 显示二级参考文献
+function showSecondaryReferences(refId) {
+  selectedReferences.value = paperData.references[refId];
+  setSelection1('secondary', refId);
+}
+
+// 显示共引文献
+function showCommonCitations() {
+  setSelection1('commonCitations', refId);
+}
+
+// 显示共引文献引用的一级参考文献
+function showReferencesForCitation(citId) {
+  const refsForCitation = paperData.thisPaper.primaryRefs.filter(refId =>
+    paperData.references[refId].secondaryCitations.includes(citId)
+  );
+  console.log('共引文献引用的一级参考文献:', refsForCitation);
+}
+
+// 更新图表的点击事件
+onMounted(() => {
+  const chartInstance = echarts.init(chartRef.value);
+
+  chartInstance.on('click', (params) => {
+    if (params.dataType === 'node') {
+      const clickedNode = params.data.name;
+
+      if (paperData.thisPaper.primaryRefs.includes(clickedNode)) {
+        // 点击一级参考文献
+        showSecondaryReferences(clickedNode);
+      } else if (commonCitations.value.includes(clickedNode)) {
+        // 点击共引文献
+        showCommonCitations();
+      }
+    }
+  });
+
+  chartInstance.setOption(chartOptions);
+});
+const paper = ref({
+
+  id: 1,
+  title: '乙烯利调控橡胶树胶乳产量和品质的阈值分析 ',
+  abstract: '分析乙烯利（ETH）、乙烯利抑制剂1-甲基环丙烯（1-MCP）和半胱氨酸（CYS）对橡胶树胶乳产量和主要品质指标的影响，并计算剂量阈值为生产提供依据，采用优化的正交实验设计分析三因素（ETH，1-MCP，CYS），四水平（三种试剂各四个浓度）共14个处理橡胶树割面，测定橡胶树胶乳产量、干含、分子量、塑性初值、塑性保持率和门尼粘度等关键指标，并分析指标之间的相关性。结果表明，14个处理橡胶树后产量、干含等均存在显著差异。相关分析表明数均分子量与重均分子量、门尼粘度正相关，相关系数分别为0.71和0.83，与多分散性负相关，相关系数为-0.91。塑性初值与门尼粘度正相关，相关系数为0.73。多分散性与门尼粘度负相关，相关系数-0.89。分别建立了以干含等指标为核心的回归方程，计算出的乙烯利的最高浓度是0.15%，1-MCP的最高浓度是1.08，CYS的浓度是0.41。优化的正交试验方法可有效的计算排胶调节剂的阈值，为后续实验提供理论和实践指导。',
+  author: '刘明洋  杨洪  樊松乐  郭冰冰  代龙军  ',
+  publisher: '农业农村部橡胶树生物学与遗传资源利用重点实验室/省部共建国家重点实验室培育基地-海南省热带作物栽培生理学重点实验室/中国热带农业科学院橡胶研究所',
+  publishedDate: '2024-12-06 11:12:23',
+  citation: '[1]刘明洋,杨洪,樊松乐,等.乙烯利调控橡胶树胶乳产量和品质的阈值分析[J/OL].森林工程,1-10[2024-12-07].http://kns.cnki.net/kcms/detail/23.1388.S.20241205.1715.002.html.'
+  // 添加更多论文数据
+});
+// 复制引用链接到剪贴板
+
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(paper.value.citation);
+    alert('引用链接已复制到剪贴板！');
+  } catch (err) {
+    console.error('复制失败:', err);
+    alert('复制失败，请尝试手动复制。');
+  }
 };
-// 跳转到对应论文详情页面
-const navigateToPaper = (id) => {
-  router.push(`/paper/${id}`);
+// 主题列表
+const subjects = ref([
+  { name: '人工智能', link: '/subjects/ai' },
+  { name: '机器学习', link: '/subjects/ml' },
+  { name: '自然语言处理', link: '/subjects/nlp' },
+  { name: '人工智能', link: '/subjects/ai' },
+  { name: '机器学习', link: '/subjects/ml' },
+  { name: '自然语言处理', link: '/subjects/nlp' },
+
+  // 可以继续添加更多主题
+]);
+
+//下载paper
+const downloadPDF = async () => {
+  try {
+    // 使用 fetch 获取文件数据
+    const response = await fetch(pdfUrl.value);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // 将响应转换为 Blob
+    const blob = await response.blob();
+
+    // 创建一个隐式下载链接
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "paper.pdf"; // 设置下载文件名
+    document.body.appendChild(link);
+    link.click();
+
+    // 移除链接并释放 Blob URL
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    console.error("下载失败：", error);
+  }
 };
 
-// 定义论文详细信息
-const paperDetails = ref({
-  id: "1",
-  title: "次优食品营销干预策略的有效性探究：来自元分析的证据",
-  author: "刘红波 等",
-  institution: "贵州大学管理学院",
-  abstract: "本研究通过元分析的方法探讨了次优食品营销干预策略的有效性。研究发现，消费者的购买意愿和行为受多种因素影响，包括价格、包装和宣传等。",
-  keywords: ["次优食品", "营销干预策略", "消费者行为"],
-  downloadUrl: "https://kns.cnki.net/reader/flowpdf?invoice=fYpH4uBhsIzZh65oHkpv1RoSDAmHQzx737l62BLgSNZUWmxmuxUsiO0SQjIlxJUhUXv1BP05RNCe5otzvOPlBsm6gqJOTi2j6pu3k2JdsSYDh4r7aKAskL6%2B%2F5Es%2Fxp7hkmClWTqhzilZk0Gj82BBd1M47b3cFWMThKE6z9tLNg%3D&platform=NZKPT&product=CJFQ&filename=JJYJ202407005&tablename=cjfdlast2024&type=JOURNAL&scope=trial&dflag=pdf&pages=&language=CHS&trial=&nonce=2CF83CB9AA8F49A9A11211234EAE1134&cflag=pdf",  // PDF 下载地址
-  downloadCount: 350,                // 下载次数
-  citationCount: 50                  // 引用次数
+// 预览窗口
+const isPreviewOpen = ref(false);
+const loading = ref(false);
+
+
+const openPreview = () => {
+  isPreviewOpen.value = true;
+  loading.value = true;
+};
+
+const closePreview = () => {
+  isPreviewOpen.value = false;
+};
+
+const onLoaded = () => {
+  loading.value = false;
+};
+
+//推荐页面
+
+// 去除重复项，并计算每个类别的subjects
+const uniqueSubjects = computed(() => {
+  const seen = new Set();
+  return subjects.value.filter((subject) => {
+    if (seen.has(subject.name)) {
+      return false;
+    }
+    seen.add(subject.name);
+    return true;
+  });
 });
 
-// 控制 PDF 预览弹窗的显示
-const showPDFPreview = ref(false);
+// 将主题分配到三个类别（研究起点、研究来源、本文）
+const categorizedSubjects = computed(() => {
+  const result = {
+    researchStart: [],
+    researchSource: [],
+    paper: []
+  };
 
-// 打开 PDF 预览
-const openPDFPreview = () => {
-  showPDFPreview.value = true;
-};
+  // 假设我们简单地平均分配主题到三个类别（实际应用中应根据需求调整）
+  const subjectsArray = Array.from(uniqueSubjects.value);
+  const chunkSize = Math.ceil(subjectsArray.length / 3);
 
-// 关闭 PDF 预览
-const closePDFPreview = () => {
-  showPDFPreview.value = false;
-};
+  for (let i = 0; i < subjectsArray.length; i += chunkSize) {
+    result.researchStart.push(...subjectsArray.slice(i, i + chunkSize));
+    if (i + chunkSize < subjectsArray.length) {
+      result.researchSource.push(...subjectsArray.slice(i + chunkSize, i + 2 * chunkSize));
+    }
+    if (i + 2 * chunkSize < subjectsArray.length) {
+      result.paper.push(...subjectsArray.slice(i + 2 * chunkSize, i + 3 * chunkSize));
+    }
+  }
 
-// 下载 PDF 文件
-const downloadPDF = () => {
-  window.open(paperDetails.value.downloadUrl, "_blank");
-};
+  return result;
+});
 </script>
 
-
 <style scoped>
-.container {
-  max-width: 800px;
-}
-.container {
-  max-width: 1200px;
-}
-
-.flex {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
+/* 美化加载器 */
+.loader {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
 }
 
-span {
-  transition: background-color 0.3s ease;
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
-#citation-network {
+
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Edge */
+}
+
+.custom-scrollbar {
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* 卡片的过渡动画效果 */
+.el-card {
+  background-color: rgb(162, 232, 209);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.el-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+
+
+/* 卡片样式 */
+.card-container {
   width: 100%;
-  height: 400px;
+  /* 使卡片宽度平均分布 */
+  transition: transform 0.5s ease-in-out;
+}
+
+.card-container:hover {
+  transform: scale(1.05);
+  /* 鼠标悬停时，卡片略微放大 */
+}
+
+/* 水平和垂直居中列表内容 */
+.center-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.list-item {
+  margin: 10px 0;
+  /* 给每个列表项添加一些垂直间距 */
+}
+
+/* 箭头的样式 */
+.arrow {
+  position: absolute;
+  top: 50%;
+  /* 垂直居中 */
+  width: 0;
+  height: 25px;
+  border-top: 25px solid transparent;
+  border-bottom: 25px solid transparent;
+  border-left: 25px solid rgba(0, 0, 0, 0.9);
+  /* 设置箭头颜色 */
+  transition: all 0.3s ease-in-out;
+  margin-top: -22px;
+}
+
+
+
+/* 箭头尾巴 */
+.arrow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -60px;
+  /* 调整尾巴的位置 */
+  width: 50px;
+  /* 设置尾巴长度 */
+  height: 20px;
+  /* 设置尾巴宽度 */
+  background-color: rgba(0, 0, 0, 0.9);
+  /* 设置尾巴颜色 */
+  transform: translateY(-50%);
+  box-shadow: 6px 12px 25px rgba(0, 0, 0, 0.5);
+  /* 给箭头加重阴影并调整透明度 */
+}
+
+/* 右侧箭头 */
+.arrow-right {
+  left: 100%;
+  /* 右侧位置 */
+  margin-left: 26px;
+  /* 调整箭头与卡片之间的距离 */
 }
 </style>

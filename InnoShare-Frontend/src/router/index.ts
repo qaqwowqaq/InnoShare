@@ -2,9 +2,12 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
+import UploadPaper from '@/views/uploadPaper.vue';
+import UpdatePaper from '@/views/updatePaper.vue';
 import PaperDetail from '@/views/PaperDetail.vue';
 import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
+import test from '@/views/test.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -23,9 +26,27 @@ const routes: Array<RouteRecordRaw> = [
     component: Register
   },
   {
+    path: '/UploadPaper',
+    name: 'UploadPaper',
+    component: UploadPaper,
+    props: true
+  },
+  {
+    path: '/UpdatePaper',
+    name: 'UpdatePaper',
+    component: UpdatePaper,
+    props: true
+  },
+  {
     path: '/paper/:id',
     name: 'PaperDetail',
     component: PaperDetail,
+    props: true
+  },
+  {
+    path: '/paper1/test',
+    name: 'test',
+    component: test,
     props: true
   },
   {
