@@ -81,22 +81,30 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   </template>
-  
   <script setup lang="ts">
   import { reactive, toRefs, ref, computed, onMounted } from 'vue'
   import { useRouter } from "vue-router"; // Vue Router for navigation
   const router = useRouter();
   const circleUrl = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
   
-  const form = ref({
+  // 明确声明 form 类型
+  const form = ref<{
+    title: string;
+    authors: string;
+    abstract: string;
+    subjects: string[]; // 确保 subjects 是 string[] 类型
+    file: { name: string } | null; // file 可能是 null 或文件对象
+    publishedAt: string;
+    downloadUrl: string;
+    createdAt?: string; // 可选属性
+  }>({
     title: '',
     authors: '',
     abstract: '',
-    subjects: [],
+    subjects: [], // 初始为空数组，类型为 string[]
     file: null,
     publishedAt: '',
     downloadUrl: '',
-    createdAt: '', // 这里不再使用创建时间，提交时设置为当前时间
   })
   
   const rules = {
@@ -109,19 +117,20 @@
     downloadUrl: [{ required: true, message: '请输入论文下载链接', trigger: 'blur' }],
   }
   
-  // 假设在更新页面加载时获取到已有的论文信息
   onMounted(() => {
-    // 这里使用假数据来模拟加载已有的论文信息，实际使用中可以通过API获取
+    // 假设通过 API 获取到的已有论文数据
     const existingPaper = {
       title: "量子代数基础",
-      authors: "张三, 李四",
+      authors: "张三, 李 四",
       abstract: "这是一篇关于量子代数的论文。",
-      subjects: ["Quantum Algebra (math.QA)"],
+      subjects: ["Quantum Algebra (math.QA)"], // 确保这里是 string[] 类型
       file: { name: "quantum_algebra_paper.pdf" },
       publishedAt: "2023-06-15",
       downloadUrl: "http://example.com/download",
+      createdAt: new Date().toISOString(), // 添加当前时间作为创建时间
     }
   
+    // 更新 form 的值
     form.value = { ...existingPaper }
   })
   
@@ -150,7 +159,7 @@
       title: '',
       authors: '',
       abstract: '',
-      subjects: [],
+      subjects: [], // 重置为空数组
       file: null,
       publishedAt: '',
       downloadUrl: '',
@@ -162,13 +171,13 @@
   const state = reactive({
     circleUrl:
       'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-    // 使用 'as const' 进行类型断言，确保 sizeList 为只读数组
     sizeList: ['small', '', 'large'] as const,
   })
   
   const { sizeList } = toRefs(state)
   
   </script>
+  
   
   <style scoped>
   /* 自定义样式 */
