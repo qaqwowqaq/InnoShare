@@ -5,11 +5,36 @@ import Register from '@/views/Register.vue';
 import PaperDetail from '@/views/PaperDetail.vue';
 import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
+import SearchResults from '@/views/SearchResults.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/home',
+    name: 'home',
+    component: Home,
+    children: [
+      {
+        path: '', // 默认子路由
+        name:'default',
+        redirect:"/home/recommend",
+      },
+      {
+        path: '/home/recommend',
+        component: () => import("../components/modules/homeComponent/recommendList.vue")
+      },
+      {
+        path: '/home/hot',
+        component: () => import("../components/modules/homeComponent/hotList.vue")
+      },
+      {
+        path: '/home/new',
+        component: () => import("../components/modules/homeComponent/newList.vue")
+      },
+    ]
   },
 
   {
@@ -36,6 +61,11 @@ const routes: Array<RouteRecordRaw> = [
     {path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
+  },
+  {
+    path: '/search',
+    name: 'SearchResults',
+    component: SearchResults,
   }
 ];
 
