@@ -5,7 +5,7 @@ import { createPinia } from 'pinia';
 import './assets/index.css';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
-import './styles/index.css'
+import './styles/index.css';
 import 'element-plus'
 import { mainStore } from './store/modules/pageStyleStore.ts'; // 引入 mainStore
 

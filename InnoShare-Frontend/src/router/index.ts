@@ -5,7 +5,7 @@ import Register from '@/views/Register.vue';
 import PaperDetail from '@/views/PaperDetail.vue';
 import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
-import SearchResults from '@/views/SearchResults.vue'
+import SearchResults from '@/views/SearchResults.vue';
 import Verify from '@/views/Verify.vue';
 const routes: Array<RouteRecordRaw> = [
 
@@ -82,6 +82,11 @@ const routes: Array<RouteRecordRaw> = [
     {path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
+  },
+  {
+    path: '/search',
+    name: 'SearchResults',
+    component: SearchResults,
   }
 ];
 

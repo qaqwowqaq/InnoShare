@@ -1,4 +1,5 @@
 <template>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <div class="p-8 bg-gray-100 min-h-screen">
       <!-- 筛选和排序 -->
       <div class="bg-white p-6 rounded-lg shadow-md mb-6">
