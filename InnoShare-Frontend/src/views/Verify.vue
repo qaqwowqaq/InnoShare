@@ -145,8 +145,8 @@ export default {
       institution: '',
       files: [],
       isInvitationCode: false,
-      status: '未通过', // 认证状态（待审核/已通过/未通过）
-      reason: '信息填写不完整', // 只有在未通过时显示
+      status: '待审核', // 认证状态（待审核/已通过/未通过）
+      reason: '', // 只有在未通过时显示
     };
   },
   methods: {
