@@ -1,3 +1,6 @@
+### 2024/12/7
+router全部使用index.ts，不要使用js
+
 ```plaintext
 前端项目结构（暂定）
 InnoShare-Frontend/

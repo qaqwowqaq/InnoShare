@@ -27,6 +27,7 @@ export default {
   text-align: center;
   margin: 0;
   background-color: white;
+  overflow: auto; /* 子页面显示滚动条用的，勿删 */
 }
 body {
   margin: 0;

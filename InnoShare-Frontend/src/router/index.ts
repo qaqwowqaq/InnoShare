@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
@@ -7,10 +7,11 @@ import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
 import SearchResults from '@/views/SearchResults.vue';
 const routes: Array<RouteRecordRaw> = [
+
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    redirect:'home'
+
   },
   {
     path: '/home',
@@ -36,7 +37,16 @@ const routes: Array<RouteRecordRaw> = [
       },
     ]
   },
-
+  {
+    path: '/about',
+    name: 'about',
+    component: () => import('../views/AboutView.vue')
+  },
+  {
+    path: '/search',
+    name: 'SearchResults',
+    component: SearchResults,
+  },
   {
     path: '/login',
     name: 'Login',
@@ -46,6 +56,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/userDashboard/:userId',
+    name: 'UserDashboard',
+    component: UserDashboard
   },
   {
     path: '/paper/:id',
@@ -70,7 +85,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes
 });
 
