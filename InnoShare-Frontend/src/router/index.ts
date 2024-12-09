@@ -27,12 +27,13 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin',
     component: AdminPanel,
+    redirect: '/admin/data-statistics', // 添加重定向到数据统计页面
     children: [
         { path: 'user-review', component: UserReview },
         { path: 'user-management', component: UserManagement },
         { path: 'data-statistics', component: DataStatistics },
     ]
-},
+  },
 ];
 
 const router = createRouter({

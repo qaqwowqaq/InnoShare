@@ -1,59 +1,61 @@
 <template>
-    <div class="user-review">
-        <div class="bulk-actions">
-            <button class="approve-all-button" @click="approveAll">一键通过</button>
-            <button class="reject-all-button" @click="rejectAll">一键拒绝</button>
+    <div class="fade-in">  <!-- 修改这里：添加外层容器并应用动画类 -->
+        <div class="user-review fade-in">
+            <div class="bulk-actions">
+                <button class="approve-all-button" @click="approveAll">一键通过</button>
+                <button class="reject-all-button" @click="rejectAll">一键拒绝</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" @change="toggleSelectAll" :checked="areAllSelected" />
+                        </th>
+                        <th>用户名</th>
+                        <th>机构</th>
+                        <th>研究领域</th>
+                        <th>申请时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="request in paginatedAuthRequests" :key="request.id">
+                        <td data-label="选择">
+                            <input type="checkbox" v-model="selectedRequests" :value="request.id" />
+                        </td>
+                        <td data-label="用户名">{{ request.fullName }}</td>
+                        <td data-label="机构">{{ request.institution }}</td>
+                        <td data-label="研究领域">{{ request.fieldOfStudy }}</td>
+                        <td data-label="申请时间">{{ request.requestedAt }}</td>
+                        <td data-label="操作">
+                            <button class="approve-button" @click="approveUser(request.id)">批准</button>
+                            <button class="reject-button" @click="rejectUser(request.id)">拒绝</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <select v-model="pageSize" @change="handlePageSizeChange">
+                    <option v-for="option in pageSizeOptions" :key="option" :value="option">
+                        {{ option }}条/页
+                    </option>
+                </select>
+                <span>跳转到第</span>
+                <input type="number" v-model.number="jumpPage" @keyup.enter="jumpToPage" min="1" :max="totalPages" />
+                <span>页</span>
+                <button @click="jumpToPage">跳转</button>
+                <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
+                <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
+                <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>
-                        <input type="checkbox" @change="toggleSelectAll" :checked="areAllSelected" />
-                    </th>
-                    <th>用户名</th>
-                    <th>机构</th>
-                    <th>研究领域</th>
-                    <th>申请时间</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="request in paginatedAuthRequests" :key="request.id">
-                    <td data-label="选择">
-                        <input type="checkbox" v-model="selectedRequests" :value="request.id" />
-                    </td>
-                    <td data-label="用户名">{{ request.fullName }}</td>
-                    <td data-label="机构">{{ request.institution }}</td>
-                    <td data-label="研究领域">{{ request.fieldOfStudy }}</td>
-                    <td data-label="申请时间">{{ request.requestedAt }}</td>
-                    <td data-label="操作">
-                        <button class="approve-button" @click="approveUser(request.id)">批准</button>
-                        <button class="reject-button" @click="rejectUser(request.id)">拒绝</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="pagination">
-            <select v-model="pageSize" @change="handlePageSizeChange">
-                <option v-for="option in pageSizeOptions" :key="option" :value="option">
-                    {{ option }}条/页
-                </option>
-            </select>
-            <span>跳转到第</span>
-            <input type="number" v-model.number="jumpPage" @keyup.enter="jumpToPage" min="1" :max="totalPages" />
-            <span>页</span>
-            <button @click="jumpToPage">跳转</button>
-            <button @click="prevPage" :disabled="currentPage === 1">上一页</button>
-            <span>第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
-            <button @click="nextPage" :disabled="currentPage === totalPages">下一页</button>
-        </div>
-    </div>
-    <div v-if="showRejectModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>输入拒绝原因</h3>
-            <textarea v-model="rejectReason" placeholder="请输入拒绝原因"></textarea>
-            <button @click="confirmReject">确定</button>
-            <button @click="cancelReject">取消</button>
+        <div v-if="showRejectModal" class="modal-overlay">
+            <div class="modal-content">
+                <h3>输入拒绝原因</h3>
+                <textarea v-model="rejectReason" placeholder="请输入拒绝原因"></textarea>
+                <button @click="confirmReject">确定</button>
+                <button @click="cancelReject">取消</button>
+            </div>
         </div>
     </div>
 </template>
@@ -395,8 +397,8 @@ export default {
     max-width: 1500px;
     background-color: #ffffff; /* 白色 */
     margin-top: 30px;
-    margin-left: -150px; /* 向左移动10px */
-    margin-right: 50px;
+    margin-left: 0px; /* 向左移动10px */
+    margin-right: 0px;
     border-radius: 8px; /* 圆角 */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
 }
@@ -450,13 +452,14 @@ button {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw; /* 改为使用视口宽度 */
+    height: 100vh; /* 改为使用视口高度 */
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     animation: fadeIn 0.3s;
+    z-index: 9999; /* 添加较高的 z-index 确保在最上层 */
 }
 
 .modal-content {
@@ -649,6 +652,21 @@ button {
     .bulk-actions button {
         width: 100%;
         margin-bottom: 10px;
+    }
+}
+
+.fade-in {
+    animation: fadeInPage 1s ease-out;
+}
+
+@keyframes fadeInPage {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 </style>

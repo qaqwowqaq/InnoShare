@@ -6,9 +6,9 @@
         <aside>
             <nav>
                 <ul>
+                    <li><router-link to="/admin/data-statistics">查看数据统计</router-link></li>
                     <li><router-link to="/admin/user-review">审核用户认证</router-link></li>
                     <li><router-link to="/admin/user-management">管理用户数据</router-link></li>
-                    <li><router-link to="/admin/data-statistics">查看数据统计</router-link></li>
                 </ul>
             </nav>
         </aside>
@@ -45,6 +45,7 @@ header {
     align-items: center;
     padding-left: 20px;
     box-sizing: border-box;
+    z-index: 1000; /* 添加较高的z-index确保在最上层 */
 }
 
 header h1 {
@@ -60,8 +61,12 @@ aside {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-left: 50px;
     padding-right: 50px;
+    position: fixed; /* 改为固定定位 */
+    top: 0; /* 从顶部开始 */
+    left: 50px; /* 对应原来的margin-left */
+    z-index: 999; /* 确保在内容上方但在header下方 */
+    height: 100vh; /* 占满整个视口高度 */
 }
 
 nav ul {
@@ -101,7 +106,7 @@ a.router-link-active:hover {
     background-color: #7fb3d5; /* 保持激活状态背景颜色 */
     color: #fff; /* 保持激活状态文字颜色 */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 保持激活状态阴影 */
-    font-weight: normal !important; /* 保持激活状态字体 */
+    font-weight: normal !重要; /* 保持激活状态字体 */
 }
 
 .router-link-active {
@@ -115,9 +120,11 @@ main {
     flex: 1;
     padding: 30px !important; /* 增加内边距 */
     margin-top: 60px;
-    margin-left: 200px;
+    margin-left: 250px; /* 增加左边距，为固定定位的aside留出空间 */
     box-sizing: border-box;
     line-height: 1.6; /* 优化行高 */
+    min-height: calc(100vh - 60px); /* 确保内容区域至少占满剩余视口高度 */
+    overflow-y: auto; /* 允许内容区域滚动 */
 }
 
 @media (max-width: 768px) {
@@ -128,7 +135,9 @@ main {
     aside {
         width: 100%;
         padding: 10px;
-        margin-left: 0;
+        position: static; /* 在移动端取消固定定位 */
+        height: auto;
+        z-index: 1;
     }
     
     nav ul {

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="fade-in">
         <div class="table-container">
             <table>
                 <thead>
@@ -455,8 +455,8 @@ td {
     max-width: 1200px; /* 最大宽度 */
     margin: 0 auto; /* 居中显示 */
     margin-top: 30px;
-    margin-left: -150px;
-    margin-right: 50px;
+    margin-left: 0px;
+    margin-right: 0px;
     padding-top: 50px;
 }
 
@@ -477,7 +477,7 @@ td {
     margin-right: 10px;
     padding: 5px;
     border: 1px solid #ccc; /* 添加浅色边框 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加���影效果 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
 }
 
 .pagination input {
@@ -619,7 +619,7 @@ td {
 }
 
 .modal-content button:first-of-type {
-    background-color: #4CAF50;
+    background-color: #f44336;
     color: white;
     margin-right: 10px;
 }
@@ -630,7 +630,7 @@ td {
 }
 
 .modal-content button:first-of-type:hover {
-    background-color: #45a049;
+    background-color: #d32f2f;
 }
 
 .modal-content button:last-of-type:hover {
@@ -645,6 +645,21 @@ td {
 @keyframes slideUp {
     from { transform: translateY(50px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeInPage 1s ease-out;
+}
+
+@keyframes fadeInPage {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
