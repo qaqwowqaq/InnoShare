@@ -12,13 +12,15 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.1.5",
+    "@jridgewell/gen-mapping": "^0.3.2",
     "axios": "^1.7.9",
+    "echarts": "^5.4.2",
     "element-plus": "^2.8.7",
     "pinia": "^2.2.6",
+    "sucrase": "^3.35.0",
     "vue": "^3.5.12",
     "vue-router": "^4.0.12",
-    "vuex": "^4.1.0",
-    "echarts": "^5.4.2"
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

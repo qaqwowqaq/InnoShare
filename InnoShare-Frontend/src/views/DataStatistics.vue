@@ -648,6 +648,14 @@ export default {
     transform: scale(1);
     transition: all 0.3s ease;
     transform-origin: center center;
+    cursor: pointer; /* 添加鼠标指针样式 */
+}
+
+/* 添加悬停效果 */
+.chart-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1; /* 确保悬停时在其他图表之上 */
 }
 
 .chart-title {

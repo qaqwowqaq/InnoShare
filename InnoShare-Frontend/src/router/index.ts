@@ -7,7 +7,6 @@ import UserReview from '@/views/UserReview.vue'
 import UserManagement from '@/views/UserManagement.vue'
 import DataStatistics from '@/views/DataStatistics.vue'
 
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -27,18 +26,30 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/admin',
     component: AdminPanel,
-    redirect: '/admin/data-statistics', // 添加重定向到数据统计页面
+    redirect: '/admin/data-statistics',
     children: [
-        { path: 'user-review', component: UserReview },
-        { path: 'user-management', component: UserManagement },
-        { path: 'data-statistics', component: DataStatistics },
+      {
+        path: 'data-statistics',
+        name: 'DataStatistics',
+        component: DataStatistics
+      },
+      {
+        path: 'user-review',
+        name: 'UserReview',
+        component: UserReview
+      },
+      {
+        path: 'user-management',
+        name: 'UserManagement',
+        component: UserManagement
+      }
     ]
-  },
+  }
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),  // 只使用 import.meta.env.BASE_URL
   routes
 });
 
-export default router;
+export { router };  // 保持命名导出
