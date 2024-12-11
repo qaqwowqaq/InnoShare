@@ -454,7 +454,7 @@ td {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
     max-width: 1200px; /* 最大宽度 */
     margin: 0 auto; /* 居中显示 */
-    margin-top: 30px;
+    margin-top: 0px;
     margin-left: 0px;
     margin-right: 0px;
     padding-top: 50px;

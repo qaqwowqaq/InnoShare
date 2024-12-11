@@ -216,9 +216,8 @@ export default {
   width: 100%;
   min-width: 1000px;
   margin: 0 ;
-  position: fixed;
   align-items: center;
-  height: 64px;
+  height: 8%;
   justify-content: center;
   top: 0;
   left: 0;
@@ -226,6 +225,8 @@ export default {
   z-index: 999;
   color: rgb(235, 238, 238);
   transition:  0.5s ease-out;
+  position: fixed; /* 设置为固定定位 */
+  z-index: 10000; /* 提高 z-index 以确保在最上层 */
 }
 #guideBar>*{
   max-width: 1800px;
@@ -320,12 +321,12 @@ export default {
   justify-content: center;
   padding: 0 15px 0 15px;
 }
-.swapicon span{
+swapicon span{
   margin: 0 2px 3px 2px;
   font-size: 18px;
   cursor: pointer;
 }
-.swapicon svg {
+swapicon svg {
   margin: 2px 5px 0 10px;
   cursor: pointer;
 }

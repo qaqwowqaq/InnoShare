@@ -65,7 +65,7 @@ aside {
     position: fixed; /* 改为固定定位 */
     top: 0; /* 从顶部开始 */
     left: 0px; /* 对应原来的margin-left */
-    z-index: 500; /* 确保在内容上方但在header下方 */
+    z-index: 1; /* 确保在内容上方但在header下方 */
     height: 100vh; /* 占满整个视口高度 */
 }
 

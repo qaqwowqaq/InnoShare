@@ -1,19 +1,26 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 import path from "node:path";
-// https://vite.dev/config/
+
+// https://vitejs.dev/config/
 export default defineConfig({
   base: './',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
     },
-    extensions: ['.ts','.js',  '.jsx', '.tsx', '.json']
+    extensions: ['.ts', '.js', '.jsx', '.tsx', '.json']
   },
   server: {
-    port: 8000,  // 设置端口为 8000
+    port: 8000,  // 设置端口
+    open: true,  // 自动打开浏览器
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8888',  // 后端 API 地址
+        changeOrigin: true,  // 修改请求头中的 Origin，解决跨域问题
+        rewrite: (path) => path.replace(/^\/api/, ''),  // 去掉 /api 前缀
+      },
+    },
   },
   plugins: [vue()],
-
-})
-
+});
