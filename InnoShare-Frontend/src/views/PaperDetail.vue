@@ -51,7 +51,7 @@
         </div>
 
         <!-- PDF 预览窗口 -->
-        <div v-if="isPreviewOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ">
+        <div v-if="isPreviewOpen" class=" fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center ">
           <div class="bg-white w-11/12 md:w-3/4 h-4/5 rounded-lg shadow-lg flex flex-col">
             <!-- 标题栏 -->
             <div class="p-4 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
@@ -83,17 +83,14 @@
           <div class="rounded-lg shadow-md overflow-hidden">
             <div class="p-4 leading-loose">
               <h3 class="text-lg font-medium mb-2">{{ paper.title }}</h3>
-              <p class="text-sm text-gray-500 mb-2 text-left">
+              <!-- 用来调试 -->
+              <p v-if="!isPreviewOpen" class="text-sm text-gray-500 mb-2 text-left">
                 <span class="font-bold  ">摘要：</span>{{ paper.abstract }}
               </p>
               <div class="flex flex-col items-start text-sm text-gray-500 text-left">
                 <div>
                   <span class="font-bold">作者：</span>
                   <span>{{ paper.author }}</span>
-                </div>
-                <div>
-                  <span class="font-bold">出版社：</span>
-                  <span>{{ paper.publisher }}</span>
                 </div>
                 <div>
                   <span class="font-bold">出版时间：</span>
@@ -138,14 +135,19 @@
           </div>
           <!-- 本篇论文参考文献 -->
           <div v-if="currentSelection === 'paper'">
-            <ul>
+            <ul v-if="paperData.thisPaper.primaryRefs.length > 0">
               <li v-for="(ref, index) in paperData.thisPaper.primaryRefs" :key="index" class="mb-2">
-                【{{ index + 1 }}】<span class="text-gray-600">{{ paperData.references[ref].id }}</span> -
+                【{{ index + 1 }}】
+                <span v-if="paperData.references[ref]" class="text-gray-600">{{ paperData.references[ref].id }}</span>
+                <span v-else class="text-gray-600">加载中...</span>
+                -
                 <button @click="showSecondaryReferences(ref)" class="ml-2 text-gray-500 hover:text-blue-700">
                   查看二级参考文献
                 </button>
               </li>
             </ul>
+            <span v-else>加载中...</span>
+
           </div>
 
           <!-- 二级参考文献 -->
@@ -216,12 +218,139 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </template>
 
-<script setup>
-import { ref, onMounted, nextTick, computed } from "vue";
+<script  setup>
+import { ref, onMounted, nextTick, computed, watch, watchEffect, reactive } from "vue";
 import PdfPreview from '@/components/PdfPreview/index.vue';
-const pdfUrl = ref("https://arxiv.org/pdf/2401.01098");
+const pdfUrl = ref();
 import * as echarts from 'echarts'; // 引入echarts库
 import { useTransition } from '@vueuse/core'
+import axios from 'axios';
+// 定义响应式的 `paper` 和 `paperData`
+const renderedAbstract = ref('');
+const subjects = ref([
+
+]);
+const paperData = ref({
+  thisPaper: {
+    id: '',
+    primaryRefs: ref([]),
+    secondaryRefs: [],
+  },
+  references: {},
+});
+const paper = ref({
+  id: '',
+  title: '',
+  abstract: '',
+  author: '',
+  publishedDate: '',
+  citation: ''
+});
+
+
+// 获取论文基本信息
+const fetchPaper = async (paperDoi) => {
+  try {
+    console.log("请求参数:", { paperDoi });
+    const response = await axios.get('/api/academic/getPaper', {
+      params: {
+        paperDoi: paperDoi,
+      },
+    });
+    console.log('获取论文基本信息成功:', response.data.data.paper);
+    paper.value = {
+      id: response.data.data.paper.doi,
+      title: response.data.data.paper.title,
+      abstract: response.data.data.paper.abstractText,
+      author: response.data.data.paper.author,
+      publishedDate: new Date(response.data.data.paper.createdAt).toLocaleDateString('zh-CN'),
+      citation: `[1]${response.data.data.paper.author}.${response.data.data.paper.title}[J/OL].arXiv, ${response.data.data.paper.createdAt}.${response.data.data.paper.doi}.`,
+    };
+     // 使用 MathJax 渲染公式
+    setTimeout(() => {
+      if (window.MathJax) {
+        window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+      }
+    }, 100);
+     pdfUrl.value = response.data.data.paper.downloadUrl;
+    console.log('pdfUrl:', pdfUrl.value);
+    console.log('获取论文基本信息成功:', paper.value);
+     // 获取并处理学科信息
+     subjects.value = response.data.data.paper.subjects.map(subject => {
+      return {
+        name: subject,
+        link: `/subjects/${subject.toLowerCase().replace(/\s+/g, '-').replace(/\(.*\)/, '')}`,
+      };
+    });
+    console.log('学科信息:', subjects.value);
+  } catch (error) {
+    console.error('获取论文基本信息失败:', error);
+  }
+};
+onMounted(() => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+    });
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+  }
+});
+
+// 获取引用信息
+const buildReferenceTree = async (paperDoi) => {
+  try {
+    const response = await axios.get('/api/academic/getPaperReferences', {
+      params: { paperDoi },
+    });
+    console.log('获取引用信息成功:', response.data);
+    paperData.value = {
+      thisPaper: {
+        id: response.data.data.paper.doi, // 使用 `paper` 中的 id
+        primaryRefs: response.data.data.references.map((ref) => ref.id),
+        secondaryRefs: [], // 可填充二级引用
+      },
+      references: response.data.data.references.reduce(
+        (acc, cur) => ({ ...acc, [cur.id]: cur }),
+        {},
+      ),
+    };
+    return response.data; // 返回引用数据
+  } catch (error) {
+    console.error('获取引用信息失败:', error);
+    return { references: [], primaryRefs: [] };
+  }
+};
+// 获取论文和引用信息，分别处理
+const fetchPaperData = async (paperDoi) => {
+  try {
+    const { references, primaryRefs } = await buildReferenceTree(paperDoi);
+    // 更新 `paperData` 中的引用信息
+    paperData.value = {
+      thisPaper: {
+        id: paper.value.id, // 使用 `paper` 中的 id
+        primaryRefs: primaryRefs,
+        secondaryRefs: [], // 可填充二级引用
+      },
+      references,
+    };
+    console.log('引用信息已更新:', paperData.value);
+  } catch (error) {
+    console.error('获取引用信息失败:', error);
+  }
+};
+const paperDoi = 'https://doi.org/10.48550/arXiv.2401.01198';
+// 组件挂载时执行
+onMounted(async () => {
+
+
+  // 先获取论文基本信息
+  await fetchPaper(paperDoi);
+
+  await fetchPaperData(paperDoi);
+  console.log('论文数据:', paper.value);
+});
+
+
 //下载与统计
 const downloadSource = ref(0)
 const citationSource = ref(0)
@@ -243,30 +372,30 @@ citationSource.value = 567
 const chartRef = ref(null);
 const currentSelection = ref('paper'); // 控制显示哪个部分
 const selectedReferences = ref({}); // 存储当前选中的参考文献
-const paperData = {
-  thisPaper: {
-    id: 'paper1',
-    primaryRefs: ['ref1', 'ref2', 'ref3'],
-    secondaryRefs: []
-  },
-  references: {
-    ref1: {
-      id: 'ref1',
-      secondaryCitations: ['cit1', 'cit2']
-    },
-    ref2: {
-      id: 'ref2',
-      secondaryCitations: ['cit2', 'cit3']
-    },
-    cit1: { id: 'cit1' },
-    cit2: { id: 'cit2' },
-    cit3: { id: 'cit3' },
-    ref3: {
-      id: 'ref3',
-      secondaryCitations: ['cit4']
-    },
-  }
-};
+// const paperData = {
+//   thisPaper: {
+//     id: 'paper1',
+//     primaryRefs: ['ref1', 'ref2', 'ref3'],
+//     secondaryRefs: []
+//   },
+//   references: {
+//     ref1: {
+//       id: 'ref1',
+//       secondaryCitations: ['cit1', 'cit2']
+//     },
+//     ref2: {
+//       id: 'ref2',
+//       secondaryCitations: ['cit2', 'cit3']
+//     },
+//     cit1: { id: 'cit1' },
+//     cit2: { id: 'cit2' },
+//     cit3: { id: 'cit3' },
+//     ref3: {
+//       id: 'ref3',
+//       secondaryCitations: ['cit4']
+//     },
+//   }
+// };
 
 // 定义一个计算共引文献的函数
 function findCommonCitations(primaryRefs, references) {
@@ -316,8 +445,8 @@ const chartOptions = {
 // 组件挂载后，初始化图表数据
 onMounted(() => {
   // 计算共引文献
-  commonCitations.value = findCommonCitations(paperData.thisPaper.primaryRefs, paperData.references);
-
+  if (paperData.thisPaper && paperData.thisPaper.primaryRefs && paperData.thisPaper.primaryRefs.length > 0)
+    commonCitations.value = findCommonCitations(paperData.thisPaper.primaryRefs, paperData.references);
   // 初始化节点和边的数据
   const nodes = [];
   const links = [];
@@ -326,19 +455,20 @@ onMounted(() => {
   nodes.push({ name: 'paper1', value: 10, symbolSize: 50 });
 
   // 添加一级参考文献节点
-  paperData.thisPaper.primaryRefs.forEach(refId => {
-    const ref = paperData.references[refId];
-    nodes.push({ name: ref.id, value: 30 });
-    links.push({ source: 'paper1', target: ref.id });
+  if (paperData.thisPaper && paperData.thisPaper.primaryRefs && paperData.thisPaper.primaryRefs.length > 0)
+    paperData.thisPaper.primaryRefs.forEach(refId => {
+      const ref = paperData.references[refId];
+      nodes.push({ name: ref.id, value: 30 });
+      links.push({ source: 'paper1', target: ref.id });
 
-    // 添加二级参考文献节点
-    ref.secondaryCitations.forEach(citId => {
-      if (!nodes.some(node => node.name === citId)) {
-        nodes.push({ name: citId, value: 20 });
-      }
-      links.push({ source: ref.id, target: citId });
+      // 添加二级参考文献节点
+      ref.secondaryCitations.forEach(citId => {
+        if (!nodes.some(node => node.name === citId)) {
+          nodes.push({ name: citId, value: 20 });
+        }
+        links.push({ source: ref.id, target: citId });
+      });
     });
-  });
   // 添加共引文献的节点和边
   commonCitations.value.forEach(citId => {
     // 检查节点是否已存在，如果存在则跳过
@@ -438,17 +568,17 @@ onMounted(() => {
 
   chartInstance.setOption(chartOptions);
 });
-const paper = ref({
+// const paper = ref({
 
-  id: 1,
-  title: '乙烯利调控橡胶树胶乳产量和品质的阈值分析 ',
-  abstract: '分析乙烯利（ETH）、乙烯利抑制剂1-甲基环丙烯（1-MCP）和半胱氨酸（CYS）对橡胶树胶乳产量和主要品质指标的影响，并计算剂量阈值为生产提供依据，采用优化的正交实验设计分析三因素（ETH，1-MCP，CYS），四水平（三种试剂各四个浓度）共14个处理橡胶树割面，测定橡胶树胶乳产量、干含、分子量、塑性初值、塑性保持率和门尼粘度等关键指标，并分析指标之间的相关性。结果表明，14个处理橡胶树后产量、干含等均存在显著差异。相关分析表明数均分子量与重均分子量、门尼粘度正相关，相关系数分别为0.71和0.83，与多分散性负相关，相关系数为-0.91。塑性初值与门尼粘度正相关，相关系数为0.73。多分散性与门尼粘度负相关，相关系数-0.89。分别建立了以干含等指标为核心的回归方程，计算出的乙烯利的最高浓度是0.15%，1-MCP的最高浓度是1.08，CYS的浓度是0.41。优化的正交试验方法可有效的计算排胶调节剂的阈值，为后续实验提供理论和实践指导。',
-  author: '刘明洋  杨洪  樊松乐  郭冰冰  代龙军  ',
-  publisher: '农业农村部橡胶树生物学与遗传资源利用重点实验室/省部共建国家重点实验室培育基地-海南省热带作物栽培生理学重点实验室/中国热带农业科学院橡胶研究所',
-  publishedDate: '2024-12-06 11:12:23',
-  citation: '[1]刘明洋,杨洪,樊松乐,等.乙烯利调控橡胶树胶乳产量和品质的阈值分析[J/OL].森林工程,1-10[2024-12-07].http://kns.cnki.net/kcms/detail/23.1388.S.20241205.1715.002.html.'
-  // 添加更多论文数据
-});
+//   id: 1,
+//   title: '乙烯利调控橡胶树胶乳产量和品质的阈值分析 ',
+//   abstract: '分析乙烯利（ETH）、乙烯利抑制剂1-甲基环丙烯（1-MCP）和半胱氨酸（CYS）对橡胶树胶乳产量和主要品质指标的影响，并计算剂量阈值为生产提供依据，采用优化的正交实验设计分析三因素（ETH，1-MCP，CYS），四水平（三种试剂各四个浓度）共14个处理橡胶树割面，测定橡胶树胶乳产量、干含、分子量、塑性初值、塑性保持率和门尼粘度等关键指标，并分析指标之间的相关性。结果表明，14个处理橡胶树后产量、干含等均存在显著差异。相关分析表明数均分子量与重均分子量、门尼粘度正相关，相关系数分别为0.71和0.83，与多分散性负相关，相关系数为-0.91。塑性初值与门尼粘度正相关，相关系数为0.73。多分散性与门尼粘度负相关，相关系数-0.89。分别建立了以干含等指标为核心的回归方程，计算出的乙烯利的最高浓度是0.15%，1-MCP的最高浓度是1.08，CYS的浓度是0.41。优化的正交试验方法可有效的计算排胶调节剂的阈值，为后续实验提供理论和实践指导。',
+//   author: '刘明洋  杨洪  樊松乐  郭冰冰  代龙军  ',
+//   publisher: '农业农村部橡胶树生物学与遗传资源利用重点实验室/省部共建国家重点实验室培育基地-海南省热带作物栽培生理学重点实验室/中国热带农业科学院橡胶研究所',
+//   publishedDate: '2024-12-06 11:12:23',
+//   citation: '[1]刘明洋,杨洪,樊松乐,等.乙烯利调控橡胶树胶乳产量和品质的阈值分析[J/OL].森林工程,1-10[2024-12-07].http://kns.cnki.net/kcms/detail/23.1388.S.20241205.1715.002.html.'
+//   // 添加更多论文数据
+// });
 // 复制引用链接到剪贴板
 
 const copyToClipboard = async () => {
@@ -461,16 +591,16 @@ const copyToClipboard = async () => {
   }
 };
 // 主题列表
-const subjects = ref([
-  { name: '人工智能', link: '/subjects/ai' },
-  { name: '机器学习', link: '/subjects/ml' },
-  { name: '自然语言处理', link: '/subjects/nlp' },
-  { name: '人工智能', link: '/subjects/ai' },
-  { name: '机器学习', link: '/subjects/ml' },
-  { name: '自然语言处理', link: '/subjects/nlp' },
+// const subjects = ref([
+//   { name: '人工智能', link: '/subjects/ai' },
+//   { name: '机器学习', link: '/subjects/ml' },
+//   { name: '自然语言处理', link: '/subjects/nlp' },
+//   { name: '人工智能', link: '/subjects/ai' },
+//   { name: '机器学习', link: '/subjects/ml' },
+//   { name: '自然语言处理', link: '/subjects/nlp' },
 
-  // 可以继续添加更多主题
-]);
+//   // 可以继续添加更多主题
+// ]);
 
 //下载paper
 const downloadPDF = async () => {
@@ -511,6 +641,11 @@ const openPreview = () => {
 
 const closePreview = () => {
   isPreviewOpen.value = false;
+  nextTick(() => {
+    if (window.MathJax) {
+      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+    }
+  });
 };
 
 const onLoaded = () => {

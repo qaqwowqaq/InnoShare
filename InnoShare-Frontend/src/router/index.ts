@@ -32,7 +32,7 @@ const routes: Array<RouteRecordRaw> = [
     props: true
   },
   {
-    path: '/UpdatePaper',
+    path: '/UpdatePaper/:id',
     name: 'UpdatePaper',
     component: UpdatePaper,
     props: true

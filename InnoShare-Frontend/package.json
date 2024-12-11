@@ -17,6 +17,7 @@
     "echarts-liquidfill": "^2.0.6",
     "element-plus": "^2.9.0",
     "fullpage.js": "^4.0.30",
+    "mathjax": "^3.2.2",
     "pinia": "^2.2.6",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",

@@ -26,11 +26,11 @@
       <section id="section1" class="mb-8 w-full flex flex-col space-y-8 items-center ">
         <!-- 动态渲染每一页的卡片 -->
         <div v-for="(paper, index) in currentPapers" :key="index"
-          class="w-3/4 h-72 bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+          class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
           style="background-color:rgb(209.4, 236.7, 195.9);">
-          <div class="p-6">
-            <h3 class="text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
-              @click="navigateToPaper(paper.id)">
+          <div  class="p-6 " >
+            <h3  class="h-2/5 text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
+              @click="navigateToPaper(paper.doi)">
               {{ paper.title }}
             </h3>
             <div class="flex flex-col items-start text-sm text-gray-500 text-left">
@@ -38,7 +38,7 @@
                 <span class="font-bold">摘要：</span>{{ paper.abstract }}
               </p>
               <p class="text-sm text-gray-600 mt-2">
-                <span class="font-bold">作者：</span> <span class="font-medium">{{ paper.authors.join(", ") }}</span>
+                <span class="font-bold">作者：</span> <span class="font-medium">{{ paper.authors }}</span>
               </p>
               <p class="text-sm text-gray-600 mt-2">
                 <span class="font-bold">出版时间：</span> <span class="font-medium">{{ paper.publishDate }}</span>
@@ -63,10 +63,10 @@
             </div>
             <!-- 右侧更新和删除按钮 -->
             <div class="flex space-x-4">
-              <button @click="handleUpdate(paper.id)" class="text-gray-600 hover:text-blue-800">
+              <button @click="handleUpdate(paper.doi)" class="text-gray-600 hover:text-blue-800">
                 <i class="fas fa-edit"></i> 更新
               </button>
-              <button @click="handleDelete(paper.id)" class="text-gray-600 hover:text-red-800">
+              <button @click="handleDelete(paper.doi)" class="text-gray-600 hover:text-red-800">
                 <i class="fas fa-trash"></i> 删除
               </button>
             </div>
@@ -84,76 +84,82 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRefs, ref, computed } from 'vue'
+import axios from 'axios';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import { reactive, toRefs, ref, computed, onMounted, nextTick, Ref } from 'vue'
 import { useRouter } from "vue-router"; // Vue Router for navigation
+// 假设每个paper是一个包含特定字段的对象
+interface Paper {
+  id: number;
+  doi: string;
+  title: string;
+  authors: string;
+  abstract: string;
+  publishDate: string;
+  uploadDate: string;
+  citations: number;
+  downloads: number;
+}
 
-// 模拟论文数据
-const papers = ref([
-  {
-    id: 1,
-    title: "Understanding AI: A Comprehensive Guide",
-    authors: ["John Doe", "Jane Smith"],
-    abstract: '分析乙烯利（ETH）、乙烯利抑制剂1-甲基环丙烯（1-MCP）和半胱氨酸（CYS）对橡胶树胶乳产量和主要品质指标的影响，并计算剂量阈值为生产提供依据，采用优化的正交实验设计分析三因素（ETH，1-MCP，CYS），四水平（三种试剂各四个浓度）共14个处理橡胶树割面，测定橡胶树胶乳产量、干含、分子量、塑性初值、塑性保持率和门尼粘度等关键指标，并分析指标之间的相关性。结果表明，14个处理橡胶树后产量、干含等均存在显著差异。相关分析表明数均分子量与重均分子量、门尼粘度正相关，相关系数分别为0.71和0.83，与多分散性负相关，相关系数为-0.91。塑性初值与门尼粘度正相关，相关系数为0.73。多分散性与门尼粘度负相关，相关系数-0.89。分别建立了以干含等指标为核心的回归方程，计算出的乙烯利的最高浓度是0.15%，1-MCP的最高浓度是1.08，CYS的浓度是0.41。优化的正交试验方法可有效的计算排胶调节剂的阈值，为后续实验提供理论和实践指导。',
-    publishDate: "2023-05-12",
-    uploadDate: "2023-07-20",
-    imageUrl: "https://via.placeholder.com/300x200?text=AI+Paper", // 使用占位图
-    citations: 120, // 引用量
-    downloads: 450, // 下载量
-  },
-  {
-    id: 2,
-    title: "Autonomous Vehicles: The Future of Transportation",
-    authors: ["Alice Johnson", "Bob Lee"],
-    abstract: "This research focuses on autonomous vehicle technology, challenges, and future directions...",
-    publishDate: "2022-11-15",
-    uploadDate: "2023-01-10",
-    imageUrl: "https://via.placeholder.com/300x200?text=AV+Paper",
-    citations: 98, // 引用量
-    downloads: 390, // 下载量
-  },
-  {
-    id: 3,
-    title: "Quantum Computing for Beginners",
-    authors: ["Charlie Wang", "David Kim"],
-    abstract: "An introductory paper on quantum computing, its principles, and potential future applications...",
-    publishDate: "2023-03-22",
-    uploadDate: "2023-04-05",
-    imageUrl: "https://via.placeholder.com/300x200?text=Quantum+Paper",
-    citations: 98, // 引用量
-    downloads: 390, // 下载量
-  },
-  {
-    id: 4,
-    title: "Machine Learning in Healthcare",
-    authors: ["Eva Adams", "George Miller"],
-    abstract: '分析乙烯利（ETH）、乙烯利抑制剂1-甲基环丙烯（1-MCP）和半胱氨酸（CYS）对橡胶树胶乳产量和主要品质指标的影响，并计算剂量阈值为生产提供依据，采用优化的正交实验设计分析三因素（ETH，1-MCP，CYS），四水平（三种试剂各四个浓度）共14个处理橡胶树割面，测定橡胶树胶乳产量、干含、分子量、塑性初值、塑性保持率和门尼粘度等关键指标，并分析指标之间的相关性。结果表明，14个处理橡胶树后产量、干含等均存在显著差异。相关分析表明数均分子量与重均分子量、门尼粘度正相关，相关系数分别为0.71和0.83，与多分散性负相关，相关系数为-0.91。塑性初值与门尼粘度正相关，相关系数为0.73。多分散性与门尼粘度负相关，相关系数-0.89。分别建立了以干含等指标为核心的回归方程，计算出的乙烯利的最高浓度是0.15%，1-MCP的最高浓度是1.08，CYS的浓度是0.41。优化的正交试验方法可有效的计算排胶调节剂的阈值，为后续实验提供理论和实践指导。',
-    publishDate: "2023-06-18",
-    uploadDate: "2023-08-03",
-    imageUrl: "https://via.placeholder.com/300x200?text=ML+Paper",
-    citations: 98, // 引用量
-    downloads: 390, // 下载量
-  },
-  {
-    id: 5,
-    title: "AI and Ethics: A Critical Review",
-    authors: ["Simon Lee", "David Kim"],
-    abstract: "An in-depth look at the ethical considerations surrounding AI technologies...",
-    publishDate: "2023-09-05",
-    uploadDate: "2023-10-15",
-    citations: 98, // 引用量
-    downloads: 390, // 下载量
-  },
-  {
-    id: 6,
-    title: "Blockchain Technology and its Applications",
-    authors: ["Rita Li", "James Wang"],
-    abstract: "Exploring blockchain technology and its application in various industries, including finance and healthcare...",
-    publishDate: "2023-02-10",
-    uploadDate: "2023-04-07",
-    citations: 98, // 引用量
-    downloads: 390, // 下载量
-  },
-]);
+const papers: Ref<Paper[]> = ref([]);
+
+
+
+const fetchPapers = async () => {
+  try {
+    const response = await axios.get('/api/academic/allPaper', {
+      params: { userId: 1 }, // 传递 userId 参数
+    });
+    console.log('获取论文数据成功:', response.data.data);
+
+    if (response.data.success) {
+      papers.value = response.data.data.map((item: { paper: { doi: any; title: any; author: any; abstractText: any; subjects: any; publishedAt: any; downloadUrl: any; }; }, index: number) => ({
+        id: index, // 当前文献的序号作为 id
+        doi: item.paper.doi,
+        title: item.paper.title,
+        authors: item.paper.author,
+        abstract: item.paper.abstractText,
+        publishDate: item.paper.publishedAt,
+        uploadDate: "2023-07-20", // 固定日期或根据需要更新
+        citations: 120, // 引用量
+        downloads: 450, // 下载量
+      }));
+      console.log('papers:', papers.value);  // 调试打印
+      // 使用 MathJax 渲染公式
+      setTimeout(() => {
+        if (window.MathJax) {
+          window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+        }
+      }, 100);
+
+      console.log('获取论文数据成功1:', papers.value);
+    } else {
+      console.error('获取论文数据失败:', response.data.message);
+    }
+  } catch (error) {
+    console.error('获取论文数据失败:', error);
+  }
+};
+
+onMounted(() => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+    });
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+  }
+});
+// 格式化日期
+const formatDate = (dateString: string | number | Date) => {
+  const date = new Date(dateString);
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+};
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchPapers();
+});
+
 const currentPage = ref(1); // 当前页码
 const pageSize = 4; // 每页显示数量
 
@@ -161,19 +167,26 @@ const pageSize = 4; // 每页显示数量
 const currentPapers = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize;
   const endIndex = currentPage.value * pageSize;
+  console.log('currentPapers:', papers.value.slice(startIndex, endIndex)); // 添加调试信息
   return papers.value.slice(startIndex, endIndex);
 });
 
 // 分页变化时触发的函数
 const handlePageChange = (page: number) => {
   currentPage.value = page;
+  nextTick(() => {
+    if (window.MathJax) {
+      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+    }
+  });
 };
 
 const router = useRouter();
 
 // 导航到论文详细页面
-const navigateToPaper = (paperId: number) => {
+const navigateToPaper = (paperId: string) => {
   router.push({ name: "paper-detail", params: { id: paperId } }); // 假设你在路由中有名为 paper-detail 的页面
+
 };
 // 使用 TypeScript 类型断言
 const state = reactive({
@@ -184,23 +197,64 @@ const state = reactive({
 })
 
 const { circleUrl, sizeList } = toRefs(state)
-
 // 点击上传论文按钮时的处理函数
 const handleUploadClick = () => {
   console.log("上传论文按钮被点击");
-  // 在这里处理上传论文逻辑
+  // 跳转到上传论文页面
+  router.push({ name: 'UploadPaper' });
 };
 // 处理更新按钮点击事件
-const handleUpdate = (paperId: number) => {
+const handleUpdate = (paperId:string) => {
   console.log(`Updating paper with ID: ${paperId}`);
-  // 你可以在这里添加更新的逻辑
+  // 跳转到更新论文页面，传递 paperId 参数
+  router.push({ name: 'UpdatePaper', params: { id:paperId } });
 };
 
 // 处理删除按钮点击事件
-const handleDelete = (paperId: number) => {
-  console.log(`Deleting paper with ID: ${paperId}`);
-  // 你可以在这里添加删除的逻辑
+
+const handleDelete = async (paperDoi: string) => {
+  try {
+    // 询问是否确认删除
+    const result = await ElMessageBox.confirm(
+      '您确定要删除这篇论文吗？',
+      '确认删除',
+      {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    );
+
+    // 如果用户点击了"删除"
+    if (result === 'confirm') {
+      console.log(`Deleting paper with DOI: ${paperDoi}`);
+      const response = await axios.get('/api/academic/delete', {
+        params: {
+          userId: 1, // 当前用户 ID
+          paperDoi: paperDoi, // 要删除的论文 DOI
+        },
+      });
+
+      if (response.data.success) {
+        console.log('Paper deleted successfully');
+        // 删除成功后重新请求论文数据
+        await fetchPapers();  // 重新获取论文列表，更新页面
+
+        // 显示成功消息
+        ElMessage.success('论文删除成功');
+      } else {
+        console.error('Failed to delete paper:', response.data.message);
+        ElMessage.error('删除论文失败，请重试');
+      }
+    }
+  } catch (error) {
+    console.error('Error occurred while deleting paper:', error);
+    ElMessage.error('删除操作失败');
+  }
 };
+
+
+
 </script>
 
 <style scoped>
