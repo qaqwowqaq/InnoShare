@@ -7,6 +7,11 @@ import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
 import SearchResults from '@/views/SearchResults.vue';
 import Verify from '@/views/Verify.vue';
+import AdminPanel from '@/views/AdminPanel.vue'
+import UserReview from '@/views/UserReview.vue'
+import UserManagement from '@/views/UserManagement.vue'
+import DataStatistics from '@/views/DataStatistics.vue'
+
 const routes: Array<RouteRecordRaw> = [
 
   {
@@ -86,7 +91,29 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/search',
     name: 'SearchResults',
-    component: SearchResults,
+    component: SearchResults
+  },
+  {
+    path: '/admin',
+    component: AdminPanel,
+    redirect: '/admin/data-statistics',
+    children: [
+      {
+        path: 'data-statistics',
+        name: 'DataStatistics',
+        component: DataStatistics
+      },
+      {
+        path: 'user-review',
+        name: 'UserReview',
+        component: UserReview
+      },
+      {
+        path: 'user-management',
+        name: 'UserManagement',
+        component: UserManagement
+      }
+    ]
   }
 ];
 
@@ -95,4 +122,4 @@ const router = createRouter({
   routes
 });
 
-export default router;
+export { router };  // 保持命名导出
