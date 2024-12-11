@@ -1,9 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '../views/Home.vue';
 import SearchResults from '../views/SearchResults.vue'
-import Login from '../views/Login.vue'
-import Register from '../views/Register.vue'
+import Register from '../views/Register.vue';
+import Login from '../views/Login.vue';
+import Verify from '../views/Verify.vue';
 import UserDashboard from '../views/UserDashboard.vue'
+import PaperDetail from '@/views/PaperDetail.vue';
+import AchiManage from '@/views/AchiManage.vue';
 
 const routes = [
   {
@@ -56,11 +59,31 @@ const routes = [
     component: Register
   },
   {
+    path: '/verify',
+    name: 'Verify',
+    component: Verify
+  },  
+  {
+    path: '/userDashboard/:userId',
+    name: 'UserDashboard',
+    component: UserDashboard
+  },
+  {
+    path: '/paper/:id',
+    name: 'PaperDetail',
+    component: PaperDetail,
+    props: true
+  },
+  {
+    path: '/AchiManage',
+    name: 'AchiManage',
+    component: AchiManage,
+  },
+  {
     path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
   }
-
 ]
 
 const router = createRouter({

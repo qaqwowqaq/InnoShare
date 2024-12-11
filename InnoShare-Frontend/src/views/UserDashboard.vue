@@ -2,15 +2,17 @@
   <div id="drag" class="cv instaFade wrap">
     <div class="mainDetails">
       <div id="editButton" class="quickFade delayThree" v-if="isCurrentUser">
-        <el-button @click="editClick"> {{ editButtonText }} </el-button>
+        <el-button @click="onEdit" type="primary"> {{ editButtonText }} </el-button>
       </div>
       <div v-if="isCurrentUser && isEditMode">
-        <el-button @click="confirmEdit"> 保存修改 </el-button>
+        <el-button @click="onConfirmEditting" type="success"> 保存修改 </el-button>
       </div>
-      <div id="headshot" class="">
-        <img v-if="!isEditMode" :src="personalInfo.profileURL" :title="'Hi, I\'m ' + personalInfo.fullname + '!'" :alt="personalInfo.fullname" />
+      <div id="headshot">
+        <img v-if="!isEditMode" :src="personalInfo.profileURL" :title="'Hi, I\'m ' + personalInfo.fullname + '!'"
+          :alt="personalInfo.fullname" />
         <el-upload v-else :limit="1" :show-file-list="false" :before-upload="validateAvatarFile">
-          <img :src="personalInfo.profileURL" :title="'Hi, I\'m ' + personalInfo.fullname + '!'" :alt="personalInfo.fullname" />
+          <img :src="personalInfo.profileURL" :title="'Hi, I\'m ' + personalInfo.fullname + '!'"
+            :alt="personalInfo.fullname" />
         </el-upload>
       </div>
 
@@ -23,17 +25,15 @@
         <h4 v-else>
           <el-input v-model="personalInfo.username" placeholder="请输入用户名"></el-input>
         </h4>
+        <h4 class="quickFade delayThree" v-if="!isEditMode">email: {{ personalInfo.phoneNumber }}</h4>
+        <h4 v-else>
+          <el-input v-model="personalInfo.phoneNumber" placeholder="请输入手机号"></el-input>
+        </h4>
         <h4 class="quickFade delayThree" v-if="!isEditMode">email: {{ personalInfo.email }}</h4>
         <h4 v-else>
           <el-input v-model="personalInfo.email" placeholder="请输入电子邮箱"></el-input>
         </h4>
       </div>
-
-      <!-- <div id="contactDetails" class="quickFade delayFour">
-        <ul>
-          <li><a href="//linkedin.com/in/jennifermogan" title="LinkedIn"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a></li>
-        </ul>
-      </div> -->
       <div class="clear"></div>
     </div>
 
@@ -48,14 +48,15 @@
             <h1>已认证</h1>
           </div>
           <div v-else>
-            <article>
+            <article class="flex-container">
               <h1>未认证</h1>
+              <el-button v-if="isCurrentUser && !isEditMode" type="success" round>去认证</el-button>
             </article>
-            <el-button v-if="isCurrentUser && !isEditMode">去认证</el-button>
           </div>
         </div>
         <div class="clear"></div>
       </section>
+
       <section>
         <article>
           <div class="sectionTitle">
@@ -66,6 +67,22 @@
             <h3 v-if="!isEditMode">{{ personalInfo.institution }}</h3>
             <h3 v-else>
               <el-input v-model="personalInfo.institution" placeholder="请输入所属机构"></el-input>
+            </h3>
+          </div>
+        </article>
+        <div class="clear"></div>
+      </section>
+
+      <section>
+        <article>
+          <div class="sectionTitle">
+            <h1>国籍</h1>
+          </div>
+
+          <div class="sectionContent">
+            <h3 v-if="!isEditMode">{{ personalInfo.nationality }}</h3>
+            <h3 v-else>
+              <el-input v-model="personalInfo.nationality" placeholder="请输入国籍"></el-input>
             </h3>
           </div>
         </article>
@@ -104,30 +121,53 @@
         <div class="clear"></div>
       </section>
 
-      <section>
+      <section v-if="!isEditMode">
         <div class="sectionTitle">
           <h1>学术成果</h1>
         </div>
 
         <div class="sectionContent">
-          <el-button v-if="!isEditMode">查看学术成果</el-button>
-          <el-button v-if="!isEditMode">上传学术成果</el-button>
+          <el-button type="primary">查看学术成果</el-button>
+          <el-button v-if="isCurrentUser" type="primary">上传学术成果</el-button>
         </div>
         <div class="clear"></div>
       </section>
+
+      <section v-if="!isEditMode && isCurrentUser">
+        <div class="sectionTitle">
+          <h1>专属邀请码</h1>
+        </div>
+        <div class="sectionContent">
+          <el-button @click="onShowInivitationCode" type="primary">查看邀请码</el-button>
+        </div>
+      </section>
     </div>
   </div>
+
   <el-dialog v-model="editSaveVisible" title="Tips" width="500">
     <span>是否需要保存当前修改？</span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="cancelEdit">不保存</el-button>
-        <el-button type="primary" @click="confirmEdit">
+        <el-button @click="onCancelEdit" type="danger">不保存</el-button>
+        <el-button type="primary" @click="onConfirmEditting">
           保存
         </el-button>
       </div>
     </template>
   </el-dialog>
+
+  <el-dialog v-model="copyInvitationCodeVisible" title="Tips" width="500">
+    <span>{{ personalInfo.fullname }}的专属邀请码:</span>
+    <br />
+    <span>{{ personalInfo.inivitationCode }}</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCopyInvitaitionCode" type="primary">复制到剪切板</el-button>
+        <el-button @click="onCloseInvitationCodeDialog">关闭窗口</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script lang="ts" setup>
@@ -135,18 +175,23 @@ import { computed, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus'
 import type { UploadProps } from 'element-plus'
 import { useRouter } from 'vue-router';
+import { useUserStore } from '../store/modules/user';
 
+const userStore = useUserStore();
 // information of user
 class PersonInfo {
   username: string = 'PlutoFX';
   fullname: string = 'Ibuki Ayapa';
+  phoneNumber: string = '11122223333';
   email: string = 'example@gmail.com';
   // 是否已认证
   isVerified: boolean = false;
   profileURL: string = 'https://th.bing.com/th/id/OIP.EyNjv0tcjuB_E5RFnPrw3wAAAA?w=203&h=145&c=7&r=0&o=5&dpr=1.5&pid=1.7';
+  nationality: string = 'China';
   institution: string = 'Beihang University';
   experience: string = 'Working / Studying Experience';
   fieldOfStudy: string = 'Software Engineer';
+  inivitationCode: string = 'f1i6VJzl8MlUVNO7uVRCDmMWvCfWX8Ed';
   // username: string, fullname: string, email: string, isVerified: boolean,
   // profileURL: string, institution: string, experience: string, fieldOfStudy: string
   constructor(other?: PersonInfo) {
@@ -156,37 +201,36 @@ class PersonInfo {
   }
 
   deepClone(other: PersonInfo) {
-      this.username = other.username;
-      this.fullname = other.fullname;
-      this.email = other.email;
-      this.isVerified = other.isVerified;
-      this.profileURL = other.profileURL;
-      this.institution = other.institution;
-      this.experience = other.experience;
-      this.fieldOfStudy = other.fieldOfStudy;
+    this.username = other.username;
+    this.fullname = other.fullname;
+    this.phoneNumber = other.phoneNumber;
+    this.email = other.email;
+    this.isVerified = other.isVerified;
+    this.profileURL = other.profileURL;
+    this.nationality = other.nationality;
+    this.institution = other.institution;
+    this.experience = other.experience;
+    this.fieldOfStudy = other.fieldOfStudy;
   }
 }
 
 const personalInfo = reactive(new PersonInfo());
 const backedPersonalInfo = reactive(new PersonInfo());
-// const username = ref('PlutoFX');
-// const fullname = ref('Ibuki Ayapa');
-// const email = ref('exaple@gmail.com');
-// const isAuthenticated = ref(false);
-// const profileURL = ref('https://th.bing.com/th/id/OIP.EyNjv0tcjuB_E5RFnPrw3wAAAA?w=203&h=145&c=7&r=0&o=5&dpr=1.5&pid=1.7');
-// const institution = ref('Beihang University');
-// const experience = ref('Working / Studying Experience');
-// const fieldOfStudy = ref('Software Engineer');
 
-const formData = ref(new FormData());
+
+const formData = reactive(new FormData());
 
 
 
-// logic of controlling
+/* logic of controlling */
+
+// 为了展示静态逻辑，暂时先默认为true
 const isCurrentUser = computed(() => {
+  // return userStore.userInfo?.username == personalInfo.username;
   return true;
 })
 const isEditMode = ref(false);
+const copyInvitationCodeVisible = ref(false);
 
 // 编辑时，确认是否需要保存的提示窗
 const editSaveVisible = ref(false);
@@ -201,7 +245,7 @@ const editButtonText = computed(() => {
 })
 
 // functions
-const editClick = (): void => {
+const onEdit = (): void => {
   if (isEditMode.value) {
     // true, check if we need to save
     editSaveVisible.value = true;
@@ -217,13 +261,13 @@ const editSave = (): void => {
   // todo: send update request
 }
 
-const cancelEdit = () : void=> {
+const onCancelEdit = (): void => {
   personalInfo.deepClone(backedPersonalInfo);
   isEditMode.value = false;
   editSaveVisible.value = false;
 }
 
-const confirmEdit = () : void => {
+const onConfirmEditting = (): void => {
   // send the edit request
   ElMessage({
     message: "个人信息修改成功！",
@@ -233,7 +277,7 @@ const confirmEdit = () : void => {
   editSaveVisible.value = false;
 }
 
-const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) : boolean => {
+const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile): boolean => {
   if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
     ElMessage.error('上传图像必须是JPG / PNG格式');
     return false;
@@ -247,6 +291,31 @@ const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) : boolean => {
   return false;
 }
 
+const onCopy = (text: string): void => {
+  navigator.clipboard.writeText(text).then(
+    () => {
+      // success
+      ElMessage.success('邀请码复制成功');
+    },
+    () => {
+      // fail
+      ElMessage.error('邀请码复制失败，请检查剪切板写入权限');
+    }
+  );
+}
+
+const onShowInivitationCode = (): void => {
+  copyInvitationCodeVisible.value = true;
+}
+
+const onCloseInvitationCodeDialog = (): void => {
+  copyInvitationCodeVisible.value = false;
+}
+
+const onCopyInvitaitionCode = (): void => {
+  onCopy(personalInfo.inivitationCode);
+}
+
 // todo: request function
 
 
@@ -254,17 +323,10 @@ const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile) : boolean => {
 
 <style scoped>
 #drag {
+  position: relative;
   padding-bottom: 200px;
 }
 
-video {
-  border: 0;
-  font: inherit;
-  font-size: 100%;
-  margin: 0;
-  padding: 0;
-  vertical-align: baseline;
-}
 
 section {
   display: block;
@@ -290,14 +352,6 @@ body {
   clear: both;
 }
 
-#menu {
-  position: fixed;
-  right: 0;
-  top: 15%;
-  width: 8em;
-  margin-top: -2.5em;
-}
-
 p {
   font-size: 1em;
   line-height: 1.4em;
@@ -314,28 +368,17 @@ a {
 }
 
 .cv {
-  /* width: 90%; */
-  max-width: 54rem;
+  /* max-width: 80%; */
+  padding-top: 20px;
+  max-width: 60rem;
   background: #fff;
-  margin: 30px auto;
-}
-
-.cv:hover {
-  cursor: grab;
-  cursor: -moz-grab;
-  cursor: -webkit-grab;
-}
-
-.cv:active {
-  cursor: grabbing;
-  cursor: -moz-grabbing;
-  cursor: -webkit-grabbing;
+  margin: 100px auto;
 }
 
 .mainDetails {
   padding: 25px 35px;
   border-bottom: 2px solid #066ccb;
-  background: #f3f3f3;
+  background: #ffffff;
 }
 
 #name h1 {
@@ -370,16 +413,18 @@ a {
 #headshot {
   width: 15%;
   float: left;
-  margin-right: 30px;
+  margin-top: 30px;
+  margin-right: 50px;
   overflow: hidden;
   position: relative;
 
 }
 
 #headshot img {
-  width: 100%;
+  width: 90%;
   aspect-ratio: 3 / 4;
   border: 1px solid #066ccb;
+  position: relative;
   object-fit: cover;
 }
 
@@ -387,39 +432,8 @@ a {
   float: left;
 }
 
-#contactDetails {
-  float: right;
-}
-
-#contactDetails ul {
-  list-style-type: none;
-  font-size: 0.9em;
-  margin-top: 2px;
-}
-
-#contactDetails ul li {
-  margin-bottom: 3px;
-  color: #444;
-  display: inline;
-}
-
-#contactDetails ul li a,
-a[href^="tel"] {
-  color: #444;
-  text-decoration: none;
-  -webkit-transition: all 0.3s ease-in;
-  -moz-transition: all 0.3s ease-in;
-  -o-transition: all 0.3s ease-in;
-  -ms-transition: all 0.3s ease-in;
-  transition: all 0.3s ease-in;
-}
-
-#contactDetails ul li a:hover {
-  color: #066ccb;
-}
-
 section {
-  border-top: 1px solid #dedede;
+  border-top: 1px solid #066ccb;
   padding: 20px 0 20px;
 }
 
@@ -460,22 +474,9 @@ section:last-child {
   margin-bottom: 3px;
 }
 
-.keySkills {
-  list-style-type: none;
-  -moz-column-count: 3;
-  -webkit-column-count: 3;
-  column-count: 3;
-  margin-bottom: 20px;
-  font-size: 1em;
-  color: #444;
-}
-
-.keySkills ul li {
-  margin-bottom: 3px;
-}
-
-
-
+/* .dialog-footer {
+  padding-top: 200px auto;
+} */
 
 
 
@@ -484,22 +485,16 @@ section:last-child {
   #headshot {
     display: none;
   }
-
-  .keySkills {
-    -moz-column-count: 2;
-    -webkit-column-count: 2;
-    column-count: 2;
-  }
 }
 
 
 
 
 
-@media all and (max-width: 54rem) {
+@media all and (max-width: 60rem) {
   .cv {
     width: 95%;
-    margin: 10px auto;
+    margin: 30px auto;
     min-width: 280px;
     transition: all 0.25s linear;
     -o-transition: all 0.25s linear;
@@ -528,12 +523,6 @@ section:last-child {
     margin-left: -2px;
     font-size: 1.25em;
   }
-
-  .keySkills {
-    -moz-column-count: 2;
-    -webkit-column-count: 2;
-    column-count: 2;
-  }
 }
 
 @media all and (max-width: 480px) {
@@ -547,12 +536,6 @@ section:last-child {
 
   #mainArea {
     padding: 0 25px;
-  }
-
-  .keySkills {
-    -moz-column-count: 1;
-    -webkit-column-count: 1;
-    column-count: 1;
   }
 
   #name h1 {

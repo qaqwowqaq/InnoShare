@@ -32,6 +32,7 @@ export default {
   margin: 0;
   padding:0;
   background-color: white;
+  overflow: auto; /* 子页面显示滚动条用的，勿删 */
 }
 
 body {
