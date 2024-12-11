@@ -34,6 +34,7 @@ import { defineComponent, ref } from 'vue';
 import { useUserStore } from '../store/modules/user';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import axiosInstance from '@/axiosConfig';
 
 export default defineComponent({
   setup() {
@@ -54,6 +55,27 @@ export default defineComponent({
 
     const handleLogin = async () => {
       errorMessage.value = '';  // 清空之前的错误信息
+      try {
+    const response = await axiosInstance.get('/users/login', {
+      params: {
+        username: username.value,
+        password: password.value,
+      },
+    });
+    const { token, user } = response.data.data;
+
+    // 将 Token 存储到 Cookie 中
+    document.cookie = `token=${token}; path=/`;
+
+    // 更新用户状态
+    userStore.login({ token, user });
+
+    // 跳转到认证页面
+    router.push('/');
+  } catch (error) {
+    // 登录失败
+    errorMessage.value = '用户名或密码错误';
+  }
 
       // try {
       //   const response = await axios.post('/api/auth/login', {
