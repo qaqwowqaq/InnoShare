@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    
     "moduleResolution": "Node",
     "lib": ["ESNext", "DOM"],
     "strict": true,
@@ -16,7 +17,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["echarts", "v-charts"]
   },
   
   "files": [],
@@ -24,5 +27,5 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
-
+  
 }

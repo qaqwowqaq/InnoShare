@@ -216,9 +216,8 @@ export default {
   width: 100%;
   min-width: 1000px;
   margin: 0 ;
-  position: fixed;
   align-items: center;
-  height: 64px;
+  height: 8%;
   justify-content: center;
   top: 0;
   left: 0;

@@ -2,11 +2,13 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
-import PaperDetail from '@/views/PaperDetail.vue';
+import UploadPaper from '@/views/uploadPaper.vue';
+import UpdatePaper from '@/views/updatePaper.vue';
 import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
 import SearchResults from '@/views/SearchResults.vue';
 import Verify from '@/views/Verify.vue';
+import PaperDetail from '@/views/PaperDetail.vue';
 const routes: Array<RouteRecordRaw> = [
 
   {
@@ -59,6 +61,18 @@ const routes: Array<RouteRecordRaw> = [
     component: Register
   },
   {
+    path: '/UploadPaper',
+    name: 'UploadPaper',
+    component: UploadPaper,
+    props: true
+  },
+  {
+    path: '/UpdatePaper/:id',
+    name: 'UpdatePaper',
+    component: UpdatePaper,
+    props: true
+  },
+  {
     path: '/verify',
     name: 'Verify',
     component: Verify
@@ -74,6 +88,7 @@ const routes: Array<RouteRecordRaw> = [
     component: PaperDetail,
     props: true
   },
+
   {
     path: '/AchiManage',
     name: 'AchiManage',
