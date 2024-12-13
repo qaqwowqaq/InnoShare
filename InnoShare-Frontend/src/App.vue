@@ -2,6 +2,7 @@
     <!-- 导航栏 -->
     <NavigationBar  />
     <!-- 路由视图 -->
+     
       <router-view />
 
 </template>

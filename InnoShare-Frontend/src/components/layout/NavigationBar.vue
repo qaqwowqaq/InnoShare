@@ -1,29 +1,30 @@
 <template>
+  
   <header id="guideBar">
       <div>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4a90e2" />
-      <stop offset="100%" style="stop-color:#9b59b6" />
-    </linearGradient>
-  </defs>
-  
-  <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#gradient)" transform="rotate(-5 150 50)">
-    <tspan dy="0">Inno</tspan>
-    <tspan dy="0" fill="#34495e">Share</tspan>
-  </text>
-  
-  <path d="M70 75 Q150 85 230 75" fill="none" stroke="#34495e" stroke-width="2" />
-</svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="90">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#4a90e2" />
+            <stop offset="100%" style="stop-color:#9b59b6" />
+          </linearGradient>
+        </defs>
+        
+        <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#gradient)" transform="rotate(-5 150 50)">
+          <tspan dy="0">Inno</tspan>
+          <tspan dy="0" fill="#34495e">Share</tspan>
+        </text>
+        
+        <path d="M70 75 Q150 85 230 75" fill="none" stroke="#34495e" stroke-width="2" />
+        </svg>
         <div  class="searchTop" :style="{ visibility: isVisible ? 'visible' : 'hidden' }">
           <div id="searchBar">
-            <button class="searchButton">
-              <svg t="1725956324198" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6176" width="16" height="16">
+            <button class="searchButton" @click = "handleSearch">
+              <svg t="1725956324198" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6176" width="18" height="18">
                 <path d="M716.29895 806.808621C641.509798 862.822176 548.629446 896 448 896 200.576432 896 0 695.423565 0 448 0 200.576432 200.576432 0 448 0 695.423565 0 896 200.576432 896 448 896 548.629446 862.822176 641.509798 806.808621 716.29895L946.011456 855.501786C970.889978 880.380314 970.970976 920.635366 945.803174 945.803174 920.809619 970.79673 879.927322 970.436992 855.501786 946.011456L716.29895 806.808621ZM448 768C624.73112 768 768 624.73112 768 448 768 271.26888 624.73112 128 448 128 271.26888 128 128 271.26888 128 448 128 624.73112 271.26888 768 448 768Z" fill="#666666" p-id="6177"></path>
               </svg>
             </button>
-            <input placeholder="Search for all " />
+            <input v-model="searchQuery" placeholder="Search for all " @keypress="handleKeyPress"/>
             <div class="advance">
               <a ref="guideSearch" class="guideSearch" @click="guideTo('/search')">高级检索</a>
             </div>
@@ -50,7 +51,7 @@
         </div>
         <a ref="guideHome" class="guideHome" @click="guideTo('/home')">首页</a>
         <a ref="guideAbout" class="guideAbout" @click="guideTo('/about')">关于我们</a>
-        <a ref="guideLogin" class="guideLogin" @click="guideTo('/login')">{{ this.useStore.isAuthenticated?this.useStore.getUserInfo.username:"登录" }}</a>
+        <a ref="guideLogin" class="guideLogin" @click="handleLoginClick">{{ this.useStore.isAuthenticated?"个人中心":"登录" }}</a>
 
       </div>
   </header>
@@ -61,6 +62,8 @@
 import {mainStore} from "../../store/modules/pageStyleStore.ts";
 import {useUserStore} from "../../store/modules/user.ts"
 import {watch} from "vue";
+import {computed} from "vue";
+import { useRouter } from "vue-router";
 export default {
   name: "NavigationBar",
   data(){
@@ -89,13 +92,17 @@ export default {
             fill="#707070"></path></svg>`,
         }
         ],//搜索类型论文专利等
+        searchQuery:"",
     }
 
   },
   setup() {
     const myStore = mainStore(); // 使用 Pinia store
     const useStore =useUserStore();
-    return { myStore,useStore }; // 返回 store 以便在模板中使用
+    const router = useRouter();
+    const userDashboardPath = computed(() => (useStore.isAuthenticated ? `/userDashboard/${useStore.getUserInfo.id}` : "/login"));
+    return { myStore, useStore, userDashboardPath, router };
+  
   },
   computed: {
 
@@ -150,6 +157,31 @@ export default {
       }
       this.$router.push(path);
     },
+    handleSearch() {
+      if (this.searchQuery.trim() === '') {
+        alert('请输入搜索内容');
+        return;
+      }
+      // 跳转到 SearchResults 页面，并传递查询参数
+      this.$router.push({
+        path: '/search',
+        query: {
+          type: this.selectType=="paper"?"achievements":"patents",
+          query: this.searchQuery,
+          subject: '', // 可根据需要添加更多参数
+          subjectLevel: 1,
+          sortBy: '_score',
+          order: 'desc',
+          page: 1,
+          limit: 9,
+        }
+      });
+    },
+    handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        this.handleSearch();
+      }
+    },
     update(newvalue){
       const header = document.getElementById('guideBar');
       const searchBar = document.getElementById('searchBar');
@@ -176,6 +208,15 @@ export default {
           login.style.color = 'rgba(252,249,249,0.85)';
         }
 
+      }
+    },
+    handleLoginClick() {
+      if (this.useStore.isAuthenticated) {
+        // 已登录，导航到个人中心
+        this.guideTo(`/userDashboard/${this.useStore.getUserInfo.id}`);
+      } else {
+        // 未登录，导航到登录页
+        this.guideTo('/login');
       }
     },
     expand(){
@@ -260,6 +301,14 @@ export default {
 }
 .logoSvg {
   height: 32px;
+}
+
+.searchButton {
+  transition: background-color 0.3s ease;
+}
+
+.searchButton:hover {
+  background-color: #e0e0e0; /* 悬浮时的背景颜色 */
 }
 .searchTop {
   flex: 6;

@@ -8,6 +8,7 @@ import 'element-plus/dist/index.css';
 import './styles/index.css';
 import { mainStore } from './store/modules/pageStyleStore.ts'; // 引入 mainStore
 
+
 const app = createApp(App);
 
 const pinia = createPinia();
