@@ -1,6 +1,6 @@
 <template>
 
-  <div class="h-screen flex">
+  <div class="h-screen flex" style="margin-top: 100px;">
     <!-- 左侧固定栏 -->
 
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
@@ -221,19 +221,19 @@
 <script  setup>
 import { ref, onMounted, nextTick, computed, watch, watchEffect, reactive } from "vue";
 import PdfPreview from '@/components/PdfPreview/index.vue';
+import { useRoute,useRouter } from 'vue-router';
 const pdfUrl = ref();
 import * as echarts from 'echarts'; // 引入echarts库
 import { useTransition } from '@vueuse/core'
 import axios from 'axios';
+import axiosInstance from "@/axiosConfig";
 // 定义响应式的 `paper` 和 `paperData`
 const renderedAbstract = ref('');
-const subjects = ref([
-
-]);
+const subjects = ref([]);
 const paperData = ref({
   thisPaper: {
     id: '',
-    primaryRefs: ref([]),
+    primaryRefs: [],
     secondaryRefs: [],
   },
   references: {},
@@ -246,15 +246,16 @@ const paper = ref({
   publishedDate: '',
   citation: ''
 });
-
-
+const router = useRouter();
+const route = useRoute();
+const paperDoi = ref(null);  
 // 获取论文基本信息
-const fetchPaper = async (paperDoi) => {
+const fetchPaper = async (paperDoiValue) => {
   try {
-    console.log("请求参数:", { paperDoi });
-    const response = await axios.get('/api/academic/getPaper', {
+    console.log("请求参数:", { paperDoi: paperDoiValue });
+    const response = await axiosInstance.get('/api/academic/getPaper', {
       params: {
-        paperDoi: paperDoi,
+        paperDoi: paperDoiValue,
       },
     });
     console.log('获取论文基本信息成功:', response.data.data.paper);
@@ -266,17 +267,17 @@ const fetchPaper = async (paperDoi) => {
       publishedDate: new Date(response.data.data.paper.createdAt).toLocaleDateString('zh-CN'),
       citation: `[1]${response.data.data.paper.author}.${response.data.data.paper.title}[J/OL].arXiv, ${response.data.data.paper.createdAt}.${response.data.data.paper.doi}.`,
     };
-     // 使用 MathJax 渲染公式
+    // 使用 MathJax 渲染公式
     setTimeout(() => {
       if (window.MathJax) {
         window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
       }
     }, 100);
-     pdfUrl.value = response.data.data.paper.downloadUrl;
+    pdfUrl.value = response.data.data.paper.downloadUrl;
     console.log('pdfUrl:', pdfUrl.value);
     console.log('获取论文基本信息成功:', paper.value);
-     // 获取并处理学科信息
-     subjects.value = response.data.data.paper.subjects.map(subject => {
+    // 获取并处理学科信息
+    subjects.value = response.data.data.paper.subjects.map(subject => {
       return {
         name: subject,
         link: `/subjects/${subject.toLowerCase().replace(/\s+/g, '-').replace(/\(.*\)/, '')}`,
@@ -287,43 +288,46 @@ const fetchPaper = async (paperDoi) => {
     console.error('获取论文基本信息失败:', error);
   }
 };
-onMounted(() => {
-  if (window.MathJax) {
-    window.MathJax.Hub.Config({
-      tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-    });
-    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
-  }
-});
 
-// 获取引用信息
-const buildReferenceTree = async (paperDoi) => {
+const buildReferenceTree = async (paperDoiValue) => {
   try {
-    const response = await axios.get('/api/academic/getPaperReferences', {
-      params: { paperDoi },
+    console.log('请求的论文 DOI:', paperDoiValue); // 确保 DOI 值正确
+    const response = await axiosInstance.get('/api/academic/getPaperReferences', {
+      params: { paperDoi: paperDoiValue.value },
     });
     console.log('获取引用信息成功:', response.data);
-    paperData.value = {
-      thisPaper: {
-        id: response.data.data.paper.doi, // 使用 `paper` 中的 id
-        primaryRefs: response.data.data.references.map((ref) => ref.id),
-        secondaryRefs: [], // 可填充二级引用
-      },
-      references: response.data.data.references.reduce(
-        (acc, cur) => ({ ...acc, [cur.id]: cur }),
-        {},
-      ),
-    };
+
+    if (response.data.data ) {
+      const references = response.data.data;
+      console.log('引用信息:', references);
+      paperData.value = {
+        thisPaper: {
+          id: paperDoiValue.value || "", // 防止 undefined
+          primaryRefs:references.map((ref) => ref.referenceId), // 使用 referenceId
+          secondaryRefs: [], // 可填充二级引用
+        },
+        references: references.reduce(
+          (acc, cur) => ({ ...acc, [cur.referenceId]: cur }), // 使用 referenceId 作为键
+          {},
+        ),
+        
+      };
+      console.log('paperData:', paperData.value.references)
+    } else {
+      console.error('论文数据格式不正确');
+    }
     return response.data; // 返回引用数据
   } catch (error) {
     console.error('获取引用信息失败:', error);
-    return { references: [], primaryRefs: [] };
+    return { error: true, message: error.message || '未知错误', references: [], primaryRefs: [] };
   }
 };
+
+
 // 获取论文和引用信息，分别处理
-const fetchPaperData = async (paperDoi) => {
+const fetchPaperData = async (paperDoiValue) => {
   try {
-    const { references, primaryRefs } = await buildReferenceTree(paperDoi);
+    const { references, primaryRefs } = await buildReferenceTree(paperDoiValue);
     // 更新 `paperData` 中的引用信息
     paperData.value = {
       thisPaper: {
@@ -338,15 +342,50 @@ const fetchPaperData = async (paperDoi) => {
     console.error('获取引用信息失败:', error);
   }
 };
-const paperDoi = 'https://doi.org/10.48550/arXiv.2401.01198';
+
+// 组件挂载时执行初始化 MathJax
+onMounted(() => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+    });
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+  }
+});
+
+// 动态监听 `route.query` 的变化，并触发数据加载
+watchEffect(async () => {
+  paperDoi.value = route.query.id ? decodeURIComponent(route.query.id) : null;
+
+  if (paperDoi.value) {
+    console.log('论文DOI:', paperDoi.value);
+
+    try {
+      // 加载论文基本信息
+      await fetchPaper(paperDoi.value);
+      // 加载引用信息
+      await fetchPaperData(paperDoi.value);
+      // 更新图表数据
+      updateChartData();
+      console.log('论文数据:', paper.value);
+    } catch (error) {
+      console.error('数据加载失败:', error);
+    }
+  } else {
+    console.error('未获取到有效的论文 DOI');
+  }
+});
+
+
+
 // 组件挂载时执行
 onMounted(async () => {
-
-
+  console.log('论文DOI:', paperDoi.value);
   // 先获取论文基本信息
-  await fetchPaper(paperDoi);
+  await fetchPaper(paperDoi.value);
 
   await fetchPaperData(paperDoi);
+  updateChartData();
   console.log('论文数据:', paper.value);
 });
 
@@ -443,7 +482,7 @@ const chartOptions = {
 };
 
 // 组件挂载后，初始化图表数据
-onMounted(() => {
+const updateChartData = () =>{
   // 计算共引文献
   if (paperData.thisPaper && paperData.thisPaper.primaryRefs && paperData.thisPaper.primaryRefs.length > 0)
     commonCitations.value = findCommonCitations(paperData.thisPaper.primaryRefs, paperData.references);
@@ -502,7 +541,9 @@ onMounted(() => {
 
   // 打印chartOptions的内容，确保配置正确
   console.log(JSON.stringify(chartOptions));
-});
+};
+
+
 //论文信息
 //文献列表
 // 导航按钮项

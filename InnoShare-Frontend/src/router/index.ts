@@ -88,7 +88,7 @@ const routes: Array<RouteRecordRaw> = [
     component: UserDashboard
   },
   {
-    path: '/paper/:id',
+    path: '/paper',
     name: 'PaperDetail',
     component: PaperDetail,
     props: true

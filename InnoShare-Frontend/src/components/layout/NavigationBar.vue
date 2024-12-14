@@ -173,7 +173,6 @@ export default {
           sortBy: '_score',
           order: 'desc',
           page: 1,
-          limit: 9,
         }
       });
     },

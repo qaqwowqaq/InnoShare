@@ -58,6 +58,7 @@ import { defineComponent, ref } from 'vue';
 import { useUserStore } from '../store/modules/user';
 import { useRouter } from 'vue-router';
 import axios from 'axios';  // 导入axios
+import axiosInstance from '@/axiosConfig';
 
 export default defineComponent({
   setup() {
@@ -93,7 +94,7 @@ export default defineComponent({
 
       // 注册请求
       try {
-        const response = await axios.post('/api/auth/register', {
+        const response = await axiosInstance.get('/users/add', {
           username: fullname.value,
           // contact: contact.value,
           password: password.value

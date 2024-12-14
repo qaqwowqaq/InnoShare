@@ -174,7 +174,7 @@ export default defineComponent({
     const subject = ref<string>(route.query.subject as string || '');
     const subjectLevel = ref<number>(Number(route.query.subjectLevel) || 1);
     const page = ref<number>(Number(route.query.page) || 1);
-    const limit = ref<number>(50); // 后端请求限制为50
+    const limit = ref<number>(100); // 后端请求限制为50
 
     const displayLimit = 6; // 前端每页展示9条
     const results = ref<Array<any>>([]);
@@ -196,15 +196,6 @@ export default defineComponent({
     const isSidebarOpen = ref<boolean>(true);
     const loading = ref<boolean>(false);
 
-    // 初始化 Markdown-It
-    
-    const md = new MarkdownIt({
-      html: true,
-      linkify: true,
-      typographer: true,
-    }).use(mk());
-
-
 
     // 获取搜索结果
     const fetchSearchResults = async () => {
@@ -215,14 +206,18 @@ export default defineComponent({
         // 构建动态的查询参数
         const params: Record<string, any> = {
           query: query.value,
-          page: 1, // 重置为第一页
           limit: limit.value, // 设置为50
         };
 
-        if (subject.value) params.subject = subject.value;
-        if (subjectLevel.value) params.subjectLevel = subjectLevel.value;
 
-        const response = await axiosInstance.get(apiPath, { params });
+        const response = await axiosInstance.get(apiPath, {
+          headers: {
+            "Content-Type": "application/json",
+            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
+            'Accept': '*/*', 
+          },
+          params
+        });
 
         console.log('API 返回数据:', response.data); // 调试用
 
@@ -370,7 +365,7 @@ export default defineComponent({
         router.push({
           path:"/paper",
           query: {
-            id: result.doi,
+            id: encodeURIComponent(result.doi),
           }
         })
       }
@@ -388,7 +383,7 @@ export default defineComponent({
       subject.value = (newQuery.subject as string) || '';
       subjectLevel.value = Number(newQuery.subjectLevel) || 1;
       page.value = Number(newQuery.page) || 1;
-      limit.value = 50; // 固定为50
+      limit.value = 100; // 固定为50
       results.value = [];
       fetchSearchResults();
     }, { immediate: true });
@@ -452,7 +447,7 @@ export default defineComponent({
 
     // 计算总页数
     const totalPages = computed(() => {
-      return Math.min(Math.ceil(filteredResults.value.length / displayLimit), 10);
+      return Math.min(Math.ceil(filteredResults.value.length / displayLimit), 100);
     });
 
     // 判断是否有下一页
