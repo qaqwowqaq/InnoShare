@@ -1,29 +1,78 @@
 <template>
-  <div class="login-container">
-    <!-- 左侧部分 -->
-    <div class="left-side">
-      <div class="welcome-text">
-        <h1>欢迎登录</h1>
-        <p class="sub-text">欢迎使用 InnoShare</p>
-      </div>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<div class="login-container bg-gradient-to-r from-blue-200 to-blue-500">
+    <!-- 左侧部分的修改 -->
+  <div class="left-side w-full sm:w-1/2 h-full flex justify-center items-center relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-full z-10 flex justify-center items-center">
+      <!-- 修改SVG尺寸和位置 -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 500 500"
+        class="w-96 h-96 absolute transform -translate-x-1/2 -translate-y-1/2"
+      >
+        <circle cx="250" cy="250" r="200" stroke="rgba(255, 255, 255, 0.4)" stroke-width="10" fill="none" />
+        <circle
+          cx="250"
+          cy="250"
+          r="200"
+          stroke="rgba(255, 255, 255, 0.7)"
+          stroke-width="10"
+          fill="none"
+          stroke-dasharray="1000"
+          stroke-dashoffset="0"
+          class="circle-animation"
+        />
+      </svg>
     </div>
 
+    <!-- 优化文字样式 -->
+    <div class="relative z-20 text-center">
+      <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 animate__animated animate__fadeIn animate__delay-1s mb-4">
+        InnoShare
+      </h1>
+      <p class="text-xl font-light text-white opacity-80 animate__animated animate__fadeIn animate__delay-2s tracking-wider">
+        创新分享，知识无界
+      </p>
+    </div>
+  </div>
+
     <!-- 右侧登录表单部分 -->
-    <div class="right-side">
-      <form @submit.prevent="handleLogin">
+    <div class="right-side w-full sm:w-1/2 h-full flex justify-center items-center p-6 sm:p-12">
+      <form @submit.prevent="handleLogin" class="w-full max-w-md space-y-6 bg-white p-8 rounded-lg shadow-lg transform transition-all duration-500 hover:scale-105">
         <div>
-          <label for="username">用户名</label>
-          <input type="text" id="username" v-model="username" required placeholder="请输入用户名" />
+          <label for="username" class="block text-gray-700 font-medium">用户名</label>
+          <input
+            type="text"
+            id="username"
+            v-model="username"
+            required
+            placeholder="请输入用户名"
+            class="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+          />
         </div>
+
         <div>
-          <label for="password">密码</label>
-          <input type="password" id="password" v-model="password" required placeholder="请输入密码" />
+          <label for="password" class="block text-gray-700 font-medium">密码</label>
+          <input
+            type="password"
+            id="password"
+            v-model="password"
+            required
+            placeholder="请输入密码"
+            class="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+          />
         </div>
-        <button type="submit">登录</button>
-        <p>没有账号？ <router-link to="/register">注册</router-link></p>
+
+        <button type="submit" class="w-full py-3 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
+          登录
+        </button>
+
+        <p class="text-sm mt-4 text-center">
+          没有账号？ <router-link to="/register" class="text-indigo-500 hover:text-indigo-700">注册</router-link>
+        </p>
 
         <!-- 错误信息展示 -->
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="text-red-500 text-center mt-3 text-sm">{{ errorMessage }}</p>
       </form>
     </div>
   </div>
@@ -33,7 +82,6 @@
 import { defineComponent, ref } from 'vue';
 import { useUserStore } from '../store/modules/user';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 import axiosInstance from '@/axiosConfig';
 
 export default defineComponent({
@@ -45,7 +93,6 @@ export default defineComponent({
     const password = ref('');
     const errorMessage = ref('');
 
-    // 模拟登录的用户信息
     const mockUser = {
       username: 'john_doe',
       email: 'john@example.com',
@@ -56,47 +103,28 @@ export default defineComponent({
     const handleLogin = async () => {
       errorMessage.value = '';  // 清空之前的错误信息
       try {
-    const response = await axiosInstance.get('/users/login', {
-      params: {
-        username: username.value,
-        password: password.value,
-      },
-    });
-    const { token, user } = response.data.data;
+        const response = await axiosInstance.get('/users/login', {
+          params: {
+            username: username.value,
+            password: password.value,
+          },
+        });
+        const { token, user } = response.data.data;
 
-    // 将 Token 存储到 Cookie 中
-    document.cookie = `token=${token}; path=/`;
+        // 将 Token 存储到 Cookie 中
+        document.cookie = `token=${token}; path=/`;
 
-    // 更新用户状态
-    userStore.login({ token, user });
+        // 更新用户状态
+        userStore.login({ token, user });
 
-    // 跳转到认证页面
-    router.push('/');
-  } catch (error) {
-    // 登录失败
-    errorMessage.value = '用户名或密码错误';
-  }
+        // 跳转到认证页面
+        router.push('/');
+      } catch (error) {
+        // 登录失败
+        errorMessage.value = '用户名或密码错误';
+      }
 
-      // try {
-      //   const response = await axios.post('/api/auth/login', {
-      //     username: username.value,
-      //     password: password.value
-      //   });
-
-      //   if (response.status === 200) {
-      //     const { token, user } = response.data;
-      //     userStore.login({ token, user });  // 假设你在 store 中有处理登录状态的逻辑
-      //     router.push('/');  // 登录成功后跳转到首页
-      //   }
-      // } catch (error) {
-      //   if (error.response && error.response.status === 401) {
-      //     errorMessage.value = '用户名或密码错误';
-      //   } else {
-      //     errorMessage.value = '登录请求失败，请稍后再试';
-      //   }
-      // }
-       // 在这里模拟登录逻辑
-       if (username.value === mockUser.username && password.value === mockUser.password) {
+      if (username.value === mockUser.username && password.value === mockUser.password) {
         // 登录成功
         userStore.login({ token: mockUser.token, user: { username: mockUser.username, email: mockUser.email } });
         router.push('/verify');  // 登录成功后跳转到认证页面
@@ -120,81 +148,138 @@ export default defineComponent({
 /* 整个页面容器 */
 .login-container {
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center;     /* 垂直居中 */
-  height: 100vh;           /* 高度占满整个视口 */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #cbdfff 0%, #3f61d3 100%);
 }
 
-/* 左侧部分 */
+/* 左侧部分样式 */
 .left-side {
-  width: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.9) 100%);
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: center;     /* 左侧内容居中 */
-  text-align: center;
+  align-items: center;
 }
 
-.welcome-text h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
+/* 玻璃拟态效果 */
+.left-side::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  z-index: 0;
 }
 
-.sub-text {
-  font-size: 20px;
-  color: #888;
+
+.left-side svg {
+  animation: spin 10s linear infinite;
 }
 
-/* 右侧部分 */
-.right-side {
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;     /* 使表单垂直居中 */
-  padding: 20px;
+
+
+/* SVG 动画效果 */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
+/* 文字样式 */
+.left-side h1 {
+  font-size: 3.2rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 2px;
+  animation: fadeInUp 1s ease-out;
+}
+
+.left-side p {
+  font-size: 1.2rem;
+  font-weight: 300;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 3px;
+  animation: fadeInUp 1s ease-out 0.5s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+/* 文字动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 左侧SVG圆环动画 */
+.circle-animation {
+  animation: dash 4s ease-in-out infinite;
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 800;
+  }
+  50% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 800;
+  }
+}
 /* 表单样式 */
 form {
-  width: 100%;
-  max-width: 400px;         /* 限制表单最大宽度 */
-  display: flex;
-  flex-direction: column;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  transition: transform 0.3s ease;
 }
 
-form div {
-  margin-bottom: 20px;
+form input,
+form button {
+  transition: all 0.3s ease;
 }
 
-form label {
-  font-size: 20px;
-  color: #333;
+form input:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
-form input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
-button {
-  padding: 10px;
-  font-size: 16px;
-  color: white;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
+/* 错误信息 */
 .error-message {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+  text-align: center;
+  animation: shake 0.5s ease-in-out;
+}
+
+/* 错误信息抖动动画 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
 }
 </style>
