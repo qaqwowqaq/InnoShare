@@ -1,10 +1,6 @@
 <template>
     <div class="fade-in">  <!-- 修改这里：添加外层容器并应用动画类 -->
         <div class="user-review fade-in">
-            <div class="bulk-actions">
-                <button class="approve-all-button" @click="approveAll">一键通过</button>
-                <button class="reject-all-button" @click="rejectAll">一键拒绝</button>
-            </div>
             <table>
                 <thead>
                     <tr>
@@ -34,6 +30,10 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="bulk-actions">
+                <button class="approve-all-button" @click="approveAll">一键通过</button>
+                <button class="reject-all-button" @click="rejectAll">一键拒绝</button>
+            </div>
             <div class="pagination">
                 <select v-model="pageSize" @change="handlePageSizeChange">
                     <option v-for="option in pageSizeOptions" :key="option" :value="option">
@@ -62,6 +62,7 @@
 
 <script>
 import axios from 'axios';
+import axiosInstance from '@/axiosConfig';
 
 export default {
     name: 'UserReview',
@@ -213,7 +214,7 @@ export default {
                     status: 'pending'
                 },
             ],
-            useStaticData: true, // 添加用于切换数据源的标志
+            useStaticData: false, // 添加用于切换数据源的标志
             showRejectModal: false,
             rejectReason: '',
             currentRequestId: null,
@@ -242,7 +243,7 @@ export default {
                 // 使用静态数据进行测试
                 
             } else {
-                axios
+                axiosInstance
                     .get('/api/admin/auth-requests', {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
@@ -263,7 +264,7 @@ export default {
         },
         approveUser(authRequestId) {
             // 发送批准请求
-            axios.put(`/api/admin/auth-requests/${authRequestId}`, {
+            axiosInstance.put(`/api/admin/auth-requests/${authRequestId}`, {
                 status: 'approved'
             }, {
                 headers: {
@@ -294,7 +295,7 @@ export default {
                 return;
             }
             // 发拒绝请求
-            axios.put(`/api/admin/auth-requests/${this.currentRequestId}`, {
+            axiosInstance.put(`/api/admin/auth-requests/${this.currentRequestId}`, {
                 status: 'rejected',
                 reason: this.rejectReason
             }, {
@@ -527,7 +528,7 @@ button {
 
 .bulk-actions {
     display: flex;
-    justify-content: center; /* 居中显示按钮 */
+    justify-content: flex-start; /* 改为左对齐 */
     margin-bottom: 10px;
 }
 

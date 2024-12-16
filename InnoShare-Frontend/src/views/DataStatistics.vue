@@ -63,12 +63,13 @@
 
 <script>
 import * as echarts from 'echarts';
+import axiosInstance from '@/axiosConfig';
 
 export default {
     name: 'DataStatistics',
     data() {
         return {
-            useTestData: true, // 添加测试开关
+            useTestData: false, // 添加测试开关
             stats: {},
             statisticsCards: [],
             papersPercentage: 0,
@@ -112,7 +113,7 @@ export default {
                 };
                 this.updateCharts();
             } else {
-                this.$axios.get('/api/admin/statistics', {
+                axiosInstance.get('/api/admin/statistics', {
                     headers: {
                         Authorization: `Bearer ${this.$store.state.adminToken}`
                     }
