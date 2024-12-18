@@ -2,7 +2,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <div class="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
     <!-- 主卡片容器 -->
-    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div class="max-w-4xl mt-10 mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
       <!-- 顶部背景横幅 -->
       <div class="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
       
@@ -19,7 +19,7 @@
                       class="avatar-uploader"
                       :limit="1"
                       :show-file-list="false"
-                      :before-upload="validateAvatarFile">
+                      :before-upload="validateAndUpdateAvatarFile">
               <img :src="personalInfo.profileURL"
                    class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mx-auto"
                    :alt="personalInfo.fullname"/>
@@ -69,7 +69,8 @@
               <span v-if="personalInfo.isVerified" class="text-green-500">已认证</span>
               <el-button v-else-if="isCurrentUser && !isEditMode" 
                         type="success" 
-                        class="!rounded-full">
+                        class="!rounded-full"
+                        @click="routerToVerify">
                 去认证
               </el-button>
               <span v-else class="text-yellow-500">未认证</span>
@@ -124,10 +125,11 @@
 
         <!-- 底部操作按钮 -->
         <div class="mt-8 flex justify-center space-x-4" v-if="!isEditMode">
-          <el-button type="primary" class="!rounded-full">查看学术成果</el-button>
+          <el-button type="primary" class="!rounded-full" @click="routerToAchivementList">查看学术成果</el-button>
           <el-button v-if="isCurrentUser" 
                      type="primary"
-                     class="!rounded-full">
+                     class="!rounded-full"
+                     @click="routerToUploadingAchivementList">
             上传学术成果
           </el-button>
           <el-button v-if="isCurrentUser" 
@@ -142,22 +144,44 @@
 
   <!-- 对话框保持不变 -->
   <el-dialog v-model="editSaveVisible" title="提示" width="500">
-    <!-- 对话框内容保持不变 -->
+    <span>是否需要保存当前修改？</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCancelEdit" type="danger">不保存</el-button>
+        <el-button type="primary" @click="onConfirmEditting">
+          保存
+        </el-button>
+      </div>
+    </template>
   </el-dialog>
 
   <el-dialog v-model="copyInvitationCodeVisible" title="专属邀请码" width="500">
-    <!-- 对话框内容保持不变 -->
+    <span>{{ personalInfo.fullname }}的专属邀请码:</span>
+    <br />
+    <span>{{ personalInfo.inivitationCode }}</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onCopyInvitaitionCode" type="primary">复制到剪切板</el-button>
+        <el-button @click="onCloseInvitationCodeDialog">关闭窗口</el-button>
+      </div>
+    </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus'
 import type { UploadProps } from 'element-plus'
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '../store/modules/user';
+import axiosInstance from '@/axiosConfig';
+
+const route = useRoute();
+const router = useRouter();
 
 const userStore = useUserStore();
+const userId: string = Array.isArray(route.params.userId) ? route.params.userId[0] : route.params.userId;
+
 // information of user
 class PersonInfo {
   username: string = 'PlutoFX';
@@ -172,8 +196,7 @@ class PersonInfo {
   experience: string = 'Working / Studying Experience';
   fieldOfStudy: string = 'Software Engineer';
   inivitationCode: string = 'f1i6VJzl8MlUVNO7uVRCDmMWvCfWX8Ed';
-  // username: string, fullname: string, email: string, isVerified: boolean,
-  // profileURL: string, institution: string, experience: string, fieldOfStudy: string
+
   constructor(other?: PersonInfo) {
     if (other !== undefined) {
       this.deepClone(other);
@@ -194,6 +217,25 @@ class PersonInfo {
   }
 }
 
+class UpdatableInfo {
+  phoneNumber: string = '11122223333';
+  email: string = 'example@gmail.com';
+  nationality: string = 'China';
+  institution: string = 'Beihang University';
+  experience: string = 'Working / Studying Experience';
+  fieldOfStudy: string = 'Software Engineer';
+}
+const personalInfo2UpdatableInfo = (other: PersonInfo): UpdatableInfo => {
+  const updatableInfo: UpdatableInfo = new UpdatableInfo();
+  updatableInfo.phoneNumber = other.phoneNumber;
+  updatableInfo.email = other.email;
+  updatableInfo.nationality = other.nationality;
+  updatableInfo.institution = other.institution;
+  updatableInfo.experience = other.experience;
+  updatableInfo.fieldOfStudy = other.fieldOfStudy;
+  return updatableInfo;
+}
+
 const personalInfo = reactive(new PersonInfo());
 const backedPersonalInfo = reactive(new PersonInfo());
 
@@ -203,11 +245,33 @@ const formData = reactive(new FormData());
 
 
 /* logic of controlling */
+onMounted(() => {
+  getUserDetails(userId).then((result) => {
+    personalInfo.username = result.username;
+    personalInfo.email = result.email;
+    personalInfo.phoneNumber = result.phoneNumber;
+    personalInfo.fullname = result.fullName;
+    personalInfo.institution = result.institution;
+    personalInfo.nationality = result.nationality;
+    personalInfo.fieldOfStudy = result.fieldOfStudy;
+    personalInfo.experience = result.experience;
+    personalInfo.isVerified = result.isVerified;
+  personalInfo.profileURL = result.avatarURL;
+  }).catch((error) => {
+    // not sure
+    ElMessage({
+      message: "获取用户信息失败",
+      type: "error",
+      offset: 100
+    })
+  })
+});
+
 
 // 为了展示静态逻辑，暂时先默认为true
 const isCurrentUser = computed(() => {
-  // return userStore.userInfo?.username == personalInfo.username;
-  return true;
+  return userStore.userInfo?.username == personalInfo.username;
+  // return true;
 })
 const isEditMode = ref(false);
 const copyInvitationCodeVisible = ref(false);
@@ -238,7 +302,6 @@ const onEdit = (): void => {
 const editSave = (): void => {
   // all information backed up
   backedPersonalInfo.deepClone(personalInfo);
-  // todo: send update request
 }
 
 const onCancelEdit = (): void => {
@@ -249,25 +312,62 @@ const onCancelEdit = (): void => {
 
 const onConfirmEditting = (): void => {
   // send the edit request
-  ElMessage({
-    message: "个人信息修改成功！",
-    type: "success",
+  updateUserDetails(personalInfo2UpdatableInfo(personalInfo)).then((result) => {
+      ElMessage({
+        message: "个人信息修改成功！",
+        type: "success",
+        offset: 100
+      });
+      isEditMode.value = false;
+      editSaveVisible.value = false;
+    }
+  ).catch((error) => {
+    // personalInfo.deepClone(backedPersonalInfo);
+    ElMessage({
+      message: "个人信息修改失败，请检查控制台",
+      type: "error",
+      offset: 100
+    });
   });
-  isEditMode.value = false;
-  editSaveVisible.value = false;
+  
 }
 
-const validateAvatarFile: UploadProps['beforeUpload'] = (rawFile): boolean => {
+// validate and update
+const validateAndUpdateAvatarFile: UploadProps['beforeUpload'] = (rawFile): boolean => {
   if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
-    ElMessage.error('上传图像必须是JPG / PNG格式');
+    ElMessage({
+      message: "上传图像必须是JPG / PNG格式",
+      type: "error",
+      offset: 100
+    });
     return false;
   } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('图像文件不能超过2MB');
+    ElMessage({
+      message: "图像文件不能超过2MB",
+      type: "error",
+      offset: 100
+    });
     return false;
   }
-  personalInfo.profileURL = URL.createObjectURL(rawFile);
+  // personalInfo.profileURL = URL.createObjectURL(rawFile);
 
-  //  todo: Do not upload to server, but add to the file list while confirming editting
+  // request
+  updateUserAvatar(rawFile).then(
+    (result) => {
+      personalInfo.profileURL = result.avatarURL
+      ElMessage({
+        message: "头像上传成功！",
+        type: "success",
+        offset: 100,
+      });
+    }
+  ).catch((error) => {
+    ElMessage({
+      message: "头像上传失败，请检查控制台",
+      type: "error",
+      offset: 100,
+    });
+  })
   return false;
 }
 
@@ -275,17 +375,34 @@ const onCopy = (text: string): void => {
   navigator.clipboard.writeText(text).then(
     () => {
       // success
-      ElMessage.success('邀请码复制成功');
+    ElMessage({
+      message: "邀请码复制成功",
+      type: "error",
+      offset: 100,
+    })
     },
     () => {
       // fail
-      ElMessage.error('邀请码复制失败，请检查剪切板写入权限');
-    }
+    ElMessage({
+      message: "邀请码复制失败，请检查剪切板写入权限",
+      type: "error",
+      offset: 100,
+    })
+  },
   );
 }
 
 const onShowInivitationCode = (): void => {
-  copyInvitationCodeVisible.value = true;
+  getInvitationCode().then((result) => {
+    personalInfo.inivitationCode = result.data;
+    copyInvitationCodeVisible.value = true;
+  }).catch((error) => {
+    ElMessage({
+      message: "邀请码获取失败",
+      type: "error",
+      offset: 100,
+    })
+  })
 }
 
 const onCloseInvitationCodeDialog = (): void => {
@@ -296,10 +413,71 @@ const onCopyInvitaitionCode = (): void => {
   onCopy(personalInfo.inivitationCode);
 }
 
-// todo: request function
+const routerToAchivementList = (): void => {
+  router.push(`/AchiManage/${userId}`)
+}
 
+const routerToUploadingAchivementList = (): void => {
+  router.push(`/UploadPaper`)
+}
 
+const routerToVerify = (): void => {
+  router.push(`/verify`)
+}
+
+// request function
+const urlBase : string = '/users'
+
+// 获取指定用户详细信息
+const getUserDetails = async (userId: string) => {
+  try {
+    const response = await axiosInstance.get(`${urlBase}/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+}
+
+// 更新用户信息
+const updateUserDetails = async (infoToUpdate: UpdatableInfo) => {
+  try {
+    const response = await axiosInstance.post(`${urlBase}/update`, infoToUpdate);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user details:', error);
+    throw error;
+  }
+}
+
+// 更新用户头像
+const updateUserAvatar = async (avatarFile: File) => {
+  try {
+    formData.append('avatar', avatarFile);
+    const response = await axiosInstance.post(`${urlBase}/updateAvatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user avatar:', error);
+    throw error;
+  }
+}
+
+// 生成专属邀请码
+const getInvitationCode = async () => {
+  try {
+    const response = await axiosInstance.get(`${urlBase}/invite`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching invitation code:', error);
+    throw error;
+  }
+}
 </script>
+
 
 <style>
 /* 只保留必要的自定义样式 */

@@ -103,6 +103,7 @@
 
 <script>
 import axios from 'axios';
+import axiosInstance from '@/axiosConfig';
 
 export default {
     name: 'UserManagement',
@@ -115,7 +116,7 @@ export default {
             isAuthenticatedFilter: null,
             showEditModal: false,
             currentUser: {},
-            useStaticData: true, // 添加用于切换数据源的标志
+            useStaticData: false, // 添加用于切换数据源的标志
             staticUsers: [
                 {
                     id: 'user1',
@@ -254,7 +255,7 @@ export default {
                 this.users = this.staticUsers;
                 this.total = this.staticUsers.length;
             } else {
-                axios
+                axiosInstance
                     .get('/api/admin/users', {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
@@ -287,7 +288,7 @@ export default {
             this.currentUser = {};
         },
         updateUser() {
-            axios
+            axiosInstance
                 .post(
                     '/api/admin/users/update',
                     this.currentUser,
@@ -312,7 +313,7 @@ export default {
             this.showDeleteModal = true;
         },
         confirmDelete() {
-            axios.delete(`/api/admin/users/${this.deleteUserId}`, {
+            axiosInstance.delete(`/api/admin/users/${this.deleteUserId}`, {
                 headers: {
                     Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
                 },

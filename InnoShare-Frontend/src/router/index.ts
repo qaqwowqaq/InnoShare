@@ -95,13 +95,9 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   {
-    path: '/AchiManage',
+    path: '/AchiManage/:userId',
     name: 'AchiManage',
     component: AchiManage,
-  },
-    {path: '/userDashboard/:userId',
-    name: 'UserDashboard',
-    component: UserDashboard
   },
   {
     path: '/search',
