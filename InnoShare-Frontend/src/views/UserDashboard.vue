@@ -66,14 +66,16 @@
               <span class="font-medium">认证状态</span>
             </div>
             <div>
-              <span v-if="personalInfo.isVerified" class="text-green-500">已认证</span>
-              <el-button v-else-if="isCurrentUser && !isEditMode" 
+              <span v-if="personalInfo.isVerified == 1" class="text-green-500">已认证</span>
+              <span v-else-if="personalInfo.isVerified == 0" class="text-yellow-500">未认证</span>
+              <span v-else-if="personalInfo.isVerified == 2" class="text-yellow-500">待审核</span>
+              <el-button v-if="personalInfo.isVerified == 0 && isCurrentUser && !isEditMode" 
                         type="success" 
                         class="!rounded-full"
                         @click="routerToVerify">
                 去认证
               </el-button>
-              <span v-else class="text-yellow-500">未认证</span>
+              
             </div>
           </div>
         </div>
@@ -189,7 +191,7 @@ class PersonInfo {
   phoneNumber: string = '11122223333';
   email: string = 'example@gmail.com';
   // 是否已认证
-  isVerified: boolean = false;
+  isVerified: number = 2;
   profileURL: string = 'https://img.51miz.com/Element/00/88/08/84/72f298b9_E880884_d0f63115.png';
   nationality: string = 'China';
   institution: string = 'Beihang University';
@@ -218,6 +220,7 @@ class PersonInfo {
 }
 
 class UpdatableInfo {
+  fullName: string = "PPP";
   phoneNumber: string = '11122223333';
   email: string = 'example@gmail.com';
   nationality: string = 'China';
@@ -227,6 +230,7 @@ class UpdatableInfo {
 }
 const personalInfo2UpdatableInfo = (other: PersonInfo): UpdatableInfo => {
   const updatableInfo: UpdatableInfo = new UpdatableInfo();
+  updatableInfo.fullName = other.fullname;
   updatableInfo.phoneNumber = other.phoneNumber;
   updatableInfo.email = other.email;
   updatableInfo.nationality = other.nationality;
@@ -273,8 +277,8 @@ onMounted(() => {
 // 为了展示静态逻辑，暂时先默认为true
 const isCurrentUser = computed(() => {
   console.log(userStore.userInfo?.username);
-  return userStore.userInfo?.username == personalInfo.username;
-  // return true;
+  // return userStore.userInfo?.username == personalInfo.username;
+  return true;
 })
 const isEditMode = ref(false);
 const copyInvitationCodeVisible = ref(false);
@@ -446,7 +450,8 @@ const getUserDetails = async (userId: string) => {
 // 更新用户信息
 const updateUserDetails = async (infoToUpdate: UpdatableInfo) => {
   try {
-    const response = await axiosInstance.post(`${urlBase}/update`, {
+    /*
+      {
       fullName: personalInfo.fullname,
       email: personalInfo.email,
       phoneNumber: personalInfo.phoneNumber,
@@ -454,7 +459,9 @@ const updateUserDetails = async (infoToUpdate: UpdatableInfo) => {
       institution: personalInfo.institution,
       nationality: personalInfo.nationality,
       experience: personalInfo.experience,
-    }, {
+    }
+     */
+    const response = await axiosInstance.post(`${urlBase}/update`, infoToUpdate, {
       headers: {
         'Content-Type': 'application/json',
       }
