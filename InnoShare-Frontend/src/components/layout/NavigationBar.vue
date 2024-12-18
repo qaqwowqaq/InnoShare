@@ -274,10 +274,8 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 999;
   color: rgb(235, 238, 238);
   transition:  0.5s ease-out;
-  position: fixed; /* 设置为固定定位 */
   z-index: 10000; /* 提高 z-index 以确保在最上层 */
 }
 #guideBar>*{
