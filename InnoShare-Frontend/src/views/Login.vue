@@ -93,46 +93,53 @@ export default defineComponent({
     const password = ref('');
     const errorMessage = ref('');
 
-    const mockUser = {
-      username: 'john_doe',
-      email: 'john@example.com',
-      password: 'John-Doe',
-      token: 'mock-jwt-token-string',
-    };
-
     const handleLogin = async () => {
-      errorMessage.value = '';  // 清空之前的错误信息
-      try {
-        const response = await axiosInstance.get('/users/login', {
-          params: {
-            username: username.value,
-            password: password.value,
-          },
-        });
-        const { token, user } = response.data.data;
+  errorMessage.value = '';  // 清空之前的错误信息
+  try {
+    const response = await axiosInstance.get('/users/login', {
+      params: {
+        username: username.value,
+        password: password.value,
+      },
+    });
 
-        // 将 Token 存储到 Cookie 中
-        document.cookie = `token=${token}; path=/`;
+    // 检查响应状态
+    if (response.data.success) {
+      // 从响应数据中解构需要的信息
+      const { userId, username, password, isVerified, salt, avatarUrl, createdAt, updatedAt } = response.data.data;
 
-        // 更新用户状态
-        userStore.login({ token, user });
+      // 保存用户信息到 store
+      userStore.saveUserInfo({
+        userId,
+        username,
+        password,
+        isVerified,
+        salt,
+        avatarUrl,
+        createdAt,
+        updatedAt
+      });
 
-        // 跳转到认证页面
-        router.push('/');
-      } catch (error) {
-        // 登录失败
-        errorMessage.value = '用户名或密码错误';
-      }
+      userStore.login(userStore.userInfo);  // 更新登录状态
+      console.log('登录成功:', response.headers);
+      // 将用户信息保存到 localStorage
+      localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
 
-      if (username.value === mockUser.username && password.value === mockUser.password) {
-        // 登录成功
-        userStore.login({ token: mockUser.token, user: { username: mockUser.username, email: mockUser.email } });
-        router.push('/verify');  // 登录成功后跳转到认证页面
+      //router.push(userStore.isAuthenticated ? `/userDashboard/${userStore.getUserId}` : "/login");
+      // 根据认证状态决定跳转
+      if (response.data.data.isVerified) {
+        router.push('/');  // 已认证用户跳转到首页
       } else {
-        // 登录失败
-        errorMessage.value = '用户名或密码错误';
+        router.push('/verify');  // 未认证用户跳转到认证页面
       }
-    };
+    } else {
+      errorMessage.value = '登录失败，请检查用户名和密码';
+    }
+  } catch (error) {
+    console.error('登录失败:', error);
+    errorMessage.value = '登录失败，请稍后重试';
+  }
+};
 
     return {
       username,
