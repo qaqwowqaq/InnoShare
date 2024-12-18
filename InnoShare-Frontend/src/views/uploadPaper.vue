@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex" style="margin-top:100px">
+  <div class="h-screen flex" >
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios';
+import axiosInstance from '@/axiosConfig';
 import { ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed } from 'vue'
 import { useRouter } from "vue-router"; // Vue Router for navigation
@@ -164,7 +164,7 @@ if (typeof form.value.downloadUrl === 'string') {
 
   // 调用 API 更新论文信息
   try {
-    const response = await axios.post('/api/academic/upload', updatePaperRequest);
+    const response = await axiosInstance.post('/api/academic/upload', updatePaperRequest);
     console.log('论文更新成功:', response.data);
 
     // 显示成功弹窗
