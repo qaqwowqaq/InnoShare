@@ -28,10 +28,7 @@ axiosInstance.interceptors.response.use(
       return response;
     },
     (error) => {
-      if (error.response && error.response.status === 401) {
-        // Token 过期，跳转到登录页面
-        window.location.href = '/login';
-      }
+      
       return Promise.reject(error);
     }
   );

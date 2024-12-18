@@ -327,7 +327,7 @@ const buildReferenceTree = async (paperDoiValue) => {
     // 获取引用论文的标题（citingTitle）
     const getCitingTitle = async (citingPaperDoi) => {
       try {
-        const response = await axiosInstance.get('/api/academic/getPaper', {
+        const response = await axiosInstance.get('/academic/getPaper', {
           params: { paperDoi: citingPaperDoi },
         });
         return response.data.data.paper?.title || ''; // 返回引用论文的标题

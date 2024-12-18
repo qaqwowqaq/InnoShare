@@ -358,18 +358,13 @@ export default defineComponent({
     };
 
     // 查看详情跳转
-    const viewDetails = (result: any) => {
-      if (searchType.value === 'patents') {
-        window.open(result.result_url, '_blank');
-      } else {        
-        router.push({
-          path:"/paper",
-          query: {
-            id: encodeURIComponent(result.doi),
-          }
-        })
-      }
-    };
+     const viewDetails = (result: any) => {
+      if (searchType.value === 'patents') {
+        window.open(result.result_url, '_blank');
+      } else {        
+        router.push({ name: "PaperDetail", params: { id: result.doi } }); 
+      }
+    };
 
     // 切换侧边栏
     const toggleSidebar = () => {

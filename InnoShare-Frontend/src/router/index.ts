@@ -97,7 +97,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Verify
   },
   {
-    path: '/userDashboard',
+    path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
   },
