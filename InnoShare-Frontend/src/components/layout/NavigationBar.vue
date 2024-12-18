@@ -1,17 +1,30 @@
 <template>
+  
   <header id="guideBar">
       <div>
-        <svg viewBox="0 0 120 33" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" class="logoSvg">
-          <path d="M9.059 7.279c4.417-.1 8.564 3.492 9.03 7.897.56 3.872-1.72 7.893-5.287 9.464-2.163 1.073-4.604.743-6.93.798H3.599v7.28H.002c.007-5.617-.014-11.234.01-16.85.12-4.186 3.545-7.932 7.682-8.49.45-.066.91-.1 1.365-.1v.001zm0 14.56c2.596.064 5.03-1.96 5.42-4.533.517-2.588-1.135-5.37-3.66-6.146-2.438-.866-5.372.272-6.564 2.575-.922 1.576-.594 3.434-.656 5.167v2.938h5.46v-.001zM19.826 7.191h3.557v18.16h-3.556V7.19l-.001.001zm14.25 11.42h.13l5.057 6.745h4.41l-6.874-9.34L42.895 7.2h-4.41l-4.28 6.225h-.128l-4.28-6.224h-4.41l6.095 8.818-6.873 9.336h4.41l5.057-6.744z" fill="currentColor" fill-rule="nonzero"></path><path d="M51.735 7.191c3.603-.07 7.06 2.29 8.394 5.624.694 1.55.683 3.264.66 4.926v7.61c-3.21-.01-6.422.022-9.636-.018-3.688-.18-7.065-2.87-8.12-6.404-.97-3.07-.166-6.635 2.116-8.932 1.703-1.763 4.123-2.827 6.583-2.803l.003-.003zm5.46 14.56c-.015-2.02.033-4.04-.028-6.058-.212-2.705-2.718-4.972-5.432-4.9-2.582-.064-5.015 1.937-5.42 4.492-.472 2.454.937 5.126 3.276 6.04 1.442.628 3.035.367 4.56.423h3.045l-.001.003zM71.628 7.279c4.262-.104 8.245 3.25 8.924 7.445.77 3.98-1.476 8.278-5.182 9.916-3.62 1.71-8.275.607-10.764-2.523-1.542-1.817-2.208-4.235-2.077-6.59V0h3.6v7.28h5.5l-.001-.001zm0 14.56c2.733.073 5.23-2.223 5.433-4.942.34-2.702-1.662-5.42-4.337-5.912-1.48-.204-2.982-.065-4.472-.11h-2.124c.022 2.054-.05 4.11.042 6.158.286 2.71 2.735 4.856 5.46 4.8l-.002.006zM91.13 7.191c3.604-.07 7.06 2.29 8.394 5.624.696 1.55.686 3.264.664 4.926v7.61c-3.21-.01-6.424.022-9.636-.018-3.69-.18-7.067-2.87-8.124-6.404-.97-3.07-.165-6.635 2.117-8.932 1.702-1.762 4.122-2.826 6.582-2.803l.003-.003zm5.46 14.56c-.016-2.02.032-4.04-.027-6.058-.208-2.705-2.715-4.972-5.43-4.9-2.58-.064-5.014 1.937-5.417 4.492-.474 2.454.936 5.126 3.274 6.04 1.44.628 3.033.367 4.556.423h3.045l-.001.003zm23.407-14.517c-.007 5.605.015 11.208-.01 16.81-.13 4.41-3.922 8.374-8.345 8.604-.84.044-1.682.016-2.523.022v-3.598c1.536-.007 3.178.15 4.537-.72 1.7-.955 2.78-2.878 2.743-4.822-3.19 2.574-8.136 2.44-11.238-.214-2.262-1.825-3.497-4.76-3.323-7.65v-8.43h3.6c.016 3.205-.034 6.413.026 9.617.195 2.587 2.46 4.797 5.055 4.926 2.674.276 5.306-1.74 5.77-4.383.203-1.48.067-2.984.108-4.476V7.239h3.6v-.005z" fill="currentColor" fill-rule="nonzero"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="90">
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#4a90e2" />
+            <stop offset="100%" style="stop-color:#9b59b6" />
+          </linearGradient>
+        </defs>
+        
+        <text x="150" y="65" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="url(#gradient)" transform="rotate(-5 150 50)">
+          <tspan dy="0">Inno</tspan>
+          <tspan dy="0" fill="#34495e">Share</tspan>
+        </text>
+        
+        <path d="M70 75 Q150 85 230 75" fill="none" stroke="#34495e" stroke-width="2" />
         </svg>
         <div  class="searchTop" :style="{ visibility: isVisible ? 'visible' : 'hidden' }">
           <div id="searchBar">
-            <button class="searchButton">
-              <svg t="1725956324198" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6176" width="16" height="16">
+            <button class="searchButton" @click = "handleSearch">
+              <svg t="1725956324198" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6176" width="18" height="18">
                 <path d="M716.29895 806.808621C641.509798 862.822176 548.629446 896 448 896 200.576432 896 0 695.423565 0 448 0 200.576432 200.576432 0 448 0 695.423565 0 896 200.576432 896 448 896 548.629446 862.822176 641.509798 806.808621 716.29895L946.011456 855.501786C970.889978 880.380314 970.970976 920.635366 945.803174 945.803174 920.809619 970.79673 879.927322 970.436992 855.501786 946.011456L716.29895 806.808621ZM448 768C624.73112 768 768 624.73112 768 448 768 271.26888 624.73112 128 448 128 271.26888 128 128 271.26888 128 448 128 624.73112 271.26888 768 448 768Z" fill="#666666" p-id="6177"></path>
               </svg>
             </button>
-            <input placeholder="Search for all " />
+            <input v-model="searchQuery" placeholder="Search for all " @keypress="handleKeyPress"/>
             <div class="advance">
               <a ref="guideSearch" class="guideSearch" @click="guideTo('/search')">高级检索</a>
             </div>
@@ -38,7 +51,7 @@
         </div>
         <a ref="guideHome" class="guideHome" @click="guideTo('/home')">首页</a>
         <a ref="guideAbout" class="guideAbout" @click="guideTo('/about')">关于我们</a>
-        <a ref="guideLogin" class="guideLogin" @click="guideTo('/login')">{{ this.useStore.isAuthenticated?this.useStore.getUserInfo.username:"登录" }}</a>
+        <a ref="guideLogin" class="guideLogin" @click="handleLoginClick">{{ this.useStore.isAuthenticated?"个人中心":"登录" }}</a>
 
       </div>
   </header>
@@ -49,6 +62,8 @@
 import {mainStore} from "../../store/modules/pageStyleStore.ts";
 import {useUserStore} from "../../store/modules/user.ts"
 import {watch} from "vue";
+import {computed} from "vue";
+import { useRouter } from "vue-router";
 export default {
   name: "NavigationBar",
   data(){
@@ -77,13 +92,17 @@ export default {
             fill="#707070"></path></svg>`,
         }
         ],//搜索类型论文专利等
+        searchQuery:"",
     }
 
   },
   setup() {
     const myStore = mainStore(); // 使用 Pinia store
     const useStore =useUserStore();
-    return { myStore,useStore }; // 返回 store 以便在模板中使用
+    const router = useRouter();
+    const userDashboardPath = computed(() => (useStore.isAuthenticated ? `/userDashboard/${useStore.getUserInfo.id}` : "/login"));
+    return { myStore, useStore, userDashboardPath, router };
+  
   },
   computed: {
 
@@ -138,6 +157,30 @@ export default {
       }
       this.$router.push(path);
     },
+    handleSearch() {
+      if (this.searchQuery.trim() === '') {
+        alert('请输入搜索内容');
+        return;
+      }
+      // 跳转到 SearchResults 页面，并传递查询参数
+      this.$router.push({
+        path: '/search',
+        query: {
+          type: this.selectType=="paper"?"achievements":"patents",
+          query: this.searchQuery,
+          subject: '', // 可根据需要添加更多参数
+          subjectLevel: 1,
+          sortBy: '_score',
+          order: 'desc',
+          page: 1,
+        }
+      });
+    },
+    handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        this.handleSearch();
+      }
+    },
     update(newvalue){
       const header = document.getElementById('guideBar');
       const searchBar = document.getElementById('searchBar');
@@ -164,6 +207,15 @@ export default {
           login.style.color = 'rgba(252,249,249,0.85)';
         }
 
+      }
+    },
+    handleLoginClick() {
+      if (this.useStore.isAuthenticated) {
+        // 已登录，导航到个人中心
+        this.guideTo(`/userDashboard/${this.useStore.getUserInfo.id}`);
+      } else {
+        // 未登录，导航到登录页
+        this.guideTo('/login');
       }
     },
     expand(){
@@ -225,6 +277,8 @@ export default {
   z-index: 999;
   color: rgb(235, 238, 238);
   transition:  0.5s ease-out;
+  position: fixed; /* 设置为固定定位 */
+  z-index: 10000; /* 提高 z-index 以确保在最上层 */
 }
 #guideBar>*{
   max-width: 1800px;
@@ -246,6 +300,14 @@ export default {
 }
 .logoSvg {
   height: 32px;
+}
+
+.searchButton {
+  transition: background-color 0.3s ease;
+}
+
+.searchButton:hover {
+  background-color: #e0e0e0; /* 悬浮时的背景颜色 */
 }
 .searchTop {
   flex: 6;
@@ -319,12 +381,12 @@ export default {
   justify-content: center;
   padding: 0 15px 0 15px;
 }
-.swapicon span{
+swapicon span{
   margin: 0 2px 3px 2px;
   font-size: 18px;
   cursor: pointer;
 }
-.swapicon svg {
+swapicon svg {
   margin: 2px 5px 0 10px;
   cursor: pointer;
 }

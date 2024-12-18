@@ -83,6 +83,28 @@ const routes = [
     path: '/userDashboard/:userId',
     name: 'UserDashboard',
     component: UserDashboard
+  },
+  {
+    path: '/admin',
+    component: AdminPanel,
+    redirect: '/admin/data-statistics',
+    children: [
+      {
+        path: 'data-statistics',
+        name: 'DataStatistics',
+        component: DataStatistics
+      },
+      {
+        path: 'user-review',
+        name: 'UserReview',
+        component: UserReview
+      },
+      {
+        path: 'user-management',
+        name: 'UserManagement',
+        component: UserManagement
+      }
+    ]
   }
 ]
 

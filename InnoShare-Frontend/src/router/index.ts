@@ -10,6 +10,11 @@ import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
 import SearchResults from '@/views/SearchResults.vue';
 import Verify from '@/views/Verify.vue';
+import AdminPanel from '@/views/AdminPanel.vue'
+import UserReview from '@/views/UserReview.vue'
+import UserManagement from '@/views/UserManagement.vue'
+import DataStatistics from '@/views/DataStatistics.vue'
+
 import PaperDetail from '@/views/PaperDetail.vue';
 const routes: Array<RouteRecordRaw> = [
 
@@ -97,25 +102,43 @@ const routes: Array<RouteRecordRaw> = [
     component: UserDashboard
   },
   {
-    path: '/paper/:id',
+    path: '/paper',
     name: 'PaperDetail',
     component: PaperDetail,
     props: true
   },
 
   {
-    path: '/AchiManage',
+    path: '/AchiManage/:userId',
     name: 'AchiManage',
     component: AchiManage,
-  },
-    {path: '/userDashboard/:userId',
-    name: 'UserDashboard',
-    component: UserDashboard
   },
   {
     path: '/search',
     name: 'SearchResults',
-    component: SearchResults,
+    component: SearchResults
+  },
+  {
+    path: '/admin',
+    component: AdminPanel,
+    redirect: '/admin/data-statistics',
+    children: [
+      {
+        path: 'data-statistics',
+        name: 'DataStatistics',
+        component: DataStatistics
+      },
+      {
+        path: 'user-review',
+        name: 'UserReview',
+        component: UserReview
+      },
+      {
+        path: 'user-management',
+        name: 'UserManagement',
+        component: UserManagement
+      }
+    ]
   }
 ];
 
@@ -124,4 +147,4 @@ const router = createRouter({
   routes
 });
 
-export default router;
+export { router };  // 保持命名导出

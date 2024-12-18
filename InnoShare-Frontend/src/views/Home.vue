@@ -36,6 +36,7 @@
         <div class="recommend-title">
           <div ref="recTitle" class="initTitle" @click="changeTitle(1)">
             <h2>推荐</h2>
+            
             <p>RECOMMEND</p>
           </div>
           <div ref="newTitle" @click="changeTitle(2)">

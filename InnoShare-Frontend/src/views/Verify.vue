@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="verify-container">
+    <div class="verify-container" style="margin-top:100px">
       <h1 class="title">实名认证&学术认证</h1>
 
       <!-- 状态显示 -->
