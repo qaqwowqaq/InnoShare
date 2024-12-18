@@ -162,7 +162,7 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios';
+import axiosInstance from '@/axiosConfig';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed, onMounted, nextTick, Ref } from 'vue'
 import { useRouter } from "vue-router"; // Vue Router for navigation
@@ -247,6 +247,7 @@ const paginatedPatents = computed(() => {
 // 分页切换时更新当前页
 const handlePageChange1 = (newPage: number) => {
   currentPage1.value = newPage;
+  
 };
 // 切换导航选项时的逻辑
 const handleTabChange = (tab: string) => {
@@ -276,7 +277,7 @@ const papers: Ref<Paper[]> = ref([]);
 
 const fetchPapers = async () => {
   try {
-    const response = await axios.get('/api/academic/allPaper', {
+    const response = await axiosInstance.get('/api/academic/allPaper', {
       params: { userId: 1 }, // 传递 userId 参数
     });
     console.log('获取论文数据成功:', response.data.data);
@@ -402,7 +403,7 @@ const handleDelete = async (paperDoi: string) => {
     // 如果用户点击了"删除"
     if (result === 'confirm') {
       console.log(`Deleting paper with DOI: ${paperDoi}`);
-      const response = await axios.get('/api/academic/delete', {
+      const response = await axiosInstance.get('/api/academic/delete', {
         params: {
           userId: 1, // 当前用户 ID
           paperDoi: paperDoi, // 要删除的论文 DOI

@@ -1,6 +1,6 @@
 <template>
 
-  <div class="h-screen flex" style="margin-top: 100px;">
+  <div class="h-screen flex" style="">
     <!-- 左侧固定栏 -->
 
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
@@ -208,8 +208,7 @@ import { useRoute,useRouter } from 'vue-router';
 const pdfUrl = ref();
 import * as echarts from 'echarts'; // 引入echarts库
 import { useTransition } from '@vueuse/core'
-import axios from 'axios';
-import { useRoute } from 'vue-router';
+import axiosInstance from '@/axiosConfig';
 const route = useRoute();
 const doi = route.params.id;
 // 定义响应式的 `paper` 和 `paperData`
@@ -237,10 +236,10 @@ const paper = ref({
 // 获取论文基本信息
 const fetchPaper = async (paperDoiValue) => {
   try {
-    console.log("请求参数:", { paperDoi: paperDoiValue });
+    console.log("请求参数:", { paperDoi: doi });
     const response = await axiosInstance.get('/api/academic/getPaper', {
       params: {
-        paperDoi: paperDoiValue,
+        paperDoi: doi,
       },
     });
     console.log('获取论文基本信息成功:', response.data.data.paper);
@@ -263,9 +262,6 @@ const fetchPaper = async (paperDoiValue) => {
       }
     }, 100);
     pdfUrl.value = response.data.data.paper.downloadUrl;
-    pdfUrl.value = response.data.data.paper.downloadUrl;
-    console.log('pdfUrl:', pdfUrl.value);
-    console.log('获取论文基本信息成功:', paper.value);
     // 获取并处理学科信息
     subjects.value = response.data.data.paper.subjects.map(subject => {
       return {
@@ -288,11 +284,11 @@ onMounted(() => {
 });
 
 // 获取引用信息
-const buildReferenceTree = async (paperDoi) => {
+const buildReferenceTree = async (paperDoiValue) => {
   try {
     // 获取一级引用
-    const response = await axios.get('/api/academic/getPaperReferences', {
-      params: { paperDoi },
+    const response = await axiosInstance.get('/api/academic/getPaperReferences', {
+      params: { paperDoi: doi, },
     });
     console.log('获取一级引用信息成功:', response.data);
 
@@ -304,7 +300,7 @@ const buildReferenceTree = async (paperDoi) => {
       references.map(async (ref) => {
         try {
           // 通过一级引用的 citedPaperDoi 获取二级引用
-          const secondaryResponse = await axios.get('/api/academic/getPaperReferences', {
+          const secondaryResponse = await axiosInstance.get('/api/academic/getPaperReferences', {
             params: { paperDoi: ref.citedPaperDoi }, // 使用一级文献的 DOI 获取二级引用
           });
           console.log('获取二级引用信息成功:', secondaryResponse.data);
@@ -331,7 +327,7 @@ const buildReferenceTree = async (paperDoi) => {
     // 获取引用论文的标题（citingTitle）
     const getCitingTitle = async (citingPaperDoi) => {
       try {
-        const response = await axios.get('/api/academic/getPaper', {
+        const response = await axiosInstance.get('/api/academic/getPaper', {
           params: { paperDoi: citingPaperDoi },
         });
         return response.data.data.paper?.title || ''; // 返回引用论文的标题
@@ -359,7 +355,7 @@ const buildReferenceTree = async (paperDoi) => {
     // 返回包含一级和二级引用的结果
     return {
       thisPaper: {
-        id: paperDoi, // 当前论文的 DOI
+        id: doi, // 当前论文的 DOI
         primaryRefs: references.map(ref => ({
           citingPaperDoi: ref.citingPaperDoi,
           referenceId: ref.referenceId,
@@ -412,7 +408,6 @@ const fetchPaperData = async (paperDoiValue) => {
   }
 };
 
-const paperDoi = doi;
 
 // 加载 primaryRefs 数据的异步操作
 async function loadPrimaryRefs() {
@@ -439,9 +434,10 @@ onMounted(() => {
     window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
   }
 });
-
+const paperDoi = ref(null);  
 // 动态监听 `route.query` 的变化，并触发数据加载
 watchEffect(async () => {
+  console.log('路由变化:', route.query.id);
   paperDoi.value = route.query.id ? decodeURIComponent(route.query.id) : null;
 
   if (paperDoi.value) {
@@ -464,32 +460,37 @@ watchEffect(async () => {
 });
 
 
+const downloadSource = ref(0)
+const citationSource = ref(0)
+const downloadValue = ref(0);
+const citationValue = ref(0);
 
 // 组件挂载时执行
 onMounted(async () => {
+  paperDoi.value = route.params.id ? decodeURIComponent(route.params.id) : null;
   console.log('论文DOI:', paperDoi.value);
   // 先获取论文基本信息
-  await fetchPaper(paperDoi.value);
+  //下载与统计
 
-  await fetchPaperData(paperDoi);
-  updateChartData();
+
+  await fetchPaper(paperDoi.value);
+console.log("21321321321",paper.value.downloadSource,paper.value.citationSource);
+// 动态过渡效果，分别对下载量和引用量进行设置
+  // 动态过渡效果，分别对下载量和引用量进行设置
+  downloadValue.value = useTransition(paper.value.downloadSource, {
+    duration: 1500,
+    type: 'number',
+  });
+  citationValue.value = useTransition(paper.value.citationSource, {
+    duration: 1500,
+    type: 'number',
+  });
+  await fetchPaperData(paperDoi.value);
   console.log('论文数据:', paper.value);
 });
 
 
-//下载与统计
-const downloadSource = ref(0)
-const citationSource = ref(0)
 
-// 动态过渡效果，分别对下载量和引用量进行设置
-const downloadValue = useTransition(downloadSource, {
-  duration: 1500,
-  type: 'number',
-})
-const citationValue = useTransition(citationSource, {
-  duration: 1500,
-  type: 'number',
-})
 
 // 设置目标值
 // 定义 chartRef 引用
