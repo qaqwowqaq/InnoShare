@@ -113,10 +113,10 @@ export default {
                 };
                 this.updateCharts();
             } else {
-                axiosInstance.get('/api/admin/statistics', {
-                    headers: {
-                        Authorization: `Bearer ${this.$store.state.adminToken}`
-                    }
+                axiosInstance.get('/admin/statistics', {
+                    // headers: {
+                    //     Authorization: `Bearer ${this.$store.state.adminToken}`
+                    // }
                 })
                     .then(response => {
                         this.stats = response.data.data;

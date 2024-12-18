@@ -244,7 +244,7 @@ export default {
                 
             } else {
                 axiosInstance
-                    .get('/api/admin/auth-requests', {
+                    .get('/admin/auth-requests', {
                         headers: {
                             Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
                         },
@@ -264,7 +264,7 @@ export default {
         },
         approveUser(authRequestId) {
             // 发送批准请求
-            axiosInstance.put(`/api/admin/auth-requests/${authRequestId}`, {
+            axiosInstance.put(`/admin/auth-requests/${authRequestId}`, {
                 status: 'approved'
             }, {
                 headers: {
@@ -295,7 +295,7 @@ export default {
                 return;
             }
             // 发拒绝请求
-            axiosInstance.put(`/api/admin/auth-requests/${this.currentRequestId}`, {
+            axiosInstance.put(`/admin/auth-requests/${this.currentRequestId}`, {
                 status: 'rejected',
                 reason: this.rejectReason
             }, {
