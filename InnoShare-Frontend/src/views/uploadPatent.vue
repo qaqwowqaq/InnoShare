@@ -110,6 +110,7 @@
 </template>
 
 <script setup lang="ts">
+import axiosInstance from '@/axiosConfig';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
@@ -185,7 +186,7 @@ const handleSubmit = async () => {
   };
 
   try {
-    const response = await axios.post('/api/academic/patent/upload', uploadPatentRequest);
+    const response = await axiosInstance.post('/api/academic/patent/upload', uploadPatentRequest);
     ElMessage.success('专利上传成功！');
     router.push('/AchiManage');
   } catch (error) {
