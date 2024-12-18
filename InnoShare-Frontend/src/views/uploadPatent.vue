@@ -186,7 +186,7 @@ const handleSubmit = async () => {
   };
 
   try {
-    const response = await axiosInstance.post('/api/academic/patent/upload', uploadPatentRequest);
+    const response = await axiosInstance.post('/academic/patent/upload', uploadPatentRequest);
     ElMessage.success('专利上传成功！');
     router.push('/AchiManage');
   } catch (error) {

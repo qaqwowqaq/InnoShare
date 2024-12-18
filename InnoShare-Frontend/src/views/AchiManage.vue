@@ -277,7 +277,7 @@ const papers: Ref<Paper[]> = ref([]);
 
 const fetchPapers = async () => {
   try {
-    const response = await axiosInstance.get('/api/academic/allPaper', {
+    const response = await axiosInstance.get('/academic/allPaper', {
       params: { userId: 1 }, // 传递 userId 参数
     });
     console.log('获取论文数据成功:', response.data.data);
@@ -403,7 +403,7 @@ const handleDelete = async (paperDoi: string) => {
     // 如果用户点击了"删除"
     if (result === 'confirm') {
       console.log(`Deleting paper with DOI: ${paperDoi}`);
-      const response = await axiosInstance.get('/api/academic/delete', {
+      const response = await axiosInstance.get('/academic/delete', {
         params: {
           userId: 1, // 当前用户 ID
           paperDoi: paperDoi, // 要删除的论文 DOI

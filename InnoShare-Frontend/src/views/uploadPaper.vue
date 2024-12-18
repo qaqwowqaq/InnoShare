@@ -164,7 +164,7 @@ if (typeof form.value.downloadUrl === 'string') {
 
   // 调用 API 更新论文信息
   try {
-    const response = await axiosInstance.post('/api/academic/upload', updatePaperRequest);
+    const response = await axiosInstance.post('/academic/upload', updatePaperRequest);
     console.log('论文更新成功:', response.data);
 
     // 显示成功弹窗

@@ -237,7 +237,7 @@ const paper = ref({
 const fetchPaper = async (paperDoiValue) => {
   try {
     console.log("请求参数:", { paperDoi: doi });
-    const response = await axiosInstance.get('/api/academic/getPaper', {
+    const response = await axiosInstance.get('/academic/getPaper', {
       params: {
         paperDoi: doi,
       },
@@ -287,7 +287,7 @@ onMounted(() => {
 const buildReferenceTree = async (paperDoiValue) => {
   try {
     // 获取一级引用
-    const response = await axiosInstance.get('/api/academic/getPaperReferences', {
+    const response = await axiosInstance.get('/academic/getPaperReferences', {
       params: { paperDoi: doi, },
     });
     console.log('获取一级引用信息成功:', response.data);
@@ -300,7 +300,7 @@ const buildReferenceTree = async (paperDoiValue) => {
       references.map(async (ref) => {
         try {
           // 通过一级引用的 citedPaperDoi 获取二级引用
-          const secondaryResponse = await axiosInstance.get('/api/academic/getPaperReferences', {
+          const secondaryResponse = await axiosInstance.get('/academic/getPaperReferences', {
             params: { paperDoi: ref.citedPaperDoi }, // 使用一级文献的 DOI 获取二级引用
           });
           console.log('获取二级引用信息成功:', secondaryResponse.data);
@@ -327,7 +327,7 @@ const buildReferenceTree = async (paperDoiValue) => {
     // 获取引用论文的标题（citingTitle）
     const getCitingTitle = async (citingPaperDoi) => {
       try {
-        const response = await axiosInstance.get('/api/academic/getPaper', {
+        const response = await axiosInstance.get('/academic/getPaper', {
           params: { paperDoi: citingPaperDoi },
         });
         return response.data.data.paper?.title || ''; // 返回引用论文的标题
@@ -438,7 +438,7 @@ const paperDoi = ref(null);
 // 动态监听 `route.query` 的变化，并触发数据加载
 watchEffect(async () => {
   console.log('路由变化:', route.query.id);
-  paperDoi.value = route.query.id ? decodeURIComponent(route.query.id) : null;
+  paperDoi.value = route.params.id ? decodeURIComponent(route.params.id) : null;
 
   if (paperDoi.value) {
     console.log('论文DOI:', paperDoi.value);

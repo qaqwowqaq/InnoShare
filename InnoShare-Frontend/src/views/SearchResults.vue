@@ -362,12 +362,7 @@ export default defineComponent({
       if (searchType.value === 'patents') {
         window.open(result.result_url, '_blank');
       } else {        
-        router.push({
-          path:"/paper",
-          query: {
-            id: encodeURIComponent(result.doi),
-          }
-        })
+        router.push({ name: "PaperDetail", params: { id: result.doi } }); 
       }
     };
 
