@@ -136,7 +136,7 @@ const existingPaper = ref({
 const fetchPaper = async () => {
   try {
     console.log('获取论文数据...', doi);
-    const response = await axiosInstance.get('/api/academic/getPaper', {
+    const response = await axiosInstance.get('/academic/getPaper', {
       params: { paperDoi: doi } // 你可以替换为动态的 DOI 或其他参数
     });
     console.log('获取论文数据成功:', response.data.data);
@@ -227,7 +227,7 @@ const handleUpdate = async () => {
 
   // 调用 API 更新论文信息
   try {
-    const response = await axiosInstance.post('/api/academic/update', updatePaperRequest);
+    const response = await axiosInstance.post('/academic/update', updatePaperRequest);
     console.log('论文更新成功:', response.data);
 
     // 显示成功弹窗
