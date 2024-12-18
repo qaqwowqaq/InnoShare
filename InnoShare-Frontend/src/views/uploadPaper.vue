@@ -20,65 +20,64 @@
     <div class="content p-4 bg-white overflow-y-auto" style="height: 100%; padding-left: 16%; width: 100%;">
       <section id="section1" class="mb-8 w-full flex flex-col space-y-10 items-center ">
         <div class=" flex flex-col  w-3/4 h-full">
-        <h2 class="text-2xl font-semibold text-center text-blue-600 mb-6">上传论文</h2>
+          <h2 class="text-2xl font-semibold text-center text-blue-600 mb-6">上传论文</h2>
 
-        <!-- 卡片包装表单 -->
-        <el-card class="p-8 shadow-lg rounded-lg">
-          <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
-            <!-- 论文标题 -->
-            <el-form-item label="论文标题" prop="title">
-              <el-input v-model="form.title" placeholder="请输入论文标题" />
-            </el-form-item>
+          <!-- 卡片包装表单 -->
+          <el-card class="p-8 shadow-lg rounded-lg">
+            <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+              <!-- 论文标题 -->
+              <el-form-item label="论文标题" prop="title">
+                <el-input v-model="form.title" placeholder="请输入论文标题" />
+              </el-form-item>
 
-            <!-- 作者 -->
-            <el-form-item label="作者" prop="authors">
-              <el-input v-model="form.authors" placeholder="请输入作者（多个作者请用逗号分隔）" />
-            </el-form-item>
+              <!-- 作者 -->
+              <el-form-item label="作者" prop="authors">
+                <el-input v-model="form.authors" placeholder="请输入作者（多个作者请用逗号分隔）" />
+              </el-form-item>
 
-            <!-- 摘要 -->
-            <el-form-item label="摘要" prop="abstract">
-              <el-input type="textarea" v-model="form.abstract" rows="4" placeholder="请输入论文摘要" />
-            </el-form-item>
+              <!-- 摘要 -->
+              <el-form-item label="摘要" prop="abstract">
+                <el-input type="textarea" v-model="form.abstract" rows="4" placeholder="请输入论文摘要" />
+              </el-form-item>
 
-            <!-- 学科领域 -->
-            <el-form-item label="学科领域" prop="subjects">
-              <el-select v-model="form.subjects" multiple placeholder="请选择学科领域">
-                <el-option label="Quantum Algebra (math.QA)" value="Quantum Algebra (math.QA)" />
-                <el-option label="Category Theory (math.CT)" value="Category Theory (math.CT)" />
-              </el-select>
-            </el-form-item>
+              <!-- 学科领域 -->
+              <el-form-item label="学科领域" prop="subjects">
+                <el-select v-model="form.subjects" multiple placeholder="请输入或选择学科领域" filterable allow-create
+                  default-first-option>
+                  <!-- 如果有预定义的学科领域，可以列在这里 -->
+                  <el-option label="Quantum Algebra (math.QA)" value="Quantum Algebra (math.QA)" />
+                  <el-option label="Category Theory (math.CT)" value="Category Theory (math.CT)" />
+                </el-select>
+              </el-form-item>
 
-            <!-- 论文文件 -->
-            <el-form-item label="论文文件" prop="file">
-              <el-upload class="upload-demo" action="#" :show-file-list="false" :on-change="handleFileChange"
-                :before-upload="beforeFileUpload">
-                <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
-              </el-upload>
-              <span v-if="form.file" class="text-sm text-gray-600">{{ form.file.name }}</span>
-            </el-form-item>
+              <!-- 论文文件 -->
+              <el-form-item label="论文文件" prop="file">
+                <el-upload class="upload-demo" action="#" :show-file-list="false" :on-change="handleFileChange"
+                  :before-upload="beforeFileUpload">
+                  <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
+                </el-upload>
+                <span v-if="form.file" class="text-sm text-gray-600">{{ form.file.name }}</span>
+              </el-form-item>
 
-            <!-- 出版日期 -->
-            <el-form-item label="出版日期" prop="publishedAt">
-              <el-date-picker v-model="form.publishedAt" type="date" placeholder="选择出版日期" />
-            </el-form-item>
+              <!-- 出版日期 -->
+              <el-form-item label="出版日期" prop="publishedAt">
+                <el-date-picker v-model="form.publishedAt" type="date" placeholder="选择出版日期" />
+              </el-form-item>
 
-            <!-- 下载链接 -->
-            <el-form-item label="下载链接" prop="downloadUrl">
-              <el-input v-model="form.downloadUrl" placeholder="请输入论文下载链接" />
-            </el-form-item>
+              <!-- 下载链接 -->
+              <el-form-item label="下载链接" prop="downloadUrl">
+                <el-input v-model="form.downloadUrl" placeholder="请输入论文下载链接" />
+              </el-form-item>
 
-            <!-- 创建时间 -->
-            <el-form-item label="创建时间" prop="createdAt">
-              <el-date-picker v-model="form.createdAt" type="datetime" placeholder="选择创建时间" />
-            </el-form-item>
 
-            <!-- 提交按钮 -->
-            <el-form-item>
-              <el-button type="primary" @click="handleSubmit">提交</el-button>
-              <el-button @click="resetForm" class="ml-4">重置</el-button>
-            </el-form-item>
-          </el-form>
-        </el-card></div>
+              <!-- 提交按钮 -->
+              <el-form-item>
+                <el-button type="primary" @click="handleSubmit">提交</el-button>
+                <el-button @click="resetForm" class="ml-4">重置</el-button>
+              </el-form-item>
+            </el-form>
+          </el-card>
+        </div>
       </section>
     </div>
   </div>
@@ -88,10 +87,13 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios';
+import { ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed } from 'vue'
 import { useRouter } from "vue-router"; // Vue Router for navigation
 const router = useRouter();
 const circleUrl = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+import { useRoute } from 'vue-router';
 
 const form = ref({
   title: '',
@@ -101,7 +103,6 @@ const form = ref({
   file: null,
   publishedAt: '',
   downloadUrl: '',
-  createdAt: '',
 })
 
 const rules = {
@@ -112,7 +113,6 @@ const rules = {
   file: [{ required: true, message: '请选择论文文件', trigger: 'change' }],
   publishedAt: [{ required: true, message: '请选择出版日期', trigger: 'change' }],
   downloadUrl: [{ required: true, message: '请输入论文下载链接', trigger: 'blur' }],
-  createdAt: [{ required: true, message: '请选择创建时间', trigger: 'change' }],
 }
 
 const handleFileChange = (file: any) => {
@@ -127,11 +127,58 @@ const beforeFileUpload = (file: File) => {
   return isPDF
 }
 
-const handleSubmit = () => {
-  console.log('提交论文信息:', form.value)
-  // 提交表单逻辑
+const formatDate = (date: string) => {
+  const parsedDate = new Date(date);
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');  // 保证月是两位数
+  const day = String(parsedDate.getDate()).padStart(2, '0');  // 保证日是两位数
+  return `${year}-${month}-${day}`;
+};
+
+const handleSubmit = async () => {
+  // 在提交时设置创建时间为当前时间
+let pdoi: string = '';
+if (typeof form.value.downloadUrl === 'string') {
+  pdoi = form.value.downloadUrl.split("/pdf/").pop() || ''; // 提取 DOI 编号（2401.01098）
 }
 
+  const formattedDate = formatDate(form.value.publishedAt);  // 输出 "2024-12-01"
+  console.log(formattedDate);
+
+  // 构建更新请求体
+  const updatePaperRequest = {
+    userId: 1, // 假设当前用户的 ID 是 1
+    paperRequest: {
+      title: form.value.title,
+      author: form.value.authors,
+      abstractText: form.value.abstract,
+      subjects: form.value.subjects,
+      publishedAt: formattedDate,
+      doi: pdoi, // 使用从 DOI 地址提取的部分
+      downloadUrl: form.value.downloadUrl,
+      references: [],  // 即使没有引用，也需要传递空数组
+    }
+  };
+
+  console.log('更新论文信息:', updatePaperRequest);
+
+  // 调用 API 更新论文信息
+  try {
+    const response = await axios.post('/api/academic/upload', updatePaperRequest);
+    console.log('论文更新成功:', response.data);
+
+    // 显示成功弹窗
+    ElMessage.success('论文更新成功！');
+
+    // 跳转到 /AchiManage 页面
+    router.push('/AchiManage');
+  } catch (error) {
+    console.error('更新论文失败:', error);
+
+    // 显示错误弹窗
+    ElMessage.error('更新论文失败，请重试。');
+  }
+};
 const resetForm = () => {
   form.value = {
     title: '',
@@ -141,7 +188,6 @@ const resetForm = () => {
     file: null,
     publishedAt: '',
     downloadUrl: '',
-    createdAt: '',
   }
 }
 
@@ -175,7 +221,8 @@ const { sizeList } = toRefs(state)
   width: 100%;
 }
 
-.el-form-item .el-input, .el-form-item .el-select {
+.el-form-item .el-input,
+.el-form-item .el-select {
   text-align: left;
 }
 </style>

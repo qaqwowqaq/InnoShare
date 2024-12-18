@@ -3,7 +3,9 @@ import Home from '@/views/Home.vue';
 import Login from '@/views/Login.vue';
 import Register from '@/views/Register.vue';
 import UploadPaper from '@/views/uploadPaper.vue';
+import UploadPatent from '@/views/uploadPatent.vue';
 import UpdatePaper from '@/views/updatePaper.vue';
+import UpdatePatent from '@/views/updatePatent.vue';
 import AchiManage from '@/views/AchiManage.vue';
 import UserDashboard from "@/views/UserDashboard.vue";
 import SearchResults from '@/views/SearchResults.vue';
@@ -67,9 +69,21 @@ const routes: Array<RouteRecordRaw> = [
     props: true
   },
   {
+    path: '/UploadPatent',
+    name: 'UploadPatent',
+    component: UploadPatent,
+    props: true
+  },
+  {
     path: '/UpdatePaper/:id',
     name: 'UpdatePaper',
     component: UpdatePaper,
+    props: true
+  },
+  {
+    path: '/UpdatePatent/:id',
+    name: 'UpdatePatent',
+    component: UpdatePatent,
     props: true
   },
   {

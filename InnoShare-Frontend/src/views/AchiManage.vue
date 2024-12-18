@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex">
+  <div class="h-screen flex " style="overflow: hidden;">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
@@ -13,6 +13,16 @@
 
       <!-- 底部部分 -->
       <div class="mt-auto pb-6">
+
+        <!-- 上传按钮 -->
+        <el-button type="primary"
+          class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
+          @click="handleUploadClick1">
+          上传专利
+        </el-button>
+      </div>
+      <div class="mt-1 pb-6">
+
         <!-- 上传按钮 -->
         <el-button type="primary"
           class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
@@ -21,61 +31,129 @@
         </el-button>
       </div>
     </div>
+    <div class="flex-col" style="height:100%;padding-bottom: 20%; padding-left: 16%; width: 120%;overflow:auto;">
+      <div>
+        <el-menu :default-active="activeTab" class="fixed w-full el-menu-demo bg-gray-800 z-10" mode="horizontal"
+          @select="handleTabChange">
+          <el-menu-item style="color:darkgray; ;" index="section2">专利部分</el-menu-item>
+          <el-menu-item style="color: darkgray;" index="section1">论文部分</el-menu-item>
 
-    <div class="content p-4 bg-white overflow-y-auto" style="height: 92%; padding-left: 16%; width: 100%;">
-      <section id="section1" class="mb-8 w-full flex flex-col space-y-8 items-center ">
-        <!-- 动态渲染每一页的卡片 -->
-        <div v-for="(paper, index) in currentPapers" :key="index"
-          class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-          style="background-color:rgb(209.4, 236.7, 195.9);">
-          <div  class="p-6 " >
-            <h3  class="h-2/5 text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
-              @click="navigateToPaper(paper.doi)">
-              {{ paper.title }}
-            </h3>
-            <div class="flex flex-col items-start text-sm text-gray-500 text-left">
-              <p class="text-gray-500 text-sm mt-4 line-clamp-3">
-                <span class="font-bold">摘要：</span>{{ paper.abstract }}
-              </p>
-              <p class="text-sm text-gray-600 mt-2">
-                <span class="font-bold">作者：</span> <span class="font-medium">{{ paper.authors }}</span>
-              </p>
-              <p class="text-sm text-gray-600 mt-2">
-                <span class="font-bold">出版时间：</span> <span class="font-medium">{{ paper.publishDate }}</span>
-              </p>
-              <p class="text-sm text-gray-600 mt-2">
-                <span class="font-bold">上传时间：</span> <span class="font-medium">{{ paper.uploadDate }}</span>
-              </p>
+        </el-menu>
+      </div>
+      <div class="content bg-white mt-20">
+
+
+
+        <!-- 论文部分 -->
+        <section v-if="activeTab === 'section1'" id="section1" class="w-full flex flex-col space-y-10 items-center ">
+          <!-- 动态渲染每一页的卡片 -->
+          <div v-for="(paper, index) in currentPapers" :key="index"
+            class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            style="background:whitesmoke;">
+            <div class="p-6 ">
+              <h3 class="h-2/5 text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
+                @click="navigateToPaper(paper.doi)">
+                {{ paper.title }}
+              </h3>
+              <div class="flex flex-col items-start text-sm text-gray-500 text-left">
+                <p class="text-gray-500 text-sm mt-4 line-clamp-3">
+                  <span class="font-bold">摘要：</span>{{ paper.abstract }}
+                </p>
+                <p class="text-sm text-gray-600 mt-2">
+                  <span class="font-bold">作者：</span> <span class="font-medium">{{ paper.authors }}</span>
+                </p>
+                <p class="text-sm text-gray-600 mt-2">
+                  <span class="font-bold">出版时间：</span> <span class="font-medium">{{ paper.publishDate }}</span>
+                </p>
+                <p class="text-sm text-gray-600 mt-2">
+                  <span class="font-bold">上传时间：</span> <span class="font-medium">{{ paper.uploadDate }}</span>
+                </p>
+              </div>
+              <slot name="paper-section"></slot>
+            </div>
+            <!-- 卡片底部横栏 -->
+            <div class="flex justify-between items-center p-4 border-t border-gray-200">
+              <!-- 左侧引用量和下载量 -->
+              <div class="flex space-x-4">
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-paperclip mr-2"></i>
+                  <span>{{ paper.citations }}</span> <!-- 引用量 -->
+                </div>
+                <div class="flex items-center text-gray-600">
+                  <i class="fas fa-download mr-2"></i>
+                  <span>{{ paper.downloads }}</span> <!-- 下载量 -->
+                </div>
+              </div>
+              <!-- 右侧更新和删除按钮 -->
+              <div class="flex space-x-4">
+                <button @click="handleUpdate(paper.doi)" class="text-gray-600 hover:text-blue-800">
+                  <i class="fas fa-edit"></i> 更新
+                </button>
+                <button @click="handleDelete(paper.doi)" class="text-gray-600 hover:text-red-800">
+                  <i class="fas fa-trash"></i> 删除
+                </button>
+              </div>
             </div>
           </div>
-          <!-- 卡片底部横栏 -->
-          <div class="flex justify-between items-center p-4 border-t border-gray-200">
-            <!-- 左侧引用量和下载量 -->
-            <div class="flex space-x-4">
-              <div class="flex items-center text-gray-600">
-                <i class="fas fa-paperclip mr-2"></i>
-                <span>{{ paper.citations }}</span> <!-- 引用量 -->
-              </div>
-              <div class="flex items-center text-gray-600">
-                <i class="fas fa-download mr-2"></i>
-                <span>{{ paper.downloads }}</span> <!-- 下载量 -->
-              </div>
-            </div>
-            <!-- 右侧更新和删除按钮 -->
-            <div class="flex space-x-4">
-              <button @click="handleUpdate(paper.doi)" class="text-gray-600 hover:text-blue-800">
-                <i class="fas fa-edit"></i> 更新
-              </button>
-              <button @click="handleDelete(paper.doi)" class="text-gray-600 hover:text-red-800">
-                <i class="fas fa-trash"></i> 删除
-              </button>
-            </div>
+          <!-- 分页组件 -->
+          <el-pagination background layout="prev, pager, next" :total="papers.length" :page-size="4"
+            @current-change="handlePageChange" />
+        </section>
+        <!-- 专利部分 -->
+        <section v-if="activeTab === 'section2'" id="section2" class="flex flex-col space-y-10 items-center"
+          style="width: 100%;">
+          <div class="w-4/5 flex flex-col px-8 h-full">
+            <el-card class="p-8 shadow-lg rounded-lg ">
+              <el-table :data="paginatedPatents" style="width: 100% ">
+                <!-- 各种列 --><!-- 操作列 -->
+                <el-table-column prop="action" label="操作" label-class-name="centered-column">
+                  <template #default="scope">
+                    <div class="flex flex-col items-center space-y-2">
+                      <!-- 设置按钮宽度，确保一致；去掉不必要的偏移 -->
+                      <el-button type="primary" size="small"
+                        style="width: 80px; text-align: center; padding-left: 0; padding-right: 0;"
+                        @click="handleEdit1(scope.row)">
+                        修改
+                      </el-button>
+                      <el-button type="danger" size="small" style="width: 80px; text-align: center;margin-left: 0px;"
+                        @click="handleDelete1(scope.row)">
+                        删除
+                      </el-button>
+                    </div>
+                  </template>
+
+
+
+
+
+                </el-table-column>
+                <el-table-column prop="title" label="专利标题" width="150"></el-table-column>
+                <el-table-column prop="assignee" label="受让人" width="150"></el-table-column>
+                <el-table-column prop="author" label="作者" width="150"></el-table-column>
+                <el-table-column prop="creation_date" label="创作日期" width="120"></el-table-column>
+                <el-table-column prop="publication_date" label="出版日期" width="120"></el-table-column>
+                <el-table-column prop="result_url" label="专利链接">
+                  <template #default="scope">
+                    <a :href="scope.row.result_url" target="_blank" class="text-blue-500">查看详情</a>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="pdf_url" label="下载">
+                  <template #default="scope">
+                    <a :href="scope.row.pdf_url" target="_blank" class="text-blue-500" width="200">下载PDF</a>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="classification" label="分类"width="200"></el-table-column>
+
+              </el-table>
+            </el-card>
+            <!-- 分页组件 -->
+            <el-pagination background layout="prev, pager, next" :total="patents.length" :page-size="pageSize1"
+              @current-change="handlePageChange1" :current-page="currentPage1" class="mt-6" />
+
           </div>
-        </div>
-        <!-- 分页组件 -->
-        <el-pagination background layout="prev, pager, next" :total="papers.length" :page-size="4"
-          @current-change="handlePageChange" />
-      </section>
+        </section>
+      </div>
+
     </div>
   </div>
 
@@ -88,6 +166,97 @@ import axios from 'axios';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed, onMounted, nextTick, Ref } from 'vue'
 import { useRouter } from "vue-router"; // Vue Router for navigation
+// 当前激活的导航选项
+const activeTab = ref('section2');
+
+// 专利部分的数据结构和初始化数据
+interface Patent {
+  id: string;
+  title: string;
+  assignee: string;
+  author: string;
+  creation_date: string;
+  publication_date: string;
+  result_url: string;
+  pdf_url: string;
+  classification: string;
+}
+
+// 专利数据
+const patents = ref<Patent[]>([
+  {
+    id: '1',
+    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
+    assignee: 'Thomas Hermann',
+    author: 'Hermann Dipl Ing Thomas',
+    creation_date: '2011-02-01',
+    publication_date: '2012-04-15',
+    result_url: 'https://patents.google.com/patent/AT510477A2/en',
+    pdf_url:
+      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
+    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
+  },
+  {
+    id: '2',
+    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
+    assignee: 'Thomas Hermann',
+    author: 'Hermann Dipl Ing Thomas',
+    creation_date: '2011-02-01',
+    publication_date: '2012-04-15',
+    result_url: 'https://patents.google.com/patent/AT510477A2/en',
+    pdf_url:
+      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
+    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
+  },
+  {
+    id: '3',
+    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
+    assignee: 'Thomas Hermann',
+    author: 'Hermann Dipl Ing Thomas',
+    creation_date: '2011-02-01',
+    publication_date: '2012-04-15',
+    result_url: 'https://patents.google.com/patent/AT510477A2/en',
+    pdf_url:
+      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
+    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
+  },
+  {
+    id: '4',
+    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
+    assignee: 'Thomas Hermann',
+    author: 'Hermann Dipl Ing Thomas',
+    creation_date: '2011-02-01',
+    publication_date: '2012-04-15',
+    result_url: 'https://patents.google.com/patent/AT510477A2/en',
+    pdf_url:
+      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
+    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
+  },
+  // 添加更多专利数据
+]);
+// 分页状态
+const currentPage1 = ref(1); // 当前页
+const pageSize1 = 2; // 每页显示的条目数
+
+// 当前页显示的数据
+const paginatedPatents = computed(() => {
+  const startIndex = (currentPage1.value - 1) * pageSize1;
+  const endIndex = currentPage1.value * pageSize1;
+  return patents.value.slice(startIndex, endIndex);
+});
+// 分页切换时更新当前页
+const handlePageChange1 = (newPage: number) => {
+  currentPage1.value = newPage;
+};
+// 切换导航选项时的逻辑
+const handleTabChange = (tab: string) => {
+  activeTab.value = tab;
+  nextTick(() => {
+    if (window.MathJax) {
+      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+    }
+  });
+};
 // 假设每个paper是一个包含特定字段的对象
 interface Paper {
   id: number;
@@ -185,7 +354,7 @@ const router = useRouter();
 
 // 导航到论文详细页面
 const navigateToPaper = (paperId: string) => {
-  router.push({ name: "paper-detail", params: { id: paperId } }); // 假设你在路由中有名为 paper-detail 的页面
+  router.push({ name: "PaperDetail", params: { id: paperId } }); // 假设你在路由中有名为 paper-detail 的页面
 
 };
 // 使用 TypeScript 类型断言
@@ -203,11 +372,16 @@ const handleUploadClick = () => {
   // 跳转到上传论文页面
   router.push({ name: 'UploadPaper' });
 };
+const handleUploadClick1 = () => {
+  console.log("上传论文按钮被点击");
+  // 跳转到上传论文页面
+  router.push({ name: 'UploadPatent' });
+};
 // 处理更新按钮点击事件
-const handleUpdate = (paperId:string) => {
+const handleUpdate = (paperId: string) => {
   console.log(`Updating paper with ID: ${paperId}`);
   // 跳转到更新论文页面，传递 paperId 参数
-  router.push({ name: 'UpdatePaper', params: { id:paperId } });
+  router.push({ name: 'UpdatePaper', params: { id: paperId } });
 };
 
 // 处理删除按钮点击事件
@@ -254,7 +428,31 @@ const handleDelete = async (paperDoi: string) => {
 };
 
 
+// 修改专利
+const handleEdit1 = (patent: Patent) => {
+  console.log('修改专利:', patent);
+  // 这里可以打开弹窗编辑专利内容，或者跳转到修改页面
+  router.push({ name: 'UpdatePatent', params: { id: patent.id } });
+};
 
+// 删除专利
+const handleDelete1 = (patent: Patent) => {
+  console.log('删除专利:', patent);
+  // 弹出确认框
+  ElMessageBox.confirm(`确定要删除专利 "${patent.title}" 吗？`, '删除确认', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      // 从列表中删除
+      patents.value = patents.value.filter((item) => item !== patent);
+      ElMessage.success('删除成功');
+    })
+    .catch(() => {
+      ElMessage.info('删除已取消');
+    });
+};
 </script>
 
 <style scoped>
