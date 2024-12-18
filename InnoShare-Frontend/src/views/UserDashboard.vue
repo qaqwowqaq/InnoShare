@@ -50,7 +50,7 @@
               <p>{{ personalInfo.phoneNumber }}</p>
             </div>
             <div v-else class="space-y-2 max-w-md mx-auto">
-              <el-input v-model="personalInfo.username" placeholder="请输入用户名" class="!rounded-lg"/>
+              <p>@{{ personalInfo.username }}</p>
               <el-input v-model="personalInfo.email" placeholder="请输入电子邮箱" class="!rounded-lg"/>
               <el-input v-model="personalInfo.phoneNumber" placeholder="请输入手机号" class="!rounded-lg"/>
             </div>
@@ -190,7 +190,7 @@ class PersonInfo {
   email: string = 'example@gmail.com';
   // 是否已认证
   isVerified: boolean = false;
-  profileURL: string = 'https://th.bing.com/th/id/OIP.EyNjv0tcjuB_E5RFnPrw3wAAAA?w=203&h=145&c=7&r=0&o=5&dpr=1.5&pid=1.7';
+  profileURL: string = 'https://img.51miz.com/Element/00/88/08/84/72f298b9_E880884_d0f63115.png';
   nationality: string = 'China';
   institution: string = 'Beihang University';
   experience: string = 'Working / Studying Experience';
@@ -247,16 +247,18 @@ const formData = reactive(new FormData());
 /* logic of controlling */
 onMounted(() => {
   getUserDetails(userId).then((result) => {
-    personalInfo.username = result.username;
-    personalInfo.email = result.email;
-    personalInfo.phoneNumber = result.phoneNumber;
-    personalInfo.fullname = result.fullName;
-    personalInfo.institution = result.institution;
-    personalInfo.nationality = result.nationality;
-    personalInfo.fieldOfStudy = result.fieldOfStudy;
-    personalInfo.experience = result.experience;
-    personalInfo.isVerified = result.isVerified;
-  personalInfo.profileURL = result.avatarURL;
+    console.log(result.data);
+    const resultData = result.data;
+    personalInfo.username = resultData.username;
+    personalInfo.email = resultData.email;
+    personalInfo.phoneNumber = resultData.phoneNumber;
+    personalInfo.fullname = resultData.fullName;
+    personalInfo.institution = resultData.institution;
+    personalInfo.nationality = resultData.nationality;
+    personalInfo.fieldOfStudy = resultData.fieldOfStudy;
+    personalInfo.experience = resultData.experience;
+    personalInfo.isVerified = resultData.isVerified;
+  personalInfo.profileURL = resultData.avatarURL;
   }).catch((error) => {
     // not sure
     ElMessage({
@@ -270,6 +272,7 @@ onMounted(() => {
 
 // 为了展示静态逻辑，暂时先默认为true
 const isCurrentUser = computed(() => {
+  console.log(userStore.userInfo?.username);
   return userStore.userInfo?.username == personalInfo.username;
   // return true;
 })
@@ -354,6 +357,7 @@ const validateAndUpdateAvatarFile: UploadProps['beforeUpload'] = (rawFile): bool
   // request
   updateUserAvatar(rawFile).then(
     (result) => {
+      console.log(result);
       personalInfo.profileURL = result.avatarURL
       ElMessage({
         message: "头像上传成功！",
@@ -442,7 +446,19 @@ const getUserDetails = async (userId: string) => {
 // 更新用户信息
 const updateUserDetails = async (infoToUpdate: UpdatableInfo) => {
   try {
-    const response = await axiosInstance.post(`${urlBase}/update`, infoToUpdate);
+    const response = await axiosInstance.post(`${urlBase}/update`, {
+      fullName: personalInfo.fullname,
+      email: personalInfo.email,
+      phoneNumber: personalInfo.phoneNumber,
+      fieldOfStudy: personalInfo.fieldOfStudy,
+      institution: personalInfo.institution,
+      nationality: personalInfo.nationality,
+      experience: personalInfo.experience,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error updating user details:', error);
