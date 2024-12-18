@@ -1,6 +1,6 @@
 <template>
 
-  <div class="h-screen flex" style="margin-top: 100px;">
+  <div class="h-screen flex" style="">
     <!-- 左侧固定栏 -->
 
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
@@ -78,16 +78,16 @@
     <!-- 右侧瀑布流内容 -->
     <div class="content  p-4 bg-white overflow-y-auto " style="height: 92%; padding-left: 16%; width: 100%;">
       <section id="section1" class="mb-8 flex justify-center items-center w-full">
-        <div class=" flex flex-col w-3/4 max-w-screen-md shadow-2xl bg-green-100">
+        <div class=" flex flex-col w-3/4  shadow-2xl " style="background-color:whitesmoke;">
           <!-- 单篇论文展示 -->
           <div class="rounded-lg shadow-md overflow-hidden">
             <div class="p-4 leading-loose">
-              <h3 class="text-lg font-medium mb-2">{{ paper.title }}</h3>
+              <h3 class="text-xl font-medium mb-2">{{ paper.title }}</h3>
               <!-- 用来调试 -->
-              <p v-if="!isPreviewOpen" class="text-sm text-gray-500 mb-2 text-left">
+              <p v-if="!isPreviewOpen" class="text-lg text-gray-500 mb-2 text-left">
                 <span class="font-bold  ">摘要：</span>{{ paper.abstract }}
               </p>
-              <div class="flex flex-col items-start text-sm text-gray-500 text-left">
+              <div class="flex flex-col items-start text-lg text-gray-500 text-left">
                 <div>
                   <span class="font-bold">作者：</span>
                   <span>{{ paper.author }}</span>
@@ -111,7 +111,7 @@
 
       <section id="section2" class=" mb-8 flex justify-center items-center w-full">
 
-        <div class=" flex flex-col w-3/4 max-w-screen-md shadow-2xl z-1  bg-green-100">
+        <div class=" flex flex-col w-3/4  shadow-2xl z-1  " style="background-color:whitesmoke;">
           <div class="text-lg font-medium mb-2 p-4">
             <h3>论文关系网络拓扑图</h3>
           </div>
@@ -123,7 +123,7 @@
       <section id="section3" class="mb-8 flex flex-col justify-start items-center w-full">
 
 
-        <div class="text-left flex flex-col w-3/4 max-w-screen-md shadow-2xl  bg-green-100" style="height: 400px;">
+        <div class="text-left flex flex-col w-3/4  shadow-2xl  " style="height: 600px;background-color:whitesmoke;">
 
           <!-- 导航栏 -->
           <div class="bg-gray-500 w-full">
@@ -138,32 +138,49 @@
             <ul v-if="paperData.thisPaper.primaryRefs.length > 0">
               <li v-for="(ref, index) in paperData.thisPaper.primaryRefs" :key="index" class="mb-2">
                 【{{ index + 1 }}】
-                <span v-if="paperData.references[ref]" class="text-gray-600">{{ paperData.references[ref].id }}</span>
+                <span v-if="paperData.references[ref.referenceId]" class="text-gray-600">
+                  {{ paperData.references[ref.referenceId].citedTitle }}
+                </span>
                 <span v-else class="text-gray-600">加载中...</span>
                 -
-                <button @click="showSecondaryReferences(ref)" class="ml-2 text-gray-500 hover:text-blue-700">
+                <button @click="showSecondaryReferences(ref.referenceId)"
+                  class="ml-2 text-gray-500 hover:text-blue-700">
                   查看二级参考文献
                 </button>
               </li>
             </ul>
+
             <span v-else>加载中...</span>
 
           </div>
 
-          <!-- 二级参考文献 -->
           <div v-if="currentSelection === 'secondary'">
-            <ul>
-              <li v-for="(cit, index) in selectedReferences.secondaryCitations" :key="index" class="mb-2">
-                【{{ index + 1 }}】{{ cit }}
+            <!-- 显示加载中提示 -->
+            <div v-if="selectedReferences.loading">Loading secondary citations...</div>
+
+            <!-- 确保 selectedReferences.value 和 secondaryCitations 已经定义且是数组 -->
+            <ul v-else-if="paperData.thisPaper.secondaryRefs ">
+              
+              <li v-for="(cit, index) in paperData.thisPaper.secondaryRefs" :key="index" class="mb-2">
+                【{{ index + 1 }}】{{ cit.citedTitle }}
               </li>
             </ul>
+
+            <!-- 如果没有二级参考文献 -->
+            <div v-else><div>{{paperData.thisPaper.secondaryRefs}}</div>No secondary citations available.</div>
           </div>
+
+
+
+
+
+
 
           <!-- 共引文献 -->
           <div v-if="currentSelection === 'commonCitations'">
             <ul>
               <li v-for="(cit, index) in commonCitations" :key="index" class="mb-2">
-                【{{ index + 1 }}】<span class="text-gray-600">{{ cit }}</span> -
+                【{{ index + 1 }}】<span class="text-gray-600">{{ cit.citedTitle }}</span> -
                 <button @click="showReferencesForCitation(cit)" class="ml-2 text-gray-500 hover:text-blue-700">
                   查看引用该文献的参考文献
                 </button>
@@ -172,41 +189,7 @@
           </div>
         </div>
       </section>
-      <section id="section4" class="mb-8 flex flex-col justify-start items-center w-full">
-        <div class="text-left   max-w-screen-md shadow-2xl bg-green-100" style="height: 400px;width: 80%;">
-          <div class="flex justify-between mx-auto w-full max-w-screen-lg">
-            <div v-for="(subjects, category, index) in categorizedSubjects" :key="category">
-              <div class="flex h-full">
-                <el-card class=" px-12 card-container">
 
-                  <div slot="header" class="text-center">
-                    <h2 class="text-xl font-medium">
-                      {{ category === 'researchStart'
-                        ? '研究起点'
-                        : category === 'researchSource'
-                          ? '研究来源'
-                          : '研究领域' }}
-                    </h2>
-                  </div>
-                  <el-list class="center-list" style="height:300px;">
-                    <el-list-item v-for="subject in subjects" :key="subject.name" class="list-item">
-                      <el-link :href="subject.link" target="_blank">{{ subject.name }}</el-link>
-                    </el-list-item>
-                  </el-list><!-- 添加箭头 -->
-
-                </el-card>
-                <div v-if="category !== 'paper'" class=" " style=' position: relative; width:0;height:400px;'>
-
-                  <div class="arrow arrow-right">
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
 
 
 
@@ -218,15 +201,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </template>
 
-<script  setup>
+<script setup>
 import { ref, onMounted, nextTick, computed, watch, watchEffect, reactive } from "vue";
 import PdfPreview from '@/components/PdfPreview/index.vue';
 import { useRoute,useRouter } from 'vue-router';
 const pdfUrl = ref();
 import * as echarts from 'echarts'; // 引入echarts库
 import { useTransition } from '@vueuse/core'
-import axios from 'axios';
-import axiosInstance from "@/axiosConfig";
+import axiosInstance from '@/axiosConfig';
+const route = useRoute();
+const doi = route.params.id;
 // 定义响应式的 `paper` 和 `paperData`
 const renderedAbstract = ref('');
 const subjects = ref([]);
@@ -244,18 +228,18 @@ const paper = ref({
   abstract: '',
   author: '',
   publishedDate: '',
-  citation: ''
+  citation: '',
+  citationSource: '',
+  downloadSource: ''
 });
-const router = useRouter();
-const route = useRoute();
-const paperDoi = ref(null);  
+
 // 获取论文基本信息
 const fetchPaper = async (paperDoiValue) => {
   try {
-    console.log("请求参数:", { paperDoi: paperDoiValue });
+    console.log("请求参数:", { paperDoi: doi });
     const response = await axiosInstance.get('/api/academic/getPaper', {
       params: {
-        paperDoi: paperDoiValue,
+        paperDoi: doi,
       },
     });
     console.log('获取论文基本信息成功:', response.data.data.paper);
@@ -266,7 +250,11 @@ const fetchPaper = async (paperDoiValue) => {
       author: response.data.data.paper.author,
       publishedDate: new Date(response.data.data.paper.createdAt).toLocaleDateString('zh-CN'),
       citation: `[1]${response.data.data.paper.author}.${response.data.data.paper.title}[J/OL].arXiv, ${response.data.data.paper.createdAt}.${response.data.data.paper.doi}.`,
+      citationSource: 21,
+      // citationSource:response.data.data.paper.citationCount,
+      downloadSource: response.data.data.paper.downloadCount
     };
+    // 使用 MathJax 渲染公式
     // 使用 MathJax 渲染公式
     setTimeout(() => {
       if (window.MathJax) {
@@ -274,8 +262,6 @@ const fetchPaper = async (paperDoiValue) => {
       }
     }, 100);
     pdfUrl.value = response.data.data.paper.downloadUrl;
-    console.log('pdfUrl:', pdfUrl.value);
-    console.log('获取论文基本信息成功:', paper.value);
     // 获取并处理学科信息
     subjects.value = response.data.data.paper.subjects.map(subject => {
       return {
@@ -288,60 +274,156 @@ const fetchPaper = async (paperDoiValue) => {
     console.error('获取论文基本信息失败:', error);
   }
 };
+onMounted(() => {
+  if (window.MathJax) {
+    window.MathJax.Hub.Config({
+      tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+    });
+    window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+  }
+});
 
+// 获取引用信息
 const buildReferenceTree = async (paperDoiValue) => {
   try {
-    console.log('请求的论文 DOI:', paperDoiValue); // 确保 DOI 值正确
+    // 获取一级引用
     const response = await axiosInstance.get('/api/academic/getPaperReferences', {
-      params: { paperDoi: paperDoiValue.value },
+      params: { paperDoi: doi, },
     });
-    console.log('获取引用信息成功:', response.data);
+    console.log('获取一级引用信息成功:', response.data);
 
-    if (response.data.data ) {
-      const references = response.data.data;
-      console.log('引用信息:', references);
-      paperData.value = {
-        thisPaper: {
-          id: paperDoiValue.value || "", // 防止 undefined
-          primaryRefs:references.map((ref) => ref.referenceId), // 使用 referenceId
-          secondaryRefs: [], // 可填充二级引用
-        },
-        references: references.reduce(
-          (acc, cur) => ({ ...acc, [cur.referenceId]: cur }), // 使用 referenceId 作为键
-          {},
-        ),
-        
-      };
-      console.log('paperData:', paperData.value.references)
-    } else {
-      console.error('论文数据格式不正确');
+    const references = response.data.data;
+    console.log('一级引用信息:', references);
+
+    // 获取二级引用的逻辑
+    const secondaryRefs = await Promise.all(
+      references.map(async (ref) => {
+        try {
+          // 通过一级引用的 citedPaperDoi 获取二级引用
+          const secondaryResponse = await axiosInstance.get('/api/academic/getPaperReferences', {
+            params: { paperDoi: ref.citedPaperDoi }, // 使用一级文献的 DOI 获取二级引用
+          });
+          console.log('获取二级引用信息成功:', secondaryResponse.data);
+          // 返回二级引用的详细信息
+          return secondaryResponse.data.data.map(secondaryRef => ({
+            citingPaperDoi: ref.citedPaperDoi, // 引用该二级引用的论文的 DOI
+
+            referenceId: secondaryRef.referenceId,
+            citedPaperDoi: secondaryRef.citedPaperDoi,
+            citedTitle: secondaryRef.citedTitle,
+            createdAt: secondaryRef.createdAt,
+            updatedAt: secondaryRef.updatedAt,
+          }));
+        } catch (secondaryError) {
+          return []; // 如果获取二级引用失败，返回空数组
+        }
+      })
+    );
+
+    // 将所有二级引用平铺到一个数组中
+    const allSecondaryRefs = secondaryRefs.flat();
+    console.log('二级引用信息1:', allSecondaryRefs);
+
+    // 获取引用论文的标题（citingTitle）
+    const getCitingTitle = async (citingPaperDoi) => {
+      try {
+        const response = await axiosInstance.get('/api/academic/getPaper', {
+          params: { paperDoi: citingPaperDoi },
+        });
+        return response.data.data.paper?.title || ''; // 返回引用论文的标题
+      } catch (error) {
+        console.error(`获取引用文献 ${citingPaperDoi} 的标题失败:`, error);
+        return ''; // 如果获取失败，返回空字符串
+      }
+    };
+
+    // 将二级引用信息关联到每个一级引用，并添加 citingTitle
+    for (let ref of references) {
+      ref.secondaryCitations = allSecondaryRefs
+        .filter(secondary => secondary.citingPaperDoi === ref.citedPaperDoi)
+        .map(async secondary => ({
+          citingPaperDoi: secondary.citingPaperDoi,
+          citingTitle: await getCitingTitle(secondary.citingPaperDoi), // 获取 citingTitle
+          referenceId: secondary.referenceId,
+          citedPaperDoi: secondary.citedPaperDoi,
+          citedTitle: secondary.citedTitle,
+          createdAt: secondary.createdAt,
+          updatedAt: secondary.updatedAt
+        }));
     }
-    return response.data; // 返回引用数据
+
+    // 返回包含一级和二级引用的结果
+    return {
+      thisPaper: {
+        id: doi, // 当前论文的 DOI
+        primaryRefs: references.map(ref => ({
+          citingPaperDoi: ref.citingPaperDoi,
+          referenceId: ref.referenceId,
+          citedPaperDoi: ref.citedPaperDoi,
+          citedTitle: ref.citedTitle,
+          createdAt: ref.createdAt,
+          updatedAt: ref.updatedAt,
+          secondaryCitations: ref.secondaryCitations, // 添加二级引用
+        })),
+        secondaryRefs: allSecondaryRefs, // 填充二级引用
+      },
+      references: references.reduce(
+        (acc, cur) => ({
+          ...acc,
+          [cur.referenceId]: cur,
+        }),
+        {}
+      ),
+    };
   } catch (error) {
     console.error('获取引用信息失败:', error);
-    return { error: true, message: error.message || '未知错误', references: [], primaryRefs: [] };
+    return { error: true, message: error.message || '未知错误', references: [], primaryRefs: [], secondaryRefs: [] }; // 默认返回空数组
   }
 };
+
+
+
+
 
 
 // 获取论文和引用信息，分别处理
 const fetchPaperData = async (paperDoiValue) => {
   try {
-    const { references, primaryRefs } = await buildReferenceTree(paperDoiValue);
+    // 调用 `buildReferenceTree` 获取引用信息
+    const { thisPaper, references } = await buildReferenceTree(paperDoiValue);
+    console.log('引用信息1:', thisPaper, references);
     // 更新 `paperData` 中的引用信息
     paperData.value = {
       thisPaper: {
-        id: paper.value.id, // 使用 `paper` 中的 id
-        primaryRefs: primaryRefs,
-        secondaryRefs: [], // 可填充二级引用
+        id: thisPaper.id, // 使用 `thisPaper` 中的 id
+        primaryRefs: thisPaper.primaryRefs, // 使用 `primaryRefs` 中的完整引用信息
+        secondaryRefs: thisPaper.secondaryRefs, // 二级引用目前为空，可以后续填充
       },
-      references,
+      references, // 包含所有引用文献的字典
     };
+
     console.log('引用信息已更新:', paperData.value);
   } catch (error) {
     console.error('获取引用信息失败:', error);
   }
 };
+
+
+// 加载 primaryRefs 数据的异步操作
+async function loadPrimaryRefs() {
+  // 假设你从 paperData 中获取 primaryRefs
+  if (paperData.value && paperData.value.thisPaper) {
+    // 等待 primaryRefs 加载完毕
+    await Promise.all(
+      paperData.value.thisPaper.primaryRefs.map(async (refId) => {
+        const ref = paperData.value.references[refId];
+        return ref;  // 获取每个引用
+      })
+    );
+  }
+}
+
+
 
 // 组件挂载时执行初始化 MathJax
 onMounted(() => {
@@ -352,9 +434,10 @@ onMounted(() => {
     window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
   }
 });
-
+const paperDoi = ref(null);  
 // 动态监听 `route.query` 的变化，并触发数据加载
 watchEffect(async () => {
+  console.log('路由变化:', route.query.id);
   paperDoi.value = route.query.id ? decodeURIComponent(route.query.id) : null;
 
   if (paperDoi.value) {
@@ -377,87 +460,78 @@ watchEffect(async () => {
 });
 
 
+const downloadSource = ref(0)
+const citationSource = ref(0)
+const downloadValue = ref(0);
+const citationValue = ref(0);
 
 // 组件挂载时执行
 onMounted(async () => {
+  paperDoi.value = route.params.id ? decodeURIComponent(route.params.id) : null;
   console.log('论文DOI:', paperDoi.value);
   // 先获取论文基本信息
-  await fetchPaper(paperDoi.value);
+  //下载与统计
 
-  await fetchPaperData(paperDoi);
-  updateChartData();
+
+  await fetchPaper(paperDoi.value);
+console.log("21321321321",paper.value.downloadSource,paper.value.citationSource);
+// 动态过渡效果，分别对下载量和引用量进行设置
+  // 动态过渡效果，分别对下载量和引用量进行设置
+  downloadValue.value = useTransition(paper.value.downloadSource, {
+    duration: 1500,
+    type: 'number',
+  });
+  citationValue.value = useTransition(paper.value.citationSource, {
+    duration: 1500,
+    type: 'number',
+  });
+  await fetchPaperData(paperDoi.value);
   console.log('论文数据:', paper.value);
 });
 
 
-//下载与统计
-const downloadSource = ref(0)
-const citationSource = ref(0)
 
-// 动态过渡效果，分别对下载量和引用量进行设置
-const downloadValue = useTransition(downloadSource, {
-  duration: 1500,
-  type: 'number',
-})
-const citationValue = useTransition(citationSource, {
-  duration: 1500,
-  type: 'number',
-})
 
 // 设置目标值
-downloadSource.value = 1234
-citationSource.value = 567
 // 定义 chartRef 引用
 const chartRef = ref(null);
 const currentSelection = ref('paper'); // 控制显示哪个部分
 const selectedReferences = ref({}); // 存储当前选中的参考文献
-// const paperData = {
-//   thisPaper: {
-//     id: 'paper1',
-//     primaryRefs: ['ref1', 'ref2', 'ref3'],
-//     secondaryRefs: []
-//   },
-//   references: {
-//     ref1: {
-//       id: 'ref1',
-//       secondaryCitations: ['cit1', 'cit2']
-//     },
-//     ref2: {
-//       id: 'ref2',
-//       secondaryCitations: ['cit2', 'cit3']
-//     },
-//     cit1: { id: 'cit1' },
-//     cit2: { id: 'cit2' },
-//     cit3: { id: 'cit3' },
-//     ref3: {
-//       id: 'ref3',
-//       secondaryCitations: ['cit4']
-//     },
-//   }
-// };
-
-// 定义一个计算共引文献的函数
-function findCommonCitations(primaryRefs, references) {
+// 计算共引文献的函数
+async function findCommonCitations(primaryRefs, references) {
   const commonCitations = new Set();
 
-  for (const refId of primaryRefs) {
-    const secondaryCitations = references[refId].secondaryCitations;
-    for (const citId of secondaryCitations) {
+  // 遍历所有一级引用
+  for (const ref of primaryRefs) {
+    // 获取二级引用，等待 Promise 完成
+    const secondaryCitations = await ref.secondaryCitations;
+
+    // 遍历该一级引用的所有二级引用
+    for (const citIdPromise of secondaryCitations) {
+      // 确保 citId 是一个已解析的对象
+      const citId = await citIdPromise;
       let isCommon = false;
-      for (const otherRefId of primaryRefs) {
-        if (refId !== otherRefId && references[otherRefId].secondaryCitations.includes(citId)) {
+      // 遍历其他一级引用，检查是否有相同的 citedPaperDoi
+      for (const otherRef of primaryRefs) {
+        if (ref !== otherRef && citId.citedPaperDoi === otherRef.citedPaperDoi) {
           isCommon = true;
-          break;
+          break; // 找到相同的共引文献，跳出循环
         }
       }
+
+      // 如果存在共引文献，则添加到 commonCitations 集合中
       if (isCommon) {
         commonCitations.add(citId);
       }
     }
   }
 
+  // 返回共引文献的数组
   return Array.from(commonCitations);
 }
+
+
+
 
 // 响应式变量保存共引文献列表
 const commonCitations = ref([]);
@@ -466,82 +540,197 @@ const commonCitations = ref([]);
 const chartOptions = {
 
   tooltip: {
+
     extraCssText: 'z-index:1',
+    show: true,
+    formatter: `{b}` // 显示节点的名称
   },
   series: [
     {
       type: 'graph',
       layout: 'force',
+      symbol: 'circle', // 设置节点为圆形（球形）
+      symbolSize: 40, // 设置球的大小
+      itemStyle: { color: '#ff9f43' }, // 设置节点颜色
+      label: {
+        show: false,
+        color: 'black' // 设置默认名称颜色为黑色
+      }, // 默认不显示名称
       data: [],
       links: [],
       roam: true,
-      label: { show: true },
       force: { repulsion: 1000 }
     }
   ]
 };
+onMounted(async () => {
+  try {
+    // 先获取论文基本信息
+    await fetchPaper(paperDoi);
 
-// 组件挂载后，初始化图表数据
-const updateChartData = () =>{
-  // 计算共引文献
-  if (paperData.thisPaper && paperData.thisPaper.primaryRefs && paperData.thisPaper.primaryRefs.length > 0)
-    commonCitations.value = findCommonCitations(paperData.thisPaper.primaryRefs, paperData.references);
-  // 初始化节点和边的数据
-  const nodes = [];
-  const links = [];
+    // 获取论文的引用信息
+    await fetchPaperData(paperDoi);
+    // 等待 primaryRefs 加载完成
+    await loadPrimaryRefs();
 
-  // 添加本篇论文节点
-  nodes.push({ name: 'paper1', value: 10, symbolSize: 50 });
+    console.log(paper.value.downloadSource, paper.value.citationSource);
+    // 动态过渡效果，分别对下载量和引用量进行设置
+    downloadValue.value = useTransition(paper.value.downloadSource, {
+      duration: 1500,
+      type: 'number',
+    });
 
-  // 添加一级参考文献节点
-  if (paperData.thisPaper && paperData.thisPaper.primaryRefs && paperData.thisPaper.primaryRefs.length > 0)
-    paperData.thisPaper.primaryRefs.forEach(refId => {
-      const ref = paperData.references[refId];
-      nodes.push({ name: ref.id, value: 30 });
-      links.push({ source: 'paper1', target: ref.id });
+    citationValue.value = useTransition(paper.value.citationSource, {
+      duration: 1500,
+      type: 'number',
+    });
 
-      // 添加二级参考文献节点
-      ref.secondaryCitations.forEach(citId => {
-        if (!nodes.some(node => node.name === citId)) {
-          nodes.push({ name: citId, value: 20 });
-        }
-        links.push({ source: ref.id, target: citId });
+
+    // 确保 paperData 被更新后才执行后续操作
+    console.log('论文数据:', paperData.value);
+
+    // 确保 paperData 有值后再进行图表的初始化
+    if (paperData.value && paperData.value.thisPaper) {
+      // 计算共引文献
+      commonCitations.value = await findCommonCitations(
+        paperData.value.thisPaper.primaryRefs,
+        paperData.value.references
+      );
+      console.log('共引文献1111:', commonCitations.value);
+      // 初始化节点和边的数据
+      const nodes = [];
+      const links = [];
+
+      // 添加本篇论文节点
+      nodes.push({
+        name: paper.value.title, value: 10, symbolSize: 50,
+        itemStyle: { color: '#f39c12' },
+        label: {
+          show: true,
+          color: 'black' // 设置默认名称颜色为黑色
+        } // 默认不显示名称
       });
-    });
-  // 添加共引文献的节点和边
-  commonCitations.value.forEach(citId => {
-    // 检查节点是否已存在，如果存在则跳过
-    if (!nodes.some(node => node.name === citId)) {
-      nodes.push({ name: citId, value: 25 }); // 共引文献节点
-    }
 
-    // 共引文献链接到所有包含该共引文献的一级参考文献
-    paperData.thisPaper.primaryRefs.forEach(refId => {
-      const ref = paperData.references[refId];
-      if (ref.secondaryCitations.includes(citId)) {
-        links.push({ source: citId, target: ref.id });
+      // 添加一级参考文献节点
+      if (paperData.value.thisPaper.primaryRefs && paperData.value.thisPaper.primaryRefs.length > 0) {
+        paperData.value.thisPaper.primaryRefs.forEach(async ref => {
+          nodes.push({ name: ref.citedTitle, value: 30 });
+          links.push({ source: paper.value.title, target: ref.citedTitle });
+
+          // 添加二级参考文献节点
+          // 添加二级参考文献节点
+          if (ref.secondaryCitations && ref.secondaryCitations.length > 0) {
+            // 使用 for...of 循环，确保支持异步操作
+            for (const citId of ref.secondaryCitations) {
+              try {
+                // 确保 citId 已解析为实际值
+                const resolvedCitId = await citId;  // 等待 citId 被解析
+
+                // 输出已解析的 citId 内容
+                console.log('2133二级参考文献:', resolvedCitId);
+                console.log('2133二级参考文献的标题:', resolvedCitId.citedTitle);
+                console.log('2133引用的标题:', resolvedCitId.citingTitle);
+
+                // 检查节点是否存在，若不存在则添加
+                if (!nodes.some(node => node.name === resolvedCitId.citedTitle)) {
+                  nodes.push({ name: resolvedCitId.citingTitle, value: 20 });
+                }
+
+                // 添加链接
+                links.push({ source: resolvedCitId.citedTitle, target: ref.citedTitle });
+                console.log('2133二级参考文献的链接:', { source: resolvedCitId.citedTitle, target: ref.citedTitle });
+              } catch (error) {
+                console.error('处理二级参考文献时出错:', error);
+              }
+            }
+          }
+
+        });
       }
-    });
-  });
-  // 设置图表的节点和边
-  chartOptions.series[0].data = nodes;
-  chartOptions.series[0].links = links;
 
-  // 初始化echarts图表
-  const chartInstance = echarts.init(chartRef.value);
-  chartInstance.setOption(chartOptions);
+      // 检查是否有共引文献，如果有才进行处理
+      if (commonCitations.value && commonCitations.value.length > 0) {
 
-  // 调整图表大小
-  nextTick(() => {
-    if (chartInstance) {
-      chartInstance.resize();
+        //  console.log('共引文献列表:', commonCitations.value); // 打印所有共引文献
+        commonCitations.value.forEach(async (citId) => {
+          // 确保 citId 已解析并且有 citedTitle
+          const citIdResolved = citId;  // 如果 citId 是 Promise，解析它
+          //  console.log('当前 citId:', citIdResolved);  // 输出 citId 对象
+          //   console.log('citedTitle:', citIdResolved.citedTitle);  // 输出 citedTitle
+
+          if (citIdResolved && citIdResolved.citedTitle) {
+            //  console.log('共引文献2222:', citIdResolved.citingTitle);
+
+            // 如果 nodes 中没有该共引文献的节点，则添加
+            if (!nodes.some(node => node.name === citIdResolved.citedTitle)) {
+              nodes.push({ name: citIdResolved.citedTitle, value: 25 });
+            }
+            // 共引文献链接到所有包含该共引文献的一级参考文献
+            for (const ref of paperData.value.thisPaper.primaryRefs) {
+
+              const secondaryCitations = await Promise.all(ref.secondaryCitations);
+              //console.log('二级参考文献345:', ref);
+              if (secondaryCitations) {
+                // console.log('共引文献:', secondaryCitations);
+
+                // 如果 secondaryCitations 是 Promise，则需要等待它解析
+
+
+                // 判断是否有 secondaryCitation 的 citedTitle 和 citId 的 citedTitle 相同
+                const isCommon = await secondaryCitations.some(async (secondary) => {
+                  const resolvedSecondary = await secondary;  // 解析每个 Promise
+                  //   console.log('解析后的二级参考文献:', resolvedSecondary);
+                  return resolvedSecondary.citingPaperDoi === citIdResolved.citingPaperDoi;  // 进行比较
+                });
+                if (isCommon) {
+                  links.push({ source: citIdResolved.citedTitle, target: ref.citedTitle });
+                  //  console.log('共引文献的链接:', { source: citIdResolved.citedTitle, target: ref.citedTitle });
+                }
+              }
+            }
+          }
+        });
+      }
+
+
+      // 设置图表的节点和边
+      chartOptions.series[0].data = nodes;
+      chartOptions.series[0].links = links;
+
+      // 初始化echarts图表
+      const chartInstance = echarts.init(chartRef.value);
+      chartInstance.setOption(chartOptions);
+
+      // 调整图表大小
+      nextTick(() => {
+        if (chartInstance) {
+          chartInstance.resize();
+        }
+      });
+
+      // 打印chartOptions的内容，确保配置正确
+      console.log('Chart options:', JSON.stringify(chartOptions));
+
+      // 绑定点击事件
+      chartInstance.on('click', (params) => {
+        if (params.dataType === 'node') {
+          const clickedNode = params.data.name;
+
+          if (paperData.value.thisPaper.primaryRefs.includes(clickedNode)) {
+            // 点击一级参考文献
+            showSecondaryReferences(clickedNode);
+          } else if (commonCitations.value.includes(clickedNode)) {
+            // 点击共引文献
+            showReferencesForCitation(clickedNode);
+          }
+        }
+      });
     }
+  } catch (error) {
+    console.error('加载论文数据失败:', error);
+  }
+});
 
-  });
-
-  // 打印chartOptions的内容，确保配置正确
-  console.log(JSON.stringify(chartOptions));
-};
 
 
 //论文信息
@@ -552,19 +741,68 @@ const navItems = [
   { name: 'secondary', label: '二级参考文献' },
   { name: 'commonCitations', label: '共引文献' }
 ];
-
 // 设置当前选择的参考文献类型
-function setSelection(selection) {
+async function setSelection(selection) {
   currentSelection.value = selection;
+
   if (selection === 'secondary') {
-    // 点击“二级参考文献”时显示所有二级文献
-    selectedReferences.value = {
-      secondaryCitations: paperData.thisPaper.primaryRefs.flatMap(refId =>
-        paperData.references[refId].secondaryCitations
-      )
-    };
+    try {
+      console.log('paperData:', paperData.value);
+      console.log('thisPaper:', paperData.value?.thisPaper);
+
+      if (paperData.value?.thisPaper) {
+        console.log('primaryRefs:', paperData.value.thisPaper.primaryRefs);
+
+        // 在加载前先将 loading 设置为 true
+        selectedReferences.loading = true;
+
+        // 使用 Promise.all 来并行请求每个参考文献的二级引用
+        const secondaryCitations = await Promise.all(
+          paperData.value.thisPaper.primaryRefs.flatMap(async refId => {
+            const ref = paperData.value.references[refId.referenceId];
+            console.log('一级参考文献:', ref);
+
+            if (ref && ref.secondaryCitations) {
+              console.log('二级参考文献:', ref.secondaryCitations);
+
+              // 等待二级引用的 Promise 解析
+              const resolvedSecondaryCitations = await Promise.all(ref.secondaryCitations);
+              return resolvedSecondaryCitations; // 返回解析后的二级引用
+            } else {
+              return [];
+            }
+          })
+        );
+
+        // 扁平化二级引用数组并设置到 selectedReferences.value
+        selectedReferences.value = {
+          secondaryCitations: secondaryCitations.flat() || [] // 确保它是一个空数组
+        };
+        // 确保视图更新后再执行
+       // 在 DOM 更新后执行回调
+       nextTick(() => {
+          console.log('更新后的二级参考文献:', selectedReferences.value.secondaryCitations);
+        });
+        console.log('二级参考文献121:', selectedReferences.value.secondaryCitations);
+
+        // 数据加载完成后，将 loading 设置为 false
+        selectedReferences.loading = false;
+
+      } else {
+        console.error('paperData 或 thisPaper 为 null');
+      }
+    } catch (error) {
+      console.error('处理二级参考文献时发生错误:', error);
+      selectedReferences.loading = false; // 发生错误时也停止加载状态
+    }
   }
 }
+
+
+
+
+
+
 function setSelection1(selection, refId) {
   currentSelection.value = selection;
 
@@ -606,7 +844,7 @@ onMounted(() => {
       }
     }
   });
-
+console.log("000"+selectedReferences.value);
   chartInstance.setOption(chartOptions);
 });
 // const paper = ref({
@@ -693,44 +931,7 @@ const onLoaded = () => {
   loading.value = false;
 };
 
-//推荐页面
 
-// 去除重复项，并计算每个类别的subjects
-const uniqueSubjects = computed(() => {
-  const seen = new Set();
-  return subjects.value.filter((subject) => {
-    if (seen.has(subject.name)) {
-      return false;
-    }
-    seen.add(subject.name);
-    return true;
-  });
-});
-
-// 将主题分配到三个类别（研究起点、研究来源、本文）
-const categorizedSubjects = computed(() => {
-  const result = {
-    researchStart: [],
-    researchSource: [],
-    paper: []
-  };
-
-  // 假设我们简单地平均分配主题到三个类别（实际应用中应根据需求调整）
-  const subjectsArray = Array.from(uniqueSubjects.value);
-  const chunkSize = Math.ceil(subjectsArray.length / 3);
-
-  for (let i = 0; i < subjectsArray.length; i += chunkSize) {
-    result.researchStart.push(...subjectsArray.slice(i, i + chunkSize));
-    if (i + chunkSize < subjectsArray.length) {
-      result.researchSource.push(...subjectsArray.slice(i + chunkSize, i + 2 * chunkSize));
-    }
-    if (i + 2 * chunkSize < subjectsArray.length) {
-      result.paper.push(...subjectsArray.slice(i + 2 * chunkSize, i + 3 * chunkSize));
-    }
-  }
-
-  return result;
-});
 </script>
 
 <style scoped>
@@ -768,7 +969,8 @@ const categorizedSubjects = computed(() => {
 
 /* 卡片的过渡动画效果 */
 .el-card {
-  background-color: rgb(162, 232, 209);
+  background-color: mintcream;
+  ;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
@@ -836,6 +1038,7 @@ const categorizedSubjects = computed(() => {
   height: 20px;
   /* 设置尾巴宽度 */
   background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(35, 31, 31, 0.9);
   /* 设置尾巴颜色 */
   transform: translateY(-50%);
   box-shadow: 6px 12px 25px rgba(0, 0, 0, 0.5);
