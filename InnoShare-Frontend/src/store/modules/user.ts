@@ -9,6 +9,7 @@ interface UserInfo {
   avatarUrl: string;
   createdAt: string;
   updatedAt: string;
+  isAdmin:boolean;
 }
 
 interface UserState {
@@ -112,5 +113,14 @@ export const useUserStore = defineStore('user', {
     getIsVerified(state): boolean | undefined {
       return state.userInfo?.isVerified;
     },
+
+    /**
+     * 获取用户是否为管理员
+     * @param state 当前状态
+     * @returns 是否为管理员
+     */
+    getIsAdmin(state): boolean | undefined {
+      return state.userInfo?.isAdmin;
+    }
   },
 });

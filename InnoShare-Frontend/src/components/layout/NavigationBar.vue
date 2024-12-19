@@ -51,7 +51,29 @@
         </div>
         <a ref="guideHome" class="guideHome" @click="guideTo('/home')">首页</a>
         <a ref="guideAbout" class="guideAbout" @click="guideTo('/about')">关于我们</a>
-        <a ref="guideLogin" class="guideLogin" @click="handleLoginClick">{{ this.useStore.isAuthenticated?"个人中心":"登录" }}</a>
+        <!-- 将原来的 a 标签改为 div 包装器 -->
+        <div class="login-wrapper" ref="loginWrapper">
+          <a ref="guideLogin" class="guideLogin" @click="handleLoginWrapper">
+            {{ this.useStore.isAuthenticated ? "个人中心" : "登录" }}
+          </a>
+          
+          <!-- 添加下拉菜单 -->
+          <div v-if="showUserMenu && useStore.isAuthenticated" class="user-dropdown">
+            <div class="dropdown-item" @click="handlePersonalCenter">个人</div>
+            <div class="dropdown-item" @click="confirmLogout">登出</div>
+          </div>
+        </div>
+
+        <!-- 添加登出确认对话框 -->
+        <div v-if="showLogoutConfirm" class="logout-confirm-modal">
+          <div class="modal-content">
+            <p>确认要登出吗？</p>
+            <div class="modal-buttons">
+              <button @click="handleLogout">确认</button>
+              <button @click="showLogoutConfirm = false">取消</button>
+            </div>
+          </div>
+        </div>
 
       </div>
   </header>
@@ -64,6 +86,9 @@ import {useUserStore} from "../../store/modules/user.ts"
 import {watch} from "vue";
 import {computed} from "vue";
 import { useRouter } from "vue-router";
+import axiosInstance from "../../axiosConfig.ts";  
+
+
 export default {
   name: "NavigationBar",
   data(){
@@ -93,6 +118,8 @@ export default {
         }
         ],//搜索类型论文专利等
         searchQuery:"",
+        showUserMenu:false,
+        showLogoutConfirm:false,
     }
 
   },
@@ -100,7 +127,7 @@ export default {
     const myStore = mainStore(); // 使用 Pinia store
     const useStore =useUserStore();
     const router = useRouter();
-    const userDashboardPath = computed(() => (useStore.isAuthenticated ? `/userDashboard/${useStore.getUserId}` : "/login"));
+    const userDashboardPath = computed(() => (useStore.isAuthenticated ? `/userDashboard/${useStore.getUserInfo.id}` : "/login"));
     return { myStore, useStore, userDashboardPath, router };
   
   },
@@ -141,6 +168,13 @@ export default {
         (newValue, oldValue) => {
           this.changeExpand();
         });
+        // 添加点击外部关闭下拉菜单的处理
+    document.addEventListener('click', (e) => {
+      const loginWrapper = this.$refs.loginWrapper;
+      if (loginWrapper && !loginWrapper.contains(e.target)) {
+        this.showUserMenu = false;
+      }
+    });
 
   },
 
@@ -243,7 +277,43 @@ export default {
     },
     selectItem(item){
       this.selectType=item;
+    },
+    handleLoginWrapper() {
+      if (this.useStore.isAuthenticated) {
+        this.showUserMenu = !this.showUserMenu;
+      } else {
+        this.guideTo('/login');
+      }
+    },
+
+    handlePersonalCenter() {
+      this.showUserMenu = false;
+      // 导航到个人中心,如果是管理员登录导航到admin
+      if (this.useStore.getIsAdmin) {
+        this.guideTo('/admin');
+      } else {
+      this.guideTo(`/userDashboard/${this.useStore.getUserId}`);
+      }
+    },
+
+    confirmLogout() {
+      this.showUserMenu = false;
+      this.showLogoutConfirm = true;
+    },
+
+    async handleLogout() {
+      try {
+        await axiosInstance.get('/users/logout');
+        this.useStore.logout();
+        this.showLogoutConfirm = false;
+        this.guideTo('/login');
+      } catch (error) {
+        console.error('登出失败:', error);
+        alert('登出失败，请稍后重试');
+      }
     }
+
+
   }
 
 }
@@ -274,8 +344,10 @@ export default {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 999;
   color: rgb(235, 238, 238);
   transition:  0.5s ease-out;
+  position: fixed; /* 设置为固定定位 */
   z-index: 10000; /* 提高 z-index 以确保在最上层 */
 }
 #guideBar>*{
@@ -416,6 +488,82 @@ swapicon svg {
 .paper{
   padding: 0 20px 0 0;
 }
+
+.login-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 120px;
+}
+
+.user-dropdown .dropdown-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #333;
+}
+
+.user-dropdown .dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #4782b4;
+}
+
+.logout-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.logout-confirm-modal .modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+  background-color: #4782b4;
+  color: white;
+}
+
+.modal-buttons button:last-child {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.modal-buttons button:hover {
+  opacity: 0.9;
+}
+
 .guideAbout,.guideHome,.guideLogin{
   border-style: solid;
   border-color: transparent;
