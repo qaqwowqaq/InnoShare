@@ -75,7 +75,7 @@
     </aside>
 
     <!-- 主内容区 -->
-    <main :class="mainClass" class="flex-1 p-6 mt-16 transition-all duration-300 ease-in-out" style="margin-left:10px">
+    <main :class="mainClass" class="flex-1 p-6 mt-16 transition-all duration-300 ease-in-out" style="margin-left:10px;margin-bottom: 10px;">
       <h1 class="text-2xl font-bold mb-6">搜索结果</h1>
 
       <!-- 加载动画 -->
@@ -131,19 +131,26 @@
       
 
       <!-- 分页控件 -->
-      <div v-if="!loading && totalPages > 1" class="fixed bottom-0 left-0 right-0 p-4 shadow-lg flex justify-center items-center space-x-4 bg-white">
+      <div 
+        v-if="!loading && totalPages > 1" 
+        class=" bottom-4   p-3 
+              shadow-lg flex  justify-center items-center space-x-4 
+              bg-white rounded-full max-w-md mx-auto"
+      >
         <button
           @click="prevPage"
           :disabled="currentPage === 1"
-          class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 disabled:opacity-50"
+          class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full 
+                hover:bg-gray-200 disabled:opacity-50 transition-colors"
         >
           上一页
         </button>
-        <span class="px-4 py-2 text-gray-700">页 {{ currentPage }} / {{ totalPages }}</span>
+        <span class="px-3 py-2 text-gray-700">{{ currentPage }} / {{ totalPages }}</span>
         <button
           @click="nextPage"
           :disabled="currentPage === totalPages"
-          class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 disabled:opacity-50"
+          class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full 
+                hover:bg-gray-200 disabled:opacity-50 transition-colors"
         >
           下一页
         </button>
@@ -520,6 +527,27 @@ export default defineComponent({
 /* 旋转效果 */
 .rotate-180 {
   transform: rotate(180deg);
+}
+
+.grid {
+  min-height: calc(100vh - 200px); /* 调整合适的高度 */
+  padding-bottom: 60px; /* 为分页控件留出空间 */
+}
+
+/* 让主容器支持滚动 */
+main {
+  overflow-y: auto;
+  height: calc(100vh - 64px); /* 减去导航栏高度 */
+  position: relative;
+}
+
+/* 修改分页控件样式 */
+.sticky {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  z-index: 10;
+  border-top: 1px solid #eee;
 }
 
 /* 侧边栏宽度调整 */
