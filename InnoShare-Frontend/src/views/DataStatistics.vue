@@ -63,7 +63,16 @@
 
 <script>
 import * as echarts from 'echarts';
-import axiosInstance from '@/axiosConfig';
+import axiosInstance from '../axiosConfig';
+// 导入Vuex store
+import store from '@/store';
+
+// 添加一个方法来获取Cookie中的token
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
 
 export default {
     name: 'DataStatistics',
@@ -114,11 +123,9 @@ export default {
                 this.updateCharts();
             } else {
                 axiosInstance.get('/admin/statistics', {
-                    // headers: {
-                    //     Authorization: `Bearer ${this.$store.state.adminToken}`
-                    // }
                 })
                     .then(response => {
+                        console.log(response);
                         this.stats = response.data.data;
                         this.updateCharts();
                     })

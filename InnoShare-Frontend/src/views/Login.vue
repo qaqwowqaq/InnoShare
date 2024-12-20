@@ -39,6 +39,19 @@
     <!-- 右侧登录表单部分 -->
     <div class="right-side w-full sm:w-1/2 h-full flex justify-center items-center p-6 sm:p-12">
       <form @submit.prevent="handleLogin" class="w-full max-w-md space-y-6 bg-white p-8 rounded-lg shadow-lg transform transition-all duration-500 hover:scale-105">
+         <!-- 添加标题和切换按钮 -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">
+      {{ isAdmin ? '管理员登录' : '用户登录' }}
+    </h2>
+    <button 
+      type="button"
+      @click="toggleLoginType"
+      class="text-sm text-indigo-600 hover:text-indigo-800 underline"
+    >
+      切换到{{ isAdmin ? '用户' : '管理员' }}登录
+    </button>
+  </div>
         <div>
           <label for="username" class="block text-gray-700 font-medium">用户名</label>
           <input
@@ -93,44 +106,68 @@ export default defineComponent({
     const password = ref('');
     const errorMessage = ref('');
 
-    const mockUser = {
-      username: 'john_doe',
-      email: 'john@example.com',
-      password: 'John-Doe',
-      token: 'mock-jwt-token-string',
+    const isAdmin = ref(false);
+    
+    const toggleLoginType = () => {
+      isAdmin.value = !isAdmin.value;
+      errorMessage.value = ''; // 切换时清除错误信息
     };
 
     const handleLogin = async () => {
-      errorMessage.value = '';  // 清空之前的错误信息
+      errorMessage.value = '';
       try {
-        const response = await axiosInstance.get('/users/login', {
-          params: {
+        let response;
+    
+        if (isAdmin.value) {
+          // 管理员登录使用 POST 请求
+          response = await axiosInstance.post('/admin/login', null, {
+            params: {
             username: username.value,
-            password: password.value,
-          },
-        });
-        const { token, user } = response.data.data;
+            password: password.value
+        }
+      });
+        } else {
+          // 普通用户登录使用 GET 请求
+          response = await axiosInstance.get('/users/login', {
+            params: {
+              username: username.value,
+              password: password.value,
+            },
+          });
+        }
 
-        // 将 Token 存储到 Cookie 中
-        document.cookie = `token=${token}; path=/`;
+        if (response.data.success) {
+          console.log('登录成功:', response.data.message);
+          const userData = response.data.data;
+          
+          userStore.saveUserInfo({
+            userId: userData.userId,
+            username: userData.username,
+            password: userData.password,
+            isVerified: userData.isVerified,
+            salt: userData.salt,
+            avatarUrl: userData.avatarUrl,
+            createdAt: userData.createdAt,
+            updatedAt: userData.updatedAt,
+            isAdmin: isAdmin.value // 添加管理员标识
+          });
 
-        // 更新用户状态
-        userStore.login({ token, user });
+          userStore.login(userStore.userInfo);
+          localStorage.setItem('userInfo', JSON.stringify(userStore.userInfo));
 
-        // 跳转到认证页面
-        router.push('/');
+          // 根据用户类型跳转到不同页面
+          if (isAdmin.value) {
+            router.push('/admin');
+          } else {
+            router.push(userData.isVerified ? '/' : '/');
+          }
+        } else {
+          errorMessage.value = '登录失败，请检查用户名和密码';
+          console.error('登录失败:', response.data.message);
+        }
       } catch (error) {
-        // 登录失败
-        errorMessage.value = '用户名或密码错误';
-      }
-
-      if (username.value === mockUser.username && password.value === mockUser.password) {
-        // 登录成功
-        userStore.login({ token: mockUser.token, user: { username: mockUser.username, email: mockUser.email } });
-        router.push('/verify');  // 登录成功后跳转到认证页面
-      } else {
-        // 登录失败
-        errorMessage.value = '用户名或密码错误';
+        console.error('登录失败:', error);
+        errorMessage.value = '登录失败，请稍后重试';
       }
     };
 
@@ -138,7 +175,9 @@ export default defineComponent({
       username,
       password,
       errorMessage,
-      handleLogin
+      handleLogin,
+      isAdmin,
+      toggleLoginType
     };
   }
 });
@@ -181,6 +220,15 @@ export default defineComponent({
 
 .left-side svg {
   animation: spin 10s linear infinite;
+}
+
+/* 添加切换按钮样式 */
+.toggle-button {
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  transform: scale(1.05);
 }
 
 

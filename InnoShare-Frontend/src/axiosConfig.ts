@@ -1,9 +1,9 @@
 // src/axiosConfig.ts
 import axios from 'axios';
-
+import { useUserStore } from './store/modules/user';
 // 创建一个 Axios 实例
 const axiosInstance = axios.create({
-  baseURL: 'http://113.44.223.168:8888', // 后端接口的基础 URL
+  baseURL: '', // 后端接口的基础 URL
   timeout: 10000, // 请求超时时间
 });
 
@@ -30,6 +30,9 @@ axiosInstance.interceptors.response.use(
     (error) => {
       if (error.response && error.response.status === 401) {
         // Token 过期，跳转到登录页面
+        // 登出操作
+        const userStore = useUserStore();
+        userStore.logout();
         window.location.href = '/login';
       }
       return Promise.reject(error);
