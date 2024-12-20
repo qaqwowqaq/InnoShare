@@ -16,6 +16,7 @@ import UserManagement from '@/views/UserManagement.vue'
 import DataStatistics from '@/views/DataStatistics.vue'
 
 import PaperDetail from '@/views/PaperDetail.vue';
+import PatentDetail from '@/views/PatentDetail.vue';
 const routes: Array<RouteRecordRaw> = [
 
   {
@@ -107,7 +108,12 @@ const routes: Array<RouteRecordRaw> = [
     component: PaperDetail,
     props: true
   },
-
+  {
+    path: '/patent/:id',
+    name: 'PatentDetail',
+    component: PatentDetail,
+    props: true
+  },
   {
     path: '/AchiManage/:userId',
     name: 'AchiManage',

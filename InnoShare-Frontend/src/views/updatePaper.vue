@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex">
+  <div class="h-screen flex mt-20 ">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
@@ -234,7 +234,7 @@ const handleUpdate = async () => {
     ElMessage.success('论文更新成功！');
 
     // 跳转到 /AchiManage 页面
-    router.push('/AchiManage');
+    router.push({ name: "AchiManage", params: { id: 1 } });
   } catch (error) {
     console.error('更新论文失败:', error);
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex " style="overflow: hidden;">
+  <div class="h-screen flex mt-20 " style="overflow: hidden;">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
@@ -103,22 +103,24 @@
         <section v-if="activeTab === 'section2'" id="section2" class="flex flex-col space-y-10 items-center"
           style="width: 100%;">
           <div class="w-4/5 flex flex-col px-8 h-full">
-            <el-card class="p-8 shadow-lg rounded-lg ">
-              <el-table :data="paginatedPatents" style="width: 100% ">
+            <el-card class="p-8 shadow-lg rounded-lg" :row-class-name="rowClassName">
+              <el-table :data="paginatedPatents" style="width: 100%; --row-height: 50px;">
                 <!-- 各种列 --><!-- 操作列 -->
-                <el-table-column prop="action" label="操作" label-class-name="centered-column">
+                <el-table-column prop="action" label="" label-class-name="centered-column">
                   <template #default="scope">
                     <div class="flex flex-col items-center space-y-2">
                       <!-- 设置按钮宽度，确保一致；去掉不必要的偏移 -->
                       <el-button type="primary" size="small"
-                        style="width: 80px; text-align: center; padding-left: 0; padding-right: 0;"
+                        style="width: 40px; text-align: center; padding-left: 0; padding-right: 0;"
                         @click="handleEdit1(scope.row)">
-                        修改
+                        <i class="fas fa-edit"></i>
                       </el-button>
-                      <el-button type="danger" size="small" style="width: 80px; text-align: center;margin-left: 0px;"
+
+                      <el-button type="danger" size="small" style="width: 40px; text-align: center;margin-left: 0px;"
                         @click="handleDelete1(scope.row)">
-                        删除
+                        <i class="fas fa-trash"></i>
                       </el-button>
+
                     </div>
                   </template>
 
@@ -127,7 +129,15 @@
 
 
                 </el-table-column>
-                <el-table-column prop="title" label="专利标题" width="150"></el-table-column>
+                <el-table-column prop="title" label="专利标题" width="150">
+                  <template #default="{ row }">
+                    <!-- 给 span 添加 link 类 -->
+                    <span @click="goToPatentDetail(row.id)" class="link">
+                      {{ row.title }}
+                    </span>
+                  </template>
+                </el-table-column>
+
                 <el-table-column prop="assignee" label="受让人" width="150"></el-table-column>
                 <el-table-column prop="author" label="作者" width="150"></el-table-column>
                 <el-table-column prop="creation_date" label="创作日期" width="120"></el-table-column>
@@ -142,7 +152,7 @@
                     <a :href="scope.row.pdf_url" target="_blank" class="text-blue-500" width="200">下载PDF</a>
                   </template>
                 </el-table-column>
-                <el-table-column prop="classification" label="分类"width="200"></el-table-column>
+                <el-table-column prop="classification" label="分类" width="200"></el-table-column>
 
               </el-table>
             </el-card>
@@ -166,8 +176,57 @@ import axiosInstance from '@/axiosConfig';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed, onMounted, nextTick, Ref } from 'vue'
 import { useRouter } from "vue-router"; // Vue Router for navigation
+// request function
+const urlBase : string = '/users'
+function getCookie(name: string): string | null {
+  const value = `; ${document.cookie}`;
+
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() ?? null;
+  return null;
+}
+
+// 获取指定用户详细信息
+const getUserDetails = async (userId: string) => {
+  try {
+    // 获取 token
+    const token = getCookie('token');
+    console.log('Token:', token); // 检查 Token 是否正确
+    console.log('Token:', document.cookie);
+    console.log('Token:', localStorage.getItem('admin-jwt-token'));
+    // 如果 token 存在，将其添加到 Authorization 请求头
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+    // 发起 GET 请求
+    const response = await axiosInstance.get(`/users/${userId}`, {
+                        headers: {
+                            Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
+                        },
+                  
+                    })
+                    //get(`/users/${userId}`, { headers });
+    
+    console.log("用户信息", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
+
+onMounted(async () => {
+  const userId = 1;
+  const userDetails = await getUserDetails(userId.toString());
+  console.log(userDetails);
+});
+
 // 当前激活的导航选项
 const activeTab = ref('section2');
+// 行样式函数
+const rowClassName = () => {
+  // 这里只用到了 row，没有 rowIndex
+  return 'custom-row';
+};
 
 // 专利部分的数据结构和初始化数据
 interface Patent {
@@ -179,64 +238,53 @@ interface Patent {
   publication_date: string;
   result_url: string;
   pdf_url: string;
-  classification: string;
+  classification: string[];
+  abstractText?: string | null;
+  timeline?: string[] | null;
 }
 
 // 专利数据
 const patents = ref<Patent[]>([
-  {
-    id: '1',
-    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
-    assignee: 'Thomas Hermann',
-    author: 'Hermann Dipl Ing Thomas',
-    creation_date: '2011-02-01',
-    publication_date: '2012-04-15',
-    result_url: 'https://patents.google.com/patent/AT510477A2/en',
-    pdf_url:
-      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
-    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
-  },
-  {
-    id: '2',
-    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
-    assignee: 'Thomas Hermann',
-    author: 'Hermann Dipl Ing Thomas',
-    creation_date: '2011-02-01',
-    publication_date: '2012-04-15',
-    result_url: 'https://patents.google.com/patent/AT510477A2/en',
-    pdf_url:
-      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
-    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
-  },
-  {
-    id: '3',
-    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
-    assignee: 'Thomas Hermann',
-    author: 'Hermann Dipl Ing Thomas',
-    creation_date: '2011-02-01',
-    publication_date: '2012-04-15',
-    result_url: 'https://patents.google.com/patent/AT510477A2/en',
-    pdf_url:
-      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
-    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
-  },
-  {
-    id: '4',
-    title: 'USE OF CORRUGATED CORRUPT IN A UNDERGROUND ROAD',
-    assignee: 'Thomas Hermann',
-    author: 'Hermann Dipl Ing Thomas',
-    creation_date: '2011-02-01',
-    publication_date: '2012-04-15',
-    result_url: 'https://patents.google.com/patent/AT510477A2/en',
-    pdf_url:
-      'https://patentimages.storage.googleapis.com/5f/0e/5d/9877c0985d783b/AT510477A2.pdf',
-    classification: 'Agriculture; Forestry; Animal Husbandry; Hunting; Trapping; Fishing',
-  },
-  // 添加更多专利数据
+
 ]);
+// 获取专利数据并更新
+const fetchPatents = async (userId: number) => {
+  try {
+    const response = await axiosInstance.get('/academic/patent/all', {
+      params: { userId }
+    });
+
+    if (response.data.success) {
+      // 格式化返回的数据
+      const formattedPatents = response.data.data.patents.map((patent: any) => ({
+        id: patent.id,
+        title: patent.title,
+        assignee: patent.assignee,
+        author: patent.author,
+        creation_date: new Date(patent.creationDate).toISOString().split('T')[0], // 格式化日期
+        publication_date: new Date(patent.publicationDate).toISOString().split('T')[0], // 格式化日期
+        result_url: patent.resultUrl,
+        pdf_url: patent.pdfUrl,
+        classification: patent.classification, // 直接使用分类数组
+        abstractText: patent.abstractText || '', // 如果没有摘要，使用空字符串
+        timeline: patent.timeline || [] // 如果没有时间线，使用空数组
+      }));
+
+      // 更新 patents 数据
+      patents.value = formattedPatents;
+    } else {
+      console.error('专利数据获取失败:', response.data.message);
+    }
+  } catch (error) {
+    console.error('获取专利数据时出错:', error);
+  }
+};
+onMounted(() => {
+  fetchPatents(1); // 传递 userId
+});
 // 分页状态
 const currentPage1 = ref(1); // 当前页
-const pageSize1 = 2; // 每页显示的条目数
+const pageSize1 = 4; // 每页显示的条目数
 
 // 当前页显示的数据
 const paginatedPatents = computed(() => {
@@ -247,7 +295,7 @@ const paginatedPatents = computed(() => {
 // 分页切换时更新当前页
 const handlePageChange1 = (newPage: number) => {
   currentPage1.value = newPage;
-  
+
 };
 // 切换导航选项时的逻辑
 const handleTabChange = (tab: string) => {
@@ -358,6 +406,10 @@ const navigateToPaper = (paperId: string) => {
   router.push({ name: "PaperDetail", params: { id: paperId } }); // 假设你在路由中有名为 paper-detail 的页面
 
 };
+const goToPatentDetail = (patentId: string) => {
+  router.push({ name: "PatentDetail", params: { id: patentId } }); // 假设你在路由中有名为 paper-detail 的页面
+
+};
 // 使用 TypeScript 类型断言
 const state = reactive({
   circleUrl:
@@ -439,21 +491,45 @@ const handleEdit1 = (patent: Patent) => {
 // 删除专利
 const handleDelete1 = (patent: Patent) => {
   console.log('删除专利:', patent);
+
   // 弹出确认框
   ElMessageBox.confirm(`确定要删除专利 "${patent.title}" 吗？`, '删除确认', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   })
-    .then(() => {
-      // 从列表中删除
-      patents.value = patents.value.filter((item) => item !== patent);
-      ElMessage.success('删除成功');
+    .then(async () => {
+      try {
+        // 调用删除接口
+        const userId = 2; // 假设当前用户的 ID 是 2
+        const patentId = patent.id;
+
+        // 调用删除接口
+        const response = await axiosInstance.get('/academic/patent/delete', {
+        params: {
+          userId: 1, // 当前用户 ID
+          patentId: patentId, // 要删除的论文 DOI
+        },
+      });
+
+        // 判断是否删除成功
+        if (response.data.success) {
+          // 从列表中删除
+          patents.value = patents.value.filter((item) => item.id !== patent.id);
+          ElMessage.success('删除成功');
+        } else {
+          ElMessage.error('删除失败，请重试');
+        }
+      } catch (error) {
+        console.error('删除专利失败:', error);
+        ElMessage.error('删除专利失败，请重试');
+      }
     })
     .catch(() => {
       ElMessage.info('删除已取消');
     });
 };
+
 </script>
 
 <style scoped>
@@ -485,6 +561,10 @@ const handleDelete1 = (patent: Patent) => {
 .demo-basic .el-col:not(:last-child) {
   border-right: 1px solid var(--el-border-color);
 }
+.custom-row {
+  height: 50px; /* 行高 */
+}
+
 
 .el-button {
   font-size: 1rem;
@@ -544,6 +624,31 @@ const handleDelete1 = (patent: Patent) => {
 }
 
 
+/* 给 .link 添加样式 */
+.link {
+  cursor: pointer;
+  /* 鼠标悬停时显示为手形光标 */
+  color: #409EFF;
+  /* 默认字体颜色为蓝色 */
+  text-decoration: underline;
+  /* 添加下划线 */
+}
+
+/* 鼠标悬停时改变颜色 */
+.link:hover {
+  color: #007bff;
+  /* 悬停时改变颜色 */
+  text-decoration: none;
+  /* 鼠标悬停时去掉下划线 */
+}
+
+/* 鼠标点击时的效果 */
+.link:active {
+  color: #0056b3;
+  /* 点击时的颜色 */
+  text-decoration: none;
+  /* 点击时去掉下划线 */
+}
 
 
 .line-clamp-3 {

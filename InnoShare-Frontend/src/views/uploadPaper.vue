@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex" >
+  <div class="h-screen flex mt-20 " >
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
