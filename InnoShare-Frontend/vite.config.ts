@@ -16,9 +16,24 @@ export default defineConfig({
     open: true,  // 自动打开浏览器
     proxy: {
       '/api': {
-        target: 'http://localhost:8888',  // 后端 API 地址
+        target: 'http://113.44.223.168:8888',  // 后端 API 地址
         changeOrigin: true,  // 修改请求头中的 Origin，解决跨域问题
         rewrite: (path) => path.replace(/^\/api/, ''),  // 去掉 /api 前缀
+      },
+
+      '/admin': {
+        target: 'http://113.44.223.168:8888',  // 后端 API 地址
+        changeOrigin: true,  // 修改请求头中的 Origin，解决跨域问题
+      },
+
+      '/users': {
+        target: 'http://113.44.223.168:8888',  // 后端 API 地址
+        changeOrigin: true,  // 修改请求头中的 Origin，解决跨域问题
+      },
+      
+      '/search': {
+        target: 'http://113.44.223.168:8888',  // 后端 API 地址
+        changeOrigin: true,  // 修改请求头中的 Origin，解决跨域问题
       },
     },
   },

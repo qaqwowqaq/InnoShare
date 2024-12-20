@@ -84,13 +84,9 @@
                 <el-input v-model="form.resultUrl" placeholder="请输入专利结果的链接" />
               </el-form-item>
 
-              <!-- 专利PDF文件 -->
-              <el-form-item label="专利PDF文件" prop="file">
-                <el-upload class="upload-demo" action="#" :show-file-list="false" :on-change="handleFileChange"
-                  :before-upload="beforeFileUpload">
-                  <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
-                </el-upload>
-                <span v-if="form.file" class="text-sm text-gray-600">{{ form.file?.name }}</span>
+              <!-- 输入PDF文件地址 -->
+              <el-form-item label="PDF文件地址" prop="fileUrl">
+                <el-input v-model="form.fileUrl" placeholder="请输入PDF文件的URL地址" />
               </el-form-item>
 
               <!-- 提交按钮 -->
@@ -111,15 +107,12 @@
 
 <script setup lang="ts">
 import axiosInstance from '@/axiosConfig';
-import axios from 'axios';
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 import { useRouter } from "vue-router";
-import { Store } from 'vuex';
 
+// 路由和表单处理的基本设置
 const router = useRouter();
-const circleUrl = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
-
 const form = ref({
   id: '',
   title: '',
@@ -130,13 +123,14 @@ const form = ref({
   abstract: '',
   classification: [] as string[], // 分类字段是一个字符串数组
   resultUrl: '',
-  file: null as File | null, // 确保 file 是 File 或 null
+  fileUrl: '', // 新增字段用于存储PDF文件的URL
 });
 
 const predefinedCategories = [
   "技术", "工程", "医疗", "化学", "其他"
 ];
 
+// 表单验证规则
 const rules = {
   id: [{ required: true, message: '请输入专利ID', trigger: 'blur' }],
   title: [{ required: true, message: '请输入专利标题', trigger: 'blur' }],
@@ -147,19 +141,7 @@ const rules = {
   abstract: [{ required: true, message: '请输入专利摘要', trigger: 'blur' }],
   classification: [{ required: true, message: '请选择至少一个分类', trigger: 'change' }],
   resultUrl: [{ required: true, message: '请输入结果链接', trigger: 'blur' }],
-  file: [{ required: true, message: '请选择专利文件', trigger: 'change' }],
-};
-
-const handleFileChange = (file: any) => {
-  form.value.file = file;
-};
-
-const beforeFileUpload = (file: File) => {
-  const isPDF = file.type === 'application/pdf';
-  if (!isPDF) {
-    alert('只能上传PDF文件!');
-  }
-  return isPDF;
+  fileUrl: [{ required: true, message: '请输入PDF文件的URL地址', trigger: 'blur' }],
 };
 
 // 处理用户输入的自定义分类
@@ -169,32 +151,48 @@ const handleCreateCategory = (newCategory: string) => {
   }
 };
 
+// 提交表单数据
 const handleSubmit = async () => {
+  const { id, title, assignee, author, creationDate, publicationDate, abstract, classification, resultUrl, fileUrl } = form.value;
+
+  // 将日期字符串转换为 Date 对象，确保与后端接口匹配
+  const formattedCreationDate = new Date(creationDate);
+  const formattedPublicationDate = new Date(publicationDate);
+
+  // 创建 PatentStd 对象
+  const patentStd = {
+    id,
+    title,
+    assignee,
+    author,
+    creationDate: formattedCreationDate,
+    publicationDate: formattedPublicationDate,
+    abstractText: abstract,
+    classification,
+    resultUrl,
+    pdfUrl: fileUrl, // 使用用户输入的 PDF URL
+    timeline: [] // 目前没有提供时间线数据，可以根据需要修改
+  };
+
+  // 创建专利请求对象，并将 PatentStd 对象赋值给 patentRequest
   const uploadPatentRequest = {
-    userId: 1, // 假设当前用户的 ID 是 1
-    patentRequest: {
-      id: form.value.id,
-      title: form.value.title,
-      assignee: form.value.assignee,
-      author: form.value.author,
-      creationDate: form.value.creationDate,
-      publicationDate: form.value.publicationDate,
-      abstract: form.value.abstract,
-      classification: form.value.classification, // 分类为数组
-      resultUrl: form.value.resultUrl,
-    },
+    userId: 2, // 假设当前用户的 ID 是 1
+    patent: patentStd, // 将 PatentStd 对象传递给 patentRequest
   };
 
   try {
     const response = await axiosInstance.post('/academic/patent/upload', uploadPatentRequest);
+    console.log('专利上传成功：', response);
     ElMessage.success('专利上传成功！');
-    router.push('/AchiManage');
+    router.push('/AchiManage/:1');
   } catch (error) {
     console.error('专利上传失败:', error);
     ElMessage.error('专利上传失败，请重试。');
   }
 };
 
+
+// 重置表单
 const resetForm = () => {
   form.value = {
     id: '',
@@ -206,17 +204,13 @@ const resetForm = () => {
     abstract: '',
     classification: [],
     resultUrl: '',
-    file: null,
+    fileUrl: '', // 清空文件地址
   };
 };
 </script>
 
 <style scoped>
 /* 自定义样式 */
-.upload-demo i {
-  margin-right: 10px;
-}
-
 .el-form-item {
   margin-bottom: 20px;
 }

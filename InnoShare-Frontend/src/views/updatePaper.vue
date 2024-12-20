@@ -234,7 +234,7 @@ const handleUpdate = async () => {
     ElMessage.success('论文更新成功！');
 
     // 跳转到 /AchiManage 页面
-    router.push('/AchiManage');
+    router.push({ name: "AchiManage", params: { id: 1 } });
   } catch (error) {
     console.error('更新论文失败:', error);
 

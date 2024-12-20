@@ -3,7 +3,7 @@
   
   <div class="flex min-h-screen bg-gray-100">
     <!-- 左侧筛选栏 -->
-    <aside :class="sidebarClass" class="relative mt-16 bg-white p-4 shadow-md transition-all duration-300 ease-in-out">
+    <aside :class="sidebarClass" class="relative  bg-white p-4 shadow-md transition-all duration-300 ease-in-out">
       <!-- 图标 -->
       <div
         class="animate-pulse absolute top-1/2 right-0 transform -translate-y-1/2 cursor-pointer"
@@ -75,7 +75,7 @@
     </aside>
 
     <!-- 主内容区 -->
-    <main :class="mainClass" class="flex-1 p-6 mt-16 transition-all duration-300 ease-in-out" style="margin-left:10px">
+    <main :class="mainClass" class="flex-1 p-6  transition-all duration-300 ease-in-out" style="margin-left:10px">
       <h1 class="text-2xl font-bold mb-6">搜索结果</h1>
 
       <!-- 加载动画 -->
