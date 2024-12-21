@@ -25,7 +25,7 @@ export default {
 
 #app {
   width: 100%;
-  height: 120%;
+  height: 100%;
   font-family: myFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -40,13 +40,17 @@ body {
   margin: 0;
   display: block;
   overflow: hidden;
+  overflow-x: auto;
+  min-width: 1000px;
+  line-height: 1.5;
   padding: 0;
   height: 100vh;
 }
 
 .scroll-container::-webkit-scrollbar {
-  height: 15px;
-  /* 设置滚动条高度 */
+  height: 0;
+  display: none;
+
 }
 
 .scroll-container::-webkit-scrollbar-thumb {

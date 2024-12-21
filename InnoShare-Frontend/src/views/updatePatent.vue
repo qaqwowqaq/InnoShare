@@ -61,18 +61,18 @@
               <!-- 分类 -->
               <el-form-item label="分类" prop="classification">
                 <el-select
-                  v-model="form.classification"
-                  multiple
-                  filterable
-                  allow-create
-                  @create="handleCreateCategory"
-                  placeholder="请选择或输入分类领域"
+                    v-model="form.classification"
+                    multiple
+                    filterable
+                    allow-create
+                    @create="handleCreateCategory"
+                    placeholder="请选择或输入分类领域"
                 >
                   <el-option
-                    v-for="option in predefinedCategories"
-                    :key="option"
-                    :label="option"
-                    :value="option"
+                      v-for="option in predefinedCategories"
+                      :key="option"
+                      :label="option"
+                      :value="option"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -202,7 +202,7 @@ const handleSubmit = async () => {
     timeline: [] // 可以根据需要修改
   };
 
- 
+
 
   try {
     const response = await axiosInstance.post('/academic/patent/update', patent); // 更新专利数据

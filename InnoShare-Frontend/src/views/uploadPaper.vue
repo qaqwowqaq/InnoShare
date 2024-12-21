@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex mt-20 " >
+  <div class="h-screen flex" >
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
@@ -164,7 +164,7 @@ if (typeof form.value.downloadUrl === 'string') {
 
   // 调用 API 更新论文信息
   try {
-    const response = await axiosInstance.post('/academic/upload', updatePaperRequest);
+    const response = await axiosInstance.post('/api/academic/upload', updatePaperRequest);
     console.log('论文更新成功:', response.data);
 
     // 显示成功弹窗

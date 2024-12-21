@@ -2,7 +2,7 @@
   <div class="h-screen flex mt-20 " style="overflow: hidden;">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
-      style="height: 92%; width: 16%;">
+         style="height: 92%; width: 16%;">
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
@@ -16,8 +16,8 @@
 
         <!-- 上传按钮 -->
         <el-button type="primary"
-          class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
-          @click="handleUploadClick1">
+                   class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
+                   @click="handleUploadClick1">
           上传专利
         </el-button>
       </div>
@@ -25,8 +25,8 @@
 
         <!-- 上传按钮 -->
         <el-button type="primary"
-          class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
-          @click="handleUploadClick">
+                   class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
+                   @click="handleUploadClick">
           上传论文
         </el-button>
       </div>
@@ -34,7 +34,7 @@
     <div class="flex-col" style="height:100%;padding-bottom: 20%; padding-left: 16%; width: 120%;overflow:auto;">
       <div>
         <el-menu :default-active="activeTab" class="fixed w-full el-menu-demo bg-gray-800 z-10" mode="horizontal"
-          @select="handleTabChange">
+                 @select="handleTabChange">
           <el-menu-item style="color:darkgray; ;" index="section2">专利部分</el-menu-item>
           <el-menu-item style="color: darkgray;" index="section1">论文部分</el-menu-item>
 
@@ -48,11 +48,11 @@
         <section v-if="activeTab === 'section1'" id="section1" class="w-full flex flex-col space-y-10 items-center ">
           <!-- 动态渲染每一页的卡片 -->
           <div v-for="(paper, index) in currentPapers" :key="index"
-            class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-            style="background:whitesmoke;">
+               class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+               style="background:whitesmoke;">
             <div class="p-6 ">
               <h3 class="h-2/5 text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
-                @click="navigateToPaper(paper.doi)">
+                  @click="navigateToPaper(paper.doi)">
                 {{ paper.title }}
               </h3>
               <div class="flex flex-col items-start text-sm text-gray-500 text-left">
@@ -97,11 +97,11 @@
           </div>
           <!-- 分页组件 -->
           <el-pagination background layout="prev, pager, next" :total="papers.length" :page-size="4"
-            @current-change="handlePageChange" />
+                         @current-change="handlePageChange" />
         </section>
         <!-- 专利部分 -->
         <section v-if="activeTab === 'section2'" id="section2" class="flex flex-col space-y-10 items-center"
-          style="width: 100%;">
+                 style="width: 100%;">
           <div class="w-4/5 flex flex-col px-8 h-full">
             <el-card class="p-8 shadow-lg rounded-lg" :row-class-name="rowClassName">
               <el-table :data="paginatedPatents" style="width: 100%; --row-height: 50px;">
@@ -111,13 +111,13 @@
                     <div class="flex flex-col items-center space-y-2">
                       <!-- 设置按钮宽度，确保一致；去掉不必要的偏移 -->
                       <el-button type="primary" size="small"
-                        style="width: 40px; text-align: center; padding-left: 0; padding-right: 0;"
-                        @click="handleEdit1(scope.row)">
+                                 style="width: 40px; text-align: center; padding-left: 0; padding-right: 0;"
+                                 @click="handleEdit1(scope.row)">
                         <i class="fas fa-edit"></i>
                       </el-button>
 
                       <el-button type="danger" size="small" style="width: 40px; text-align: center;margin-left: 0px;"
-                        @click="handleDelete1(scope.row)">
+                                 @click="handleDelete1(scope.row)">
                         <i class="fas fa-trash"></i>
                       </el-button>
 
@@ -158,7 +158,7 @@
             </el-card>
             <!-- 分页组件 -->
             <el-pagination background layout="prev, pager, next" :total="patents.length" :page-size="pageSize1"
-              @current-change="handlePageChange1" :current-page="currentPage1" class="mt-6" />
+                           @current-change="handlePageChange1" :current-page="currentPage1" class="mt-6" />
 
           </div>
         </section>
@@ -199,13 +199,13 @@ const getUserDetails = async (userId: string) => {
 
     // 发起 GET 请求
     const response = await axiosInstance.get(`/users/${userId}`, {
-                        headers: {
-                            Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
-                        },
-                  
-                    })
-                    //get(`/users/${userId}`, { headers });
-    
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
+      },
+
+    })
+    //get(`/users/${userId}`, { headers });
+
     console.log("用户信息", response.data);
     return response.data;
   } catch (error) {
@@ -413,7 +413,7 @@ const goToPatentDetail = (patentId: string) => {
 // 使用 TypeScript 类型断言
 const state = reactive({
   circleUrl:
-    'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
   // 使用 'as const' 进行类型断言，确保 sizeList 为只读数组
   sizeList: ['small', '', 'large'] as const,
 })
@@ -443,13 +443,13 @@ const handleDelete = async (paperDoi: string) => {
   try {
     // 询问是否确认删除
     const result = await ElMessageBox.confirm(
-      '您确定要删除这篇论文吗？',
-      '确认删除',
-      {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
+        '您确定要删除这篇论文吗？',
+        '确认删除',
+        {
+          confirmButtonText: '删除',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
     );
 
     // 如果用户点击了"删除"
@@ -498,36 +498,36 @@ const handleDelete1 = (patent: Patent) => {
     cancelButtonText: '取消',
     type: 'warning',
   })
-    .then(async () => {
-      try {
-        // 调用删除接口
-        const userId = 2; // 假设当前用户的 ID 是 2
-        const patentId = patent.id;
+      .then(async () => {
+        try {
+          // 调用删除接口
+          const userId = 2; // 假设当前用户的 ID 是 2
+          const patentId = patent.id;
 
-        // 调用删除接口
-        const response = await axiosInstance.get('/academic/patent/delete', {
-        params: {
-          userId: 1, // 当前用户 ID
-          patentId: patentId, // 要删除的论文 DOI
-        },
-      });
+          // 调用删除接口
+          const response = await axiosInstance.get('/academic/patent/delete', {
+            params: {
+              userId: 1, // 当前用户 ID
+              patentId: patentId, // 要删除的论文 DOI
+            },
+          });
 
-        // 判断是否删除成功
-        if (response.data.success) {
-          // 从列表中删除
-          patents.value = patents.value.filter((item) => item.id !== patent.id);
-          ElMessage.success('删除成功');
-        } else {
-          ElMessage.error('删除失败，请重试');
+          // 判断是否删除成功
+          if (response.data.success) {
+            // 从列表中删除
+            patents.value = patents.value.filter((item) => item.id !== patent.id);
+            ElMessage.success('删除成功');
+          } else {
+            ElMessage.error('删除失败，请重试');
+          }
+        } catch (error) {
+          console.error('删除专利失败:', error);
+          ElMessage.error('删除专利失败，请重试');
         }
-      } catch (error) {
-        console.error('删除专利失败:', error);
-        ElMessage.error('删除专利失败，请重试');
-      }
-    })
-    .catch(() => {
-      ElMessage.info('删除已取消');
-    });
+      })
+      .catch(() => {
+        ElMessage.info('删除已取消');
+      });
 };
 
 </script>

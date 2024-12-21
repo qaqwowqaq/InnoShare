@@ -1,14 +1,15 @@
 <template>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  
+
   <div class="flex min-h-screen bg-gray-100">
-    <!-- 左侧筛选栏 -->
-    <aside :class="sidebarClass" class="relative  bg-white p-4 shadow-md transition-all duration-300 ease-in-out">
+    <!-- 左侧筛选栏 加入padding适应导航栏 -->
+    <aside :class="sidebarClass" class="relative  bg-white p-4 shadow-md transition-all duration-300 ease-in-out"
+    style="padding-top: 100px">
       <!-- 图标 -->
       <div
-        class="animate-pulse absolute top-1/2 right-0 transform -translate-y-1/2 cursor-pointer"
-        :class="{ 'rotate-180': isSidebarOpen }"
-        @click="toggleSidebar"
+          class="animate-pulse absolute top-1/2 right-0 transform -translate-y-1/2 cursor-pointer"
+          :class="{ 'rotate-180': isSidebarOpen }"
+          @click="toggleSidebar"
       >
         <span class="text-2xl text-gray-500">&laquo;</span>
       </div>
@@ -38,10 +39,10 @@
         <div class="mb-4">
           <label for="keywords" class="block text-sm font-medium text-gray-700">关键词</label>
           <input
-            id="keywords"
-            v-model="filters.keywords"
-            class="w-full mt-1 p-2 border rounded"
-            placeholder="输入关键词"
+              id="keywords"
+              v-model="filters.keywords"
+              class="w-full mt-1 p-2 border rounded"
+              placeholder="输入关键词"
           />
         </div>
 
@@ -74,8 +75,8 @@
       </div>
     </aside>
 
-    <!-- 主内容区 -->
-    <main :class="mainClass" class="flex-1 p-6  transition-all duration-300 ease-in-out" style="margin-left:10px">
+    <!-- 主内容区 加入paddingTop适应bar-->
+    <main :class="mainClass" class="flex-1 p-6  transition-all duration-300 ease-in-out" style="margin-left:10px;margin-top: 100px">
       <h1 class="text-2xl font-bold mb-6">搜索结果</h1>
 
       <!-- 加载动画 -->
@@ -88,12 +89,12 @@
 
       <!-- 搜索结果卡片 -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" >
-        
+
         <div
-          v-for="result in paginatedResults"
-          :key="result.id || result.paper_id"
-          @click="viewDetails(result)"
-          class="bg-white rounded-lg mt-8 mb-4 shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 cursor-pointer transform hover:scale-105 relative"
+            v-for="result in paginatedResults"
+            :key="result.id || result.paper_id"
+            @click="viewDetails(result)"
+            class="bg-white rounded-lg mt-8 mb-4 shadow-lg hover:shadow-xl transition-shadow duration-300 p-4 cursor-pointer transform hover:scale-105 relative"
         >
           <!-- 标记类型 -->
           <div class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-lg">
@@ -107,17 +108,17 @@
             {{ searchType === 'patents' ? formatDate(result.publication_date) : formatDate(result.published_at) }}
           </p>
           <!-- 摘要部分（仅论文） -->
-           
+
           <p v-if="searchType === 'achievements'" class="text-sm text-gray-400 italic mt-2">
             <strong>Abstract:</strong> <span v-html="getAbstract(result.abstract_text)"></span>
           </p>
           <!-- 标签部分 -->
           <div class="mt-4 flex flex-wrap justify-center gap-6">
             <span
-              v-for="(tag, index) in getTags(result).slice(0, 3)"
-              :key="index"
-              class="px-3 py-1 text-xs text-white rounded-full"
-              :style="getTagStyle(index)"
+                v-for="(tag, index) in getTags(result).slice(0, 3)"
+                :key="index"
+                class="px-3 py-1 text-xs text-white rounded-full"
+                :style="getTagStyle(index)"
             >
               {{ tag }}
             </span>
@@ -128,28 +129,28 @@
         </div>
       </div>
 
-      
+
 
       <!-- 分页控件 -->
-      <div 
-        v-if="!loading && totalPages > 1" 
-        class=" bottom-4   p-3 
-              shadow-lg flex  justify-center items-center space-x-4 
+      <div
+          v-if="!loading && totalPages > 1"
+          class=" bottom-4   p-3
+              shadow-lg flex  justify-center items-center space-x-4
               bg-white rounded-full max-w-md mx-auto"
       >
         <button
-          @click="prevPage"
-          :disabled="currentPage === 1"
-          class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full 
+            @click="prevPage"
+            :disabled="currentPage === 1"
+            class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full
                 hover:bg-gray-200 disabled:opacity-50 transition-colors"
         >
           上一页
         </button>
         <span class="px-3 py-2 text-gray-700">{{ currentPage }} / {{ totalPages }}</span>
         <button
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
-          class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full 
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+            class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full
                 hover:bg-gray-200 disabled:opacity-50 transition-colors"
         >
           下一页
@@ -221,7 +222,7 @@ export default defineComponent({
           headers: {
             "Content-Type": "application/json",
             'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
-            'Accept': '*/*', 
+            'Accept': '*/*',
           },
           params
         });
@@ -328,11 +329,11 @@ export default defineComponent({
       if (!abstractText) return '';
       const truncated = abstractText.length > 300 ? abstractText.slice(0, 300) + '...' : abstractText;
       if (window.MathJax) {
-      window.MathJax.Hub.Config({
-        tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-      });
-      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
-    }
+        window.MathJax.Hub.Config({
+          tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        });
+        window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+      }
       return truncated;
     };
 
@@ -368,8 +369,8 @@ export default defineComponent({
     const viewDetails = (result: any) => {
       if (searchType.value === 'patents') {
         window.open(result.result_url, '_blank');
-      } else {        
-        router.push({ name: "PaperDetail", params: { id: result.doi } }); 
+      } else {
+        router.push({ name: "PaperDetail", params: { id: result.doi } });
       }
     };
 
@@ -395,8 +396,8 @@ export default defineComponent({
       let filtered = results.value.filter(result => {
         // 过滤作者
         if (filters.value.author && !(
-          (result.author && result.author.includes(filters.value.author)) ||
-          (result.assignee && result.assignee.includes(filters.value.author))
+            (result.author && result.author.includes(filters.value.author)) ||
+            (result.assignee && result.assignee.includes(filters.value.author))
         )) {
           return false;
         }
@@ -479,16 +480,16 @@ export default defineComponent({
       };
 
       years.value = generateYears();
-      
+
 
       fetchSearchResults();
 
       if (window.MathJax) {
-      window.MathJax.Hub.Config({
-        tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-      });
-      window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
-    }
+        window.MathJax.Hub.Config({
+          tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        });
+        window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
+      }
     });
 
     return {
