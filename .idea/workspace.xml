@@ -1,188 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a974d8ac-545f-4154-b30b-5d239854db49" name="变更" comment="调整文件结构">
-      <change afterPath="$PROJECT_DIR$/.idea/InnoShare-main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/_metadata.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/chunk-AYVSL3LM.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/chunk-AYVSL3LM.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/chunk-LPAU6MA2.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/chunk-LPAU6MA2.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/chunk-RNWUNH7L.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/chunk-RNWUNH7L.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/element-plus.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/element-plus.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/pinia.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/pinia.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/vue-router.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/vue-router.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/vue.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vite/deps/vue.js.map" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/.vscode/extensions.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/public/vite.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/App.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/AlimamaFangYuanTiVF-Thin.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/AlimamaFangYuanTiVF-Thin.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/AlimamaFangYuanTiVF-Thin.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/back1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/back2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/back3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/back4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/back5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/card.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/databack1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/temp/back2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/temp/back3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/temp/back4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/BackgroundImg/temp/back5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/icons/dataPageIcon/data1.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/assets/loginImg/back.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/axiosConfig.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/axiosConfig.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/catch/pa.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/catch/pa1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/PdfPreview/index.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/layout/NavigationBar.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/modules/AchievementList.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/modules/homeComponent/dataPage.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/modules/homeComponent/dotGuide.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/modules/homeComponent/hotList.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/modules/homeComponent/newList.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/modules/homeComponent/recommendList.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/components/paperComponent.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/main.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/router/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/router/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/shims-vue.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/store/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/store/modules/pageStyleStore.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/store/modules/user.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/styles/index.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/types/global.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/types/math.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/AboutView.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/AchiManage.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/AdminPanel.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/DataStatistics.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/Home.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/Login.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/PaperDetail.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/PatentDetail.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/Register.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/SearchResults.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/UserDashboard.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/UserManagement.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/UserReview.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/Verify.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/updatePaper.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/updatePatent.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/uploadPaper.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/views/uploadPatent.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/vite-env.d.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/src/vue.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/tsconfig.app.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/tsconfig.node.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/tsconfig.tsbuildinfo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InnoShare-Frontend/vite.config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/innoshare.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/.vscode/settings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/.vscode/extensions.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/public/vite.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/AlimamaFangYuanTiVF-Thin.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/AlimamaFangYuanTiVF-Thin.woff" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/AlimamaFangYuanTiVF-Thin.woff2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/back1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/back2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/back3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/back4.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/back5.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/card.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/databack1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/temp/back2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/temp/back3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/temp/back4.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/BackgroundImg/temp/back5.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/icons/dataPageIcon/data1.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/index.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/assets/loginImg/back.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/axiosConfig.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/axiosConfig.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/catch/pa.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/catch/pa1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/PdfPreview/index.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/layout/NavigationBar.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/modules/AchievementList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/modules/homeComponent/dataPage.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/modules/homeComponent/dotGuide.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/modules/homeComponent/hotList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/modules/homeComponent/newList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/modules/homeComponent/recommendList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/components/paperComponent.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/main.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/router/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/router/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/shims-vue.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/store/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/store/modules/pageStyleStore.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/store/modules/user.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/styles/index.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/types/global.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/types/math.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/AboutView.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/AchiManage.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/AdminPanel.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/DataStatistics.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/Home.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/Login.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/PaperDetail.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/PatentDetail.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/Register.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/SearchResults.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/UserDashboard.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/UserManagement.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/UserReview.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/Verify.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/updatePaper.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/updatePatent.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/uploadPaper.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/views/uploadPatent.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/vite-env.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/src/vue.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/tsconfig.app.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/tsconfig.node.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/tsconfig.tsbuildinfo" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/InnoShare-Frontend/vite.config.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/InnoShare-main/package.json" beforeDir="false" />
-    </list>
+    <list default="true" id="a974d8ac-545f-4154-b30b-5d239854db49" name="变更" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -192,6 +11,7 @@
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$/.." value="master" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -294,7 +114,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/InnoShare-Frontend/src/components/layout/NavigationBar.vue</url>
           <line>537</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
