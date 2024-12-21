@@ -332,7 +332,7 @@ export default {
                 })
                 .catch((error) => {
                     console.log('更新用户失败:', error);
-                    this.$message.error('更新失败: ' + error.message);
+                    this.$message.error('更新失败: 该用户尚未认证');
                 });
         },
         handlePageSizeChange() {
