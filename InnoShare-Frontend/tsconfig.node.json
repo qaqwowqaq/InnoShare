@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "module": "CommonJS",
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": ["vite.config.ts"]
+}
