@@ -5,6 +5,7 @@ import { useUserStore } from './store/modules/user';
 const axiosInstance = axios.create({
   baseURL: '', // 后端接口的基础 URL
   timeout: 10000, // 请求超时时间
+  withCredentials: true, // 携带 cookie
 });
 
 // 请求拦截器
