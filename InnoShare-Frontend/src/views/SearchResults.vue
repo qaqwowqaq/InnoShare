@@ -184,7 +184,7 @@ export default defineComponent({
     const page = ref<number>(Number(route.query.page) || 1);
     const limit = ref<number>(100); // 后端请求限制为50
 
-    const displayLimit = 6; // 前端每页展示9条
+    const displayLimit = 6; // 前端每页展示6个结果
     const results = ref<Array<any>>([]);
     const totalResults = ref<number>(0);
 
@@ -221,7 +221,6 @@ export default defineComponent({
         const response = await axiosInstance.get(apiPath, {
           headers: {
             "Content-Type": "application/json",
-            'User-Agent': 'Apifox/1.0.0 (https://apifox.com)',
             'Accept': '*/*',
           },
           params

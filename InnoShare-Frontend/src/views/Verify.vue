@@ -1,132 +1,137 @@
 <template>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <div>
-    <div class="verify-container bg-gradient-to-r from-blue-200 to-blue-500">
-      <h1 class="title text-4xl font-bold text-white mb-8">实名认证 & 学术认证</h1>
-      <!-- 状态显示 -->
-      <div class="status">
-        <p class="status-text">状态：<span>{{ status }}</span></p>
-        <p v-if="status === '未通过'" class="status-reason">原因：{{ reason }}</p>
+  <div class="min-h-screen mt-12 bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-200 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+      <!-- 顶部标题区域 -->
+      <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-8">
+        <h1 class="text-3xl font-bold text-white text-center">实名认证 & 学术认证</h1>
+        
+        <!-- 状态显示 -->
+        <div class="mt-4 flex justify-center items-center space-x-4">
+          <span class="px-4 py-1 rounded-full text-sm font-medium" 
+                :class="{
+                  'bg-yellow-100 text-yellow-700': status === '待审核',
+                  'bg-green-100 text-green-700': status === '通过',
+                  'bg-red-100 text-red-700': status === '未通过'
+                }">
+            状态：{{ status }}
+          </span>
+          <span v-if="status === '未通过'" 
+                class="text-red-100 text-sm">
+            {{ reason }}
+          </span>
+        </div>
       </div>
 
       <!-- 认证方式选择 -->
-      <div class="auth-method">
-        <button @click="isInvitationCode = false">个人申请认证</button>
-        <button @click="isInvitationCode = true">邀请码申请认证</button>
+      <div class="flex justify-center space-x-4 p-6 bg-gray-50">
+        <button @click="isInvitationCode = false"
+                :class="!isInvitationCode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                class="px-6 py-2 rounded-full transition duration-300 hover:shadow-md">
+          个人申请认证
+        </button>
+        <button @click="isInvitationCode = true"
+                :class="isInvitationCode ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'"
+                class="px-6 py-2 rounded-full transition duration-300 hover:shadow-md">
+          邀请码申请认证
+        </button>
       </div>
 
       <!-- 表单内容 -->
-      <form @submit.prevent="handleSubmit">
-        <div class="form-item">
-          <label for="fullName">*姓名：</label>
-          <input
-              type="text"
-              id="fullName"
-              v-model="fullName"
-              required
-              placeholder="请输入您的姓名"
-          />
+      <form @submit.prevent="handleSubmit" class="p-8 space-y-6">
+        <!-- 基本信息部分 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label for="fullName" class="block text-sm font-medium text-gray-700">姓名 *</label>
+            <input type="text" id="fullName" v-model="fullName" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">邮箱</label>
+            <input type="email" id="email" v-model="email"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+
+          <div class="space-y-2">
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">手机号</label>
+            <input type="tel" id="phoneNumber" v-model="phoneNumber"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+
+          <div class="space-y-2">
+            <label for="nationality" class="block text-sm font-medium text-gray-700">国籍 *</label>
+            <input type="text" id="nationality" v-model="nationality" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+
+          <div class="space-y-2">
+            <label for="idNumber" class="block text-sm font-medium text-gray-700">身份证号/护照号 *</label>
+            <input type="text" id="idNumber" v-model="idNumber" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+
+          <div class="space-y-2">
+            <label for="fieldOfStudy" class="block text-sm font-medium text-gray-700">研究领域 *</label>
+            <input type="text" id="fieldOfStudy" v-model="fieldOfStudy" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+
+          <div v-if="!isInvitationCode" class="space-y-2">
+            <label for="institution" class="block text-sm font-medium text-gray-700">机构</label>
+            <input type="text" id="institution" v-model="institution"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
         </div>
 
-        <div class="form-item">
-          <label for="email">邮箱：</label>
-          <input
-              type="text"
-              id="email"
-              v-model="email"
-              placeholder="请输入您的邮箱"
-          />
+        <!-- 文件上传部分 -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">
+            上传文件 *<span class="text-xs text-gray-500">(学籍证明、手持护照/身份证半身照)</span>
+          </label>
+          <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-blue-500 transition-colors">
+            <div class="space-y-1 text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="flex text-sm text-gray-600">
+                <label for="documents" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                  <span>上传文件</span>
+                  <input id="documents" ref="fileInput" type="file" class="sr-only" @change="handleFileChange" required multiple>
+                </label>
+                <p class="pl-1">或拖放文件</p>
+              </div>
+              <p class="text-xs text-gray-500">
+                支持ZIP、RAR格式
+              </p>
+              <p v-if="files.length" class="text-sm text-blue-500">
+                已选择 {{ files.length }} 个文件
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div class="form-item">
-          <label for="phoneNmber">手机号：</label>
-          <input
-              type="text"
-              id="phoneNumber"
-              v-model="phoneNumber"
-              placeholder="请输入您的手机号"
-          />
+        <!-- 邀请码部分 -->
+        <div v-if="isInvitationCode" class="space-y-6">
+          <div class="space-y-2">
+            <label for="invitor" class="block text-sm font-medium text-gray-700">邀请者 *</label>
+            <input type="text" id="invitor" v-model="invitor" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
+          <div class="space-y-2">
+            <label for="invitationCode" class="block text-sm font-medium text-gray-700">邀请码 *</label>
+            <input type="text" id="invitationCode" v-model="invitationCode" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+          </div>
         </div>
 
-        <div class="form-item">
-          <label for="nationality">*国籍：</label>
-          <input
-              type="text"
-              id="nationality"
-              v-model="nationality"
-              required
-              placeholder="请输入您的国籍"
-          />
+        <!-- 提交按钮 -->
+        <div class="flex justify-center">
+          <button type="submit"
+                  class="inline-flex justify-center py-3 px-12 border border-transparent shadow-sm text-sm font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-300 hover:scale-105">
+            提交认证
+          </button>
         </div>
-
-        <div class="form-item">
-          <label for="idNumber">*身份证号/护照号：</label>
-          <input
-              type="text"
-              id="idNumber"
-              v-model="idNumber"
-              required
-              placeholder="请输入您的身份证或护照号"
-          />
-        </div>
-
-        <div class="form-item">
-          <label for="fieldOfStudy">*研究领域：</label>
-          <input
-              type="text"
-              id="fieldOfStudy"
-              v-model="fieldOfStudy"
-              required
-              placeholder="请输入您的学术领域"
-          />
-        </div>
-
-        <div v-if="!isInvitationCode" class="form-item">
-          <label for="institution">机构：</label>
-          <input
-              type="text"
-              id="institution"
-              v-model="institution"
-              placeholder="请输入您的工作/学习机构"
-          />
-        </div>
-
-        <!-- 上传文件部分 -->
-        <div class="form-item">
-          <label for="documents">*上传压缩文件（1.学籍证明, 2.手持护照/身份证半身照）</label>
-          <input
-              type="file"
-              id="documents"
-              ref="fileInput"
-              @change="handleFileChange"
-              required
-          />
-          <span v-if="files.length">已选择 {{ files.length }} 个文件</span>
-        </div>
-
-        <div v-if="isInvitationCode" class="form-item">
-          <label for="invitationCode">*邀请者：</label>
-          <input
-              type="text"
-              id="invitor"
-              v-model="invitor"
-              required
-              placeholder="请输入邀请者"
-          />
-        </div>
-
-        <div v-if="isInvitationCode" class="form-item">
-          <label for="invitationCode">*邀请码：</label>
-          <input
-              type="text"
-              id="invitationCode"
-              v-model="invitationCode"
-              required
-              placeholder="请输入邀请码"
-          />
-        </div>
-
-        <button type="submit" class="submit-button">提交</button>
       </form>
     </div>
   </div>
@@ -149,6 +154,7 @@ export default {
       fieldOfStudy: '',
       institution: '',
       files: [],
+      invitor: '',
       isInvitationCode: false,
       status: '待审核', // 认证状态（待审核/已通过/未通过）
       reason: '', // 只有在未通过时显示
@@ -226,7 +232,7 @@ export default {
         }
       } catch (error) {
         if (error.response && error.response.data) {
-          console.error('服务器返回的错误详情:', error.response.data);
+          console.error('服务器返回的错误详情:', error);
           this.errorMessage = error.response.data.message || '认证失败，请检查输入';
           alert(`认证失败：${this.errorMessage}`);
         } else if (error.code === 'ERR_NETWORK') {

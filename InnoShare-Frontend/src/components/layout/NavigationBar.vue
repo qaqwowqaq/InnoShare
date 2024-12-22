@@ -89,6 +89,8 @@ import {useUserStore} from "../../store/modules/user.ts"
 import {watch} from "vue";
 import {computed} from "vue";
 import { useRouter } from "vue-router";
+import axiosInstance from "@/axiosConfig.ts";
+
 export default {
   name: "NavigationBar",
   data(){
