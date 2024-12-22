@@ -70,14 +70,14 @@ export default defineComponent({
       }
 
       try {
-        const response = await axiosInstance.get('/users/add', {
-          params: {
-            username: fullname.value,
-            password: password.value
-          }
-        });
+        const response = await axiosInstance.post('/users/add', {
+          
+          username: fullname.value,
+          password: password.value
+        
+      });
 
-        if (response.status === 201) {
+        if (response.status === 200) {
           alert('注册成功！');
           router.push('/login');
         }

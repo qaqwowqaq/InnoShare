@@ -264,7 +264,7 @@ onMounted(() => {
     personalInfo.experience = resultData.experience;
     personalInfo.isVerified = resultData.isVerified;
   personalInfo.profileURL = resultData.avatarURL;
-  }).catch((error) => {
+  }).catch(() => {
     // not sure
     ElMessage({
       message: "获取用户信息失败",

@@ -174,12 +174,12 @@ export default {
         path: '/search',
         query: {
           type: "paper",
-          query: "default",//占位
+          query: "",//占位
           subject: `paper`, //  占位
           subjectLevel: 1,
           sortBy: '_score',
           order: 'desc',
-          page: 1,
+          page: 0,
         }
       });
     },

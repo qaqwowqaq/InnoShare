@@ -144,6 +144,7 @@ import { useRouter } from 'vue-router';
 import axiosInstance from '@/axiosConfig';
 
 export default {
+
   data() {
     return {
       fullName: '',
@@ -222,9 +223,11 @@ export default {
 
         // 5. 处理响应
         if (response.status === 200 && response.data.success) {
-          alert('认证成功！');
-          this.status = '通过';
+          alert('提交成功！');
+          this.status = '待审核';
           this.reason = '';
+          // 跳转到个人中心页面
+          this.$router.push('/home');
         } else {
           this.status = '未通过';
           this.reason = response.data.message || '认证失败';

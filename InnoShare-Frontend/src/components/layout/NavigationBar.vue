@@ -69,7 +69,7 @@
 
       <!-- 添加登出确认对话框 -->
       <div v-if="showLogoutConfirm" class="logout-confirm-modal">
-        <div class="modal-content">
+        <div class="modal-content" style="color: black;">
           <p>确认要登出吗？</p>
           <div class="modal-buttons">
             <button @click="handleLogout">确认</button>
@@ -202,7 +202,7 @@ export default {
           subjectLevel: 1,
           sortBy: '_score',
           order: 'desc',
-          page: 1,
+          page: 0,
         }
       });
     },
