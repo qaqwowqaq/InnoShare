@@ -5,8 +5,8 @@ import Register from '../views/Register.vue';
 import Login from '../views/Login.vue';
 import Verify from '../views/Verify.vue';
 import UserDashboard from '../views/UserDashboard.vue'
-import PaperDetail from '@/views/PaperDetail.vue';
-import AchiManage from '@/views/AchiManage.vue';
+import PaperDetail from '../views/PaperDetail.vue';
+import AchiManage from '../views/AchiManage.vue';
 
 const routes = [
   {
@@ -112,5 +112,10 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
+
+router.afterEach((to) => {
+  //保存router路径防止刷新失效
+  localStorage.setItem('savedRoute', to.path);
+});
 
 export default router

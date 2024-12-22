@@ -1,6 +1,6 @@
 <template>
 
-  <div class="h-screen flex mt-20 " style="">
+  <div class="h-screen flex h-screen-flex" style="">
     <!-- 左侧固定栏 -->
 
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
@@ -76,7 +76,7 @@
     </div>
 
     <!-- 右侧瀑布流内容 -->
-    <div class="content  p-4 bg-white overflow-y-auto " style="height: 92%; padding-left: 16%; width: 100%;">
+    <div class="content  p-4 bg-white overflow-y-auto " style="height: 100%; padding-left: 16%; width: 100%;">
       <section id="section1" class="mb-8 flex justify-center items-center w-full">
         <div class=" flex flex-col w-3/4  shadow-2xl " style="background-color:whitesmoke;">
           <!-- 单篇论文展示 -->
@@ -210,7 +210,7 @@ import * as echarts from 'echarts'; // 引入echarts库
 import { useTransition } from '@vueuse/core'
 import axiosInstance from '@/axiosConfig';
 const route = useRoute();
-const doi = route.params.id;
+const doi = route.params.id;//路由跳转需要的参数
 // 定义响应式的 `paper` 和 `paperData`
 const renderedAbstract = ref('');
 const subjects = ref([]);
@@ -237,7 +237,7 @@ const paper = ref({
 const fetchPaper = async (paperDoiValue) => {
   try {
     console.log("请求参数:", { paperDoi: doi });
-    const response = await axiosInstance.get('/academic/getPaper', {
+    const response = await axiosInstance.get('/api/academic/getPaper', {
       params: {
         paperDoi: doi,
       },
@@ -287,7 +287,7 @@ onMounted(() => {
 const buildReferenceTree = async (paperDoiValue) => {
   try {
     // 获取一级引用
-    const response = await axiosInstance.get('/academic/getPaperReferences', {
+    const response = await axiosInstance.get('/api/academic/getPaperReferences', {
       params: { paperDoi: doi, },
     });
     console.log('获取一级引用信息成功:', response.data);
@@ -300,7 +300,7 @@ const buildReferenceTree = async (paperDoiValue) => {
       references.map(async (ref) => {
         try {
           // 通过一级引用的 citedPaperDoi 获取二级引用
-          const secondaryResponse = await axiosInstance.get('/academic/getPaperReferences', {
+          const secondaryResponse = await axiosInstance.get('/api/academic/getPaperReferences', {
             params: { paperDoi: ref.citedPaperDoi }, // 使用一级文献的 DOI 获取二级引用
           });
           console.log('获取二级引用信息成功:', secondaryResponse.data);
@@ -327,7 +327,7 @@ const buildReferenceTree = async (paperDoiValue) => {
     // 获取引用论文的标题（citingTitle）
     const getCitingTitle = async (citingPaperDoi) => {
       try {
-        const response = await axiosInstance.get('/academic/getPaper', {
+        const response = await axiosInstance.get('/api/academic/getPaper', {
           params: { paperDoi: citingPaperDoi },
         });
         return response.data.data.paper?.title || ''; // 返回引用论文的标题
@@ -438,7 +438,7 @@ const paperDoi = ref(null);
 // 动态监听 `route.query` 的变化，并触发数据加载
 watchEffect(async () => {
   console.log('路由变化:', route.query.id);
-  paperDoi.value = route.params.id ? decodeURIComponent(route.params.id) : null;
+  paperDoi.value = route.query.id ? decodeURIComponent(route.query.id) : null;
 
   if (paperDoi.value) {
     console.log('论文DOI:', paperDoi.value);
@@ -935,6 +935,11 @@ const onLoaded = () => {
 </script>
 
 <style scoped>
+/*调整了一下视图*/
+.h-screen-flex{
+  padding-top: 70px;
+}
+
 /* 美化加载器 */
 .loader {
   border: 8px solid #f3f3f3;

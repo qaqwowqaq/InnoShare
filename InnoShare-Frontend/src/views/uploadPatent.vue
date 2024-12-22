@@ -2,7 +2,7 @@
   <div class="h-screen flex mt-20 ">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
-      style="height: 92%; width: 16%;">
+         style="height: 92%; width: 16%;">
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
@@ -63,18 +63,18 @@
               <!-- 分类 -->
               <el-form-item label="分类" prop="classification">
                 <el-select
-                  v-model="form.classification"
-                  multiple
-                  filterable
-                  allow-create
-                  @create="handleCreateCategory"
-                  placeholder="请选择或输入分类领域"
+                    v-model="form.classification"
+                    multiple
+                    filterable
+                    allow-create
+                    @create="handleCreateCategory"
+                    placeholder="请选择或输入分类领域"
                 >
                   <el-option
-                    v-for="option in predefinedCategories"
-                    :key="option"
-                    :label="option"
-                    :value="option"
+                      v-for="option in predefinedCategories"
+                      :key="option"
+                      :label="option"
+                      :value="option"
                   ></el-option>
                 </el-select>
               </el-form-item>

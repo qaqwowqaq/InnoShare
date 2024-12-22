@@ -1,78 +1,78 @@
 <template>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-<div class="login-container bg-gradient-to-r from-blue-200 to-blue-500">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <div class="login-container bg-gradient-to-r from-blue-200 to-blue-500">
     <!-- 左侧部分的修改 -->
-  <div class="left-side w-full sm:w-1/2 h-full flex justify-center items-center relative overflow-hidden">
-    <div class="absolute top-0 left-0 w-full h-full z-10 flex justify-center items-center">
-      <!-- 修改SVG尺寸和位置 -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 500 500"
-        class="w-96 h-96 absolute transform -translate-x-1/2 -translate-y-1/2"
-      >
-        <circle cx="250" cy="250" r="200" stroke="rgba(255, 255, 255, 0.4)" stroke-width="10" fill="none" />
-        <circle
-          cx="250"
-          cy="250"
-          r="200"
-          stroke="rgba(255, 255, 255, 0.7)"
-          stroke-width="10"
-          fill="none"
-          stroke-dasharray="1000"
-          stroke-dashoffset="0"
-          class="circle-animation"
-        />
-      </svg>
-    </div>
+    <div class="left-side w-full sm:w-1/2 h-full flex justify-center items-center relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-full z-10 flex justify-center items-center">
+        <!-- 修改SVG尺寸和位置 -->
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 500 500"
+            class="w-96 h-96 absolute transform -translate-x-1/2 -translate-y-1/2"
+        >
+          <circle cx="250" cy="250" r="200" stroke="rgba(255, 255, 255, 0.4)" stroke-width="10" fill="none" />
+          <circle
+              cx="250"
+              cy="250"
+              r="200"
+              stroke="rgba(255, 255, 255, 0.7)"
+              stroke-width="10"
+              fill="none"
+              stroke-dasharray="1000"
+              stroke-dashoffset="0"
+              class="circle-animation"
+          />
+        </svg>
+      </div>
 
-    <!-- 优化文字样式 -->
-    <div class="relative z-20 text-center">
-      <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 animate__animated animate__fadeIn animate__delay-1s mb-4">
-        InnoShare
-      </h1>
-      <p class="text-xl font-light text-white opacity-80 animate__animated animate__fadeIn animate__delay-2s tracking-wider">
-        创新分享，知识无界
-      </p>
+      <!-- 优化文字样式 -->
+      <div class="relative z-20 text-center">
+        <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200 animate__animated animate__fadeIn animate__delay-1s mb-4">
+          InnoShare
+        </h1>
+        <p class="text-xl font-light text-white opacity-80 animate__animated animate__fadeIn animate__delay-2s tracking-wider">
+          创新分享，知识无界
+        </p>
+      </div>
     </div>
-  </div>
 
     <!-- 右侧登录表单部分 -->
     <div class="right-side w-full sm:w-1/2 h-full flex justify-center items-center p-6 sm:p-12">
       <form @submit.prevent="handleLogin" class="w-full max-w-md space-y-6 bg-white p-8 rounded-lg shadow-lg transform transition-all duration-500 hover:scale-105">
-         <!-- 添加标题和切换按钮 -->
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">
-      {{ isAdmin ? '管理员登录' : '用户登录' }}
-    </h2>
-    <button 
-      type="button"
-      @click="toggleLoginType"
-      class="text-sm text-indigo-600 hover:text-indigo-800 underline"
-    >
-      切换到{{ isAdmin ? '用户' : '管理员' }}登录
-    </button>
-  </div>
+        <!-- 添加标题和切换按钮 -->
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">
+            {{ isAdmin ? '管理员登录' : '用户登录' }}
+          </h2>
+          <button
+              type="button"
+              @click="toggleLoginType"
+              class="text-sm text-indigo-600 hover:text-indigo-800 underline"
+          >
+            切换到{{ isAdmin ? '用户' : '管理员' }}登录
+          </button>
+        </div>
         <div>
           <label for="username" class="block text-gray-700 font-medium">用户名</label>
           <input
-            type="text"
-            id="username"
-            v-model="username"
-            required
-            placeholder="请输入用户名"
-            class="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+              type="text"
+              id="username"
+              v-model="username"
+              required
+              placeholder="请输入用户名"
+              class="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
           />
         </div>
 
         <div>
           <label for="password" class="block text-gray-700 font-medium">密码</label>
           <input
-            type="password"
-            id="password"
-            v-model="password"
-            required
-            placeholder="请输入密码"
-            class="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
+              type="password"
+              id="password"
+              v-model="password"
+              required
+              placeholder="请输入密码"
+              class="w-full mt-2 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300"
           />
         </div>
 
@@ -101,13 +101,13 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const userStore = useUserStore();
-    
+
     const username = ref('');
     const password = ref('');
     const errorMessage = ref('');
 
     const isAdmin = ref(false);
-    
+
     const toggleLoginType = () => {
       isAdmin.value = !isAdmin.value;
       errorMessage.value = ''; // 切换时清除错误信息
@@ -117,15 +117,15 @@ export default defineComponent({
       errorMessage.value = '';
       try {
         let response;
-    
+
         if (isAdmin.value) {
           // 管理员登录使用 POST 请求
           response = await axiosInstance.post('/admin/login', null, {
             params: {
-            username: username.value,
-            password: password.value
-        }
-      });
+              username: username.value,
+              password: password.value
+            }
+          });
         } else {
           // 普通用户登录使用 GET 请求
           response = await axiosInstance.get('/users/login', {
@@ -139,7 +139,7 @@ export default defineComponent({
         if (response.data.success) {
           console.log('登录成功:', response.data.message);
           const userData = response.data.data;
-          
+
           userStore.saveUserInfo({
             userId: userData.userId,
             username: userData.username,

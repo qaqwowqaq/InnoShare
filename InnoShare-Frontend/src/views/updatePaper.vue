@@ -2,7 +2,7 @@
   <div class="h-screen flex mt-20 ">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
-      style="height: 92%; width: 16%;">
+         style="height: 92%; width: 16%;">
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
@@ -18,7 +18,7 @@
     </div>
 
     <div class="content p-4 bg-white overflow-y-auto" style="height: 100%; padding-left: 16%; width: 100%;">
-      
+
       <section id="section1" class="mb-8 w-full flex flex-col space-y-10 items-center ">
         <div class=" flex flex-col  w-3/4 h-full">
           <h2 class="text-2xl font-semibold text-center text-blue-600 mb-6">更新论文信息</h2>
@@ -51,7 +51,7 @@
               <!-- 论文文件 -->
               <el-form-item label="论文文件" prop="file">
                 <el-upload class="upload-demo" action="#" :show-file-list="false" :on-change="handleFileChange"
-                  :before-upload="beforeFileUpload">
+                           :before-upload="beforeFileUpload">
                   <el-button slot="trigger" size="small" type="primary">选择文件</el-button>
                 </el-upload>
                 <span v-if="form.file" class="text-sm text-gray-600">{{ form.file.name }}</span>
@@ -258,7 +258,7 @@ const resetForm = () => {
 // 使用 TypeScript 类型断言
 const state = reactive({
   circleUrl:
-    'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
   sizeList: ['small', '', 'large'] as const,
 })
 
