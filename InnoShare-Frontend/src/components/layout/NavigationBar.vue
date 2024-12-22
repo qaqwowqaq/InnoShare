@@ -122,7 +122,7 @@ export default {
     const myStore = mainStore(); // 使用 Pinia store
     const useStore =useUserStore();
     const router = useRouter();
-    const userDashboardPath = computed(() => (useStore.isAuthenticated ? `/userDashboard/${useStore.getUserInfo.id}` : "/login"));
+    const userDashboardPath = computed(() => (useStore.isAuthenticated ? `/userDashboard/${useStore.getUserId}` : "/login"));
     return { myStore, useStore, userDashboardPath, router };
 
   },
@@ -276,7 +276,7 @@ export default {
     handleLoginClick() {
       if (this.useStore.isAuthenticated) {
         // 已登录，导航到个人中心
-        this.guideTo(`/userDashboard/${this.useStore.getUserInfo.id}`);
+        this.guideTo(`/userDashboard/${this.useStore.getUserId}`);
       } else {
         // 未登录，导航到登录页
         this.guideTo('/login');
