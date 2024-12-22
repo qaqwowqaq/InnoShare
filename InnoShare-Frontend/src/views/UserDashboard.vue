@@ -13,6 +13,7 @@
           <div class="relative">
             <img v-if="!isEditMode" 
                  :src="personalInfo.profileURL"
+                 @error="onImageError"
                  class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mx-auto"
                  :alt="personalInfo.fullname"/>
             <el-upload v-else 
@@ -28,7 +29,7 @@
         </div>
 
         <!-- 编辑按钮 -->
-        <div class="absolute top-4 right-4 space-x-2" v-if="isCurrentUser">
+        <div class="absolute top-4 right-4 space-x-2" v-if="isCurrentUser && personalInfo.isVerified == 1">
           <el-button @click="onEdit" 
                      class="!bg-blue-600 !text-white hover:!bg-blue-700 rounded-full">
             {{ editButtonText }}
@@ -296,6 +297,11 @@ const editButtonText = computed(() => {
 })
 
 // functions
+const onImageError = (event: Event): void => {
+  const target = event.target as HTMLImageElement;
+  target.src = 'https://img.51miz.com/Element/00/88/08/84/72f298b9_E880884_d0f63115.png';
+}
+
 const onEdit = (): void => {
   if (isEditMode.value) {
     // true, check if we need to save
@@ -320,6 +326,7 @@ const onCancelEdit = (): void => {
 const onConfirmEditting = (): void => {
   // send the edit request
   updateUserDetails(personalInfo2UpdatableInfo(personalInfo)).then((result) => {
+    console.log(result.message)
       ElMessage({
         message: "个人信息修改成功！",
         type: "success",
@@ -385,7 +392,7 @@ const onCopy = (text: string): void => {
       // success
     ElMessage({
       message: "邀请码复制成功",
-      type: "error",
+      type: "success",
       offset: 100,
     })
     },
