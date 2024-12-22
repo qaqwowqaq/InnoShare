@@ -109,7 +109,7 @@
           </p>
           <!-- 摘要部分（仅论文） -->
 
-          <p v-if="searchType === 'achievements'" class="text-sm text-gray-400 italic mt-2">
+          <p v-if="searchType === 'paper'" class="text-sm text-gray-400 italic mt-2">
             <strong>Abstract:</strong> <span v-html="getAbstract(result.abstract_text)"></span>
           </p>
           <!-- 标签部分 -->

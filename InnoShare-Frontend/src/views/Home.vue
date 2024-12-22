@@ -173,7 +173,7 @@ export default {
       this.$router.push({
         path: '/search',
         query: {
-          type: "paper",
+          type: "",
           query: "",//占位
           subject: `paper`, //  占位
           subjectLevel: 1,
@@ -192,7 +192,7 @@ export default {
       this.$router.push({
         path: '/search',
         query: {
-          type: this.searchType,
+          type: this.searchType[this.curType % 3],
           query: this.searchQuery,
           subject: '', // 可根据需要添加更多参数
           subjectLevel: 1,

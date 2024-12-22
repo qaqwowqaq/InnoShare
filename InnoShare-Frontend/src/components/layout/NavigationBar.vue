@@ -229,7 +229,7 @@ export default {
       this.$router.push({
         path: '/search',
         query: {
-          type: this.selectType==="paper"?"achievements":"patents",
+          type: this.selectType==="paper"?"paper":"patents",
           query: this.searchQuery,
           subject: '', // 可根据需要添加更多参数
           subjectLevel: 1,
