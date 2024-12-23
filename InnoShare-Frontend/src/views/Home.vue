@@ -26,7 +26,7 @@
             <div class="container--YKYLB">
               <div class="triggerWrapper--NACCC">
                 <button  @click="changePaper" class="searchType" type="button">
-                  <span class="label">{{ this.searchType[curType%3] }}</span>
+                  <span class="label">{{ this.searchType[curType%2] }}</span>
                   <svg :style=" {transform: `rotate(${rotated*360}deg)`} " ref="swapicon" t="1731382656708" class="swapicon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6994" width="16" height="16"><path d="M268.584571 963.031262l-75.408113-40.96322 209.417277-209.928519a63.905181 63.905181 0 0 1 90.361926 90.553641l-80.264907 80.584433a383.814515 383.814515 0 0 0 436.344573-553.866201 63.905181 63.905181 0 1 1 112.409213-60.901637 511.241446 511.241446 0 0 1-450.851049 755.487046 508.429618 508.429618 0 0 1-242.00892-60.965543zM61.979122 755.850667A511.752687 511.752687 0 0 1 754.902996 61.456973l75.408114 40.963221-228.07759 228.588831a63.969086 63.969086 0 0 1-90.425831-90.553641l99.05303-99.30865a383.87842 383.87842 0 0 0-436.344574 553.866201 63.905181 63.905181 0 1 1-112.409213 60.965542z" fill="#656f79" p-id="6995"></path></svg>
                 </button>
               </div>
@@ -97,7 +97,6 @@ export default {
       searchType:[
         "paper",
         "patents",
-        "achievements",
       ],//搜索类型论文专利等
       searchQuery:""
     }
@@ -157,9 +156,6 @@ export default {
       document.removeEventListener('DOMMouseScroll', this.handlerWheel);
     }
     //清楚已经缓存的数据
-    localStorage.removeItem('hotPapers');
-    localStorage.removeItem('recPapers');
-    localStorage.removeItem('newPapers')
     const savedRoute = localStorage.getItem('savedRoute');//存储到localStorage中
     if (savedRoute) {
       next(savedRoute); // 重定向到保存的路由
@@ -260,11 +256,10 @@ export default {
     changePaper() {
       this.rotated++;
       this.index++;
-      if (this.index === 4) this.index = 1;
+      if (this.index === 3) this.index = 1;
       const img = this.$refs.Img;
       //img.style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
       const image= document.getElementsByClassName("backImage");
-      console.log(image)
       image.item(0).style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
       //切换搜索标签
       this.curType++;

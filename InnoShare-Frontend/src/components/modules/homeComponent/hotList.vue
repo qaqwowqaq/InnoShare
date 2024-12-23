@@ -26,7 +26,7 @@ export default {
     // 每隔一定时间获取新的数据
     this.intervalId = setInterval(() => {
       this.fetch();
-      console.log("获取hot数据"+this.interval)
+      console.log("获取hot数据")
     }, this.interval);
   },
   beforeDestroy() {
