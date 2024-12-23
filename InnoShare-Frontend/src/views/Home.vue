@@ -156,6 +156,10 @@ export default {
     } else {
       document.removeEventListener('DOMMouseScroll', this.handlerWheel);
     }
+    //清楚已经缓存的数据
+    localStorage.removeItem('hotPapers');
+    localStorage.removeItem('recPapers');
+    localStorage.removeItem('newPapers')
     const savedRoute = localStorage.getItem('savedRoute');//存储到localStorage中
     if (savedRoute) {
       next(savedRoute); // 重定向到保存的路由
@@ -166,7 +170,7 @@ export default {
     next(); // 继续路由切换
   },
   methods: {
-
+    //
     //前端函数
     jumpToSearch(){
       //前往高级搜索界面筛选
