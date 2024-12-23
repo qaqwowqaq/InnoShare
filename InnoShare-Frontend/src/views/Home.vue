@@ -173,13 +173,13 @@ export default {
       this.$router.push({
         path: '/search',
         query: {
-          type: "paper",
-          query: "default",//占位
+          type: "",
+          query: "",//占位
           subject: `paper`, //  占位
           subjectLevel: 1,
           sortBy: '_score',
           order: 'desc',
-          page: 1,
+          page: 0,
         }
       });
     },
@@ -192,7 +192,7 @@ export default {
       this.$router.push({
         path: '/search',
         query: {
-          type: this.searchType,
+          type: this.searchType[this.curType % 3],
           query: this.searchQuery,
           subject: '', // 可根据需要添加更多参数
           subjectLevel: 1,

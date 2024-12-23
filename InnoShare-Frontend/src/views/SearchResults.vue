@@ -109,7 +109,7 @@
           </p>
           <!-- 摘要部分（仅论文） -->
 
-          <p v-if="searchType === 'achievements'" class="text-sm text-gray-400 italic mt-2">
+          <p v-if="searchType === 'paper'" class="text-sm text-gray-400 italic mt-2">
             <strong>Abstract:</strong> <span v-html="getAbstract(result.abstract_text)"></span>
           </p>
           <!-- 标签部分 -->
@@ -146,14 +146,31 @@
         >
           上一页
         </button>
-        <span class="px-3 py-2 text-gray-700">{{ currentPage }} / {{ totalPages }}</span>
+        <!-- 添加页码输入和跳转 -->
+        <div class="flex items-center space-x-2">
+          <input type="number" 
+                v-model="targetPage" 
+                class="w-16 px-2 py-1 text-center border rounded-lg"
+                min="1"
+                :max="totalPages"/>
+          <span class="text-gray-700">/ {{ totalPages }}</span>
+          <button @click="jumpToPage"
+                  class="px-3 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+            跳转
+          </button>
+        </div>
         <button
             @click="nextPage"
-            :disabled="currentPage === totalPages"
-            class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full
-                hover:bg-gray-200 disabled:opacity-50 transition-colors"
+            :disabled="!isLastBatchPage && currentPage === totalPages"
+            :class="[
+      'px-4 py-2 rounded-full transition-colors',
+      isLastBatchPage 
+        ? 'bg-red-500 text-white hover:bg-red-600' 
+        : 'bg-gray-100 text-gray-800 hover:bg-gray-200',
+      'disabled:opacity-50'
+    ]"
         >
-          下一页
+          下一页 
         </button>
       </div>
     </main>
@@ -168,6 +185,7 @@ import axiosInstance from '../axiosConfig'; // 引入配置好的 Axios 实例
 import MarkdownIt from 'markdown-it';
 import mk from 'markdown-it-mathjax'; // 使用 MathJax 插件解析数学公式
 import { renderMath } from "@/types/math";
+import { c } from "vite/dist/node/types.d-aGj9QkWt";
 
 
 export default defineComponent({
@@ -175,6 +193,13 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const router = useRouter();
+    // 修改初始状态
+    const batchSize = ref(100); // 每批数据大小
+    const hasNextBatch = ref(true); // 是否还有下一批数据
+    const currentBatch = ref<number>(0); // 当前批次
+    const isLastBatchPage = computed(() => {
+      return page.value === totalPages.value && hasNextBatch.value;
+    });
 
     // 基础查询参数
     const searchType = ref<string>(route.query.type as string || 'patents'); // 'patents' 或 'achievements'
@@ -219,10 +244,7 @@ export default defineComponent({
 
 
         const response = await axiosInstance.get(apiPath, {
-          headers: {
-            "Content-Type": "application/json",
-            'Accept': '*/*',
-          },
+          
           params
         });
 
@@ -243,6 +265,9 @@ export default defineComponent({
           }));
           results.value = fetchedResults;
           totalResults.value = fetchedResults.length;
+          if(fetchedResults.length < batchSize.value){
+            hasNextBatch.value = false;
+          }
         } else {
           // 处理论文数据
           const fetchedResults = response.data.map((item: any) => ({
@@ -257,6 +282,9 @@ export default defineComponent({
           }));
           results.value = fetchedResults;
           totalResults.value = fetchedResults.length;
+          if(fetchedResults.length < batchSize.value){
+            hasNextBatch.value = false;
+          }
         }
 
         // 提取作者列表
@@ -343,9 +371,69 @@ export default defineComponent({
       }
     };
 
-    const nextPage = () => {
-      if (hasNextPage.value) {
-        page.value += 1;
+    const nextPage = async () => {
+      if (isLastBatchPage.value) {
+        // 如果是批次的最后一页，加载新数据
+        console.log('加载新数据...');
+        loading.value = true;
+        try {
+          const apiPath = searchType.value === 'patents' ? '/search/patents' : '/search/achievements';
+          const params = {
+            query: query.value,
+            limit: limit.value,
+            page: currentBatch.value + 1 // 使用批次号
+          };
+
+          const response = await axiosInstance.get(apiPath, { params });
+          console.log('加载新数据:', response.data);
+          
+          // 处理新数据
+          let newResults = [];
+          if (searchType.value === 'patents') {
+            newResults = response.data.map((item: any) => ({
+              id: item.id,
+              title: item.title,
+              assignee: item.assignee,
+              author: item.author,
+              publication_date: item.publication_date,
+              tags: item.classification || [],
+              result_url: item.result_url,
+              pdf_url: item.pdf_url,
+            }));
+            if(newResults.length < batchSize.value){
+              hasNextBatch.value = false;
+            }
+          } else {
+            newResults = response.data.map((item: any) => ({
+              paper_id: item.paper_id,
+              title: item.title,
+              author: item.author,
+              published_at: item.published_at,
+              download_url: item.download_url,
+              doi: item.doi,
+              tags: [...(item.subject1 || []), ...(item.subject2 || [])],
+              abstract_text: item.abstract_text || '',
+            }));
+            if(newResults.length < batchSize.value){
+              hasNextBatch.value = false;
+            }
+          }
+
+          // 更新数据和状态
+          results.value = [...results.value, ...newResults];
+          currentBatch.value++;
+          page.value++;    
+          // 更新筛选条件数据
+          extractAuthors();
+          extractFields();
+        } catch (error) {
+          console.error('加载新数据失败:', error);
+        } finally {
+          loading.value = false;
+        }
+      } else {
+        // 普通翻页
+        page.value++;
       }
     };
 
@@ -372,6 +460,11 @@ export default defineComponent({
         router.push({ name: "PaperDetail", params: { id: result.doi } });
       }
     };
+
+    // 添加监听器
+    watch(page, (newVal) => {
+      targetPage.value = newVal;
+    });
 
     // 切换侧边栏
     const toggleSidebar = () => {
@@ -467,6 +560,18 @@ export default defineComponent({
       }
     };
 
+    // 在 setup 中添加
+    const targetPage = ref(1);
+
+    const jumpToPage = () => {
+      const pageNum = parseInt(targetPage.value.toString());
+      if (pageNum && pageNum >= 1 && pageNum <= totalPages.value) {
+        page.value = pageNum;
+      } else {
+        alert('请输入有效的页码！');
+      }
+    };
+
     onMounted(() => {
       // 生成年份列表
       const generateYears = () => {
@@ -517,6 +622,13 @@ export default defineComponent({
       totalResults,
       limit,
       router,
+      isLastBatchPage,
+      currentBatch,
+      hasNextBatch,
+      batchSize,
+      jumpToPage,
+      targetPage,
+
     };
   },
 });

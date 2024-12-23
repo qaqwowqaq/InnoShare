@@ -303,6 +303,7 @@ export default {
             console.log('批准成功:', response.data);
             // 更新请求的状态为已批准
             const request = this.authRequests.find(req => req.id === authRequestId);
+            this.$message.success('批准成功');
             if (request) {
               request.status = 1;
             }
@@ -341,6 +342,7 @@ export default {
             this.showRejectModal = false;
             this.rejectReason = '';
             this.currentRequestId = null;
+            this.$message.success('拒绝成功');
           })
           .catch(error => {
             console.error('拒绝失败:', error);

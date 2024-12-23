@@ -135,7 +135,7 @@
                      @click="routerToUploadingAchivementList">
             上传学术成果
           </el-button>
-          <el-button v-if="isCurrentUser" 
+          <el-button v-if="isCurrentUser && personalInfo.isVerified == 1" 
                      @click="onShowInivitationCode"
                      class="!rounded-full">
             查看邀请码
@@ -264,7 +264,7 @@ onMounted(() => {
     personalInfo.experience = resultData.experience;
     personalInfo.isVerified = resultData.isVerified;
   personalInfo.profileURL = resultData.avatarURL;
-  }).catch((error) => {
+  }).catch(() => {
     // not sure
     ElMessage({
       message: "获取用户信息失败",
