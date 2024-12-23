@@ -6,9 +6,11 @@
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
-        <el-avatar :size="80" :src="circleUrl" shape="circle" class="mb-4" />
+        <el-avatar :size="80" :src="userAvatar || ''" shape="circle" class="mb-4">
+          {{ username.charAt(0).toUpperCase() }} <!-- 使用用户名的首字母 -->
+        </el-avatar>
         <!-- 用户昵称 -->
-        <div class="text-center font-semibold text-lg">用户昵称</div>
+        <div class="text-center font-semibold text-lg">{{ username }}</div>
       </div>
 
       <!-- 底部部分 -->
@@ -92,9 +94,41 @@ import axiosInstance from '@/axiosConfig';
 const router = useRouter();
 const circleUrl = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 // 获取路由对象
+
+const userAvatar = ref('');
+const username = ref('');
+
+// 获取指定用户详细信息
+const getUserDetails = async (userId: string) => {
+  try {
+    // 发起 GET 请求
+    const response = await axiosInstance.get(`/users/${userId}`, {
+
+    })
+    //get(`/users/${userId}`, { headers });
+
+    console.log("用户信息", response.data);
+    // 从返回的数据中提取用户名和头像
+    username.value = response.data.data.username || '';  // 默认空字符串
+    userAvatar.value = response.data.data.avatarURL || '';  // 默认空字符串
+    console.log('用户名', username.value);
+    console.log('头像', userAvatar.value);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
+
+onMounted(async () => {
+  const userId = 1;
+  const userDetails = await getUserDetails(userId.toString());
+  console.log(userDetails);
+});
 const route = useRoute();
 // 从路由参数中获取 DOI
 const doi = route.params.id;
+const userId = route.params.userId;
 console.log('DOI:', doi);
 const subjects = ref<string[]>([]); // 单独管理 subjects
 // 明确声明 form 类型
@@ -210,7 +244,7 @@ const handleUpdate = async () => {
   console.log(formattedDate);
   // 构建更新请求体
   const updatePaperRequest = {
-    userId: 1, // 假设当前用户的 ID 是 1
+    userId: Number(userId), // 假设当前用户的 ID 是 1
     paperRequest: {
       title: form.value.title,
       author: form.value.authors,
@@ -234,7 +268,7 @@ const handleUpdate = async () => {
     ElMessage.success('论文更新成功！');
 
     // 跳转到 /AchiManage 页面
-    router.push({ name: "AchiManage", params: { id: 1 } });
+    router.push({ name: "AchiManage", params: { userId: userId } });
   } catch (error) {
     console.error('更新论文失败:', error);
 

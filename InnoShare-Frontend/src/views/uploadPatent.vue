@@ -6,9 +6,11 @@
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
-        <el-avatar :size="80" :src="circleUrl" shape="circle" class="mb-4" />
+        <el-avatar :size="80" :src="userAvatar || ''" shape="circle" class="mb-4">
+          {{ username.charAt(0).toUpperCase() }} <!-- 使用用户名的首字母 -->
+        </el-avatar>
         <!-- 用户昵称 -->
-        <div class="text-center font-semibold text-lg">用户昵称</div>
+        <div class="text-center font-semibold text-lg">{{ username }}</div>
       </div>
 
       <!-- 底部部分 -->
@@ -108,9 +110,38 @@
 <script setup lang="ts">
 import axiosInstance from '@/axiosConfig';
 import { ElMessage } from 'element-plus';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from "vue-router";
+const userAvatar = ref('');
+const username = ref('');
 
+// 获取指定用户详细信息
+const getUserDetails = async (userId: string) => {
+  try {
+    // 发起 GET 请求
+    const response = await axiosInstance.get(`/users/${userId}`, {
+
+    })
+    //get(`/users/${userId}`, { headers });
+
+    console.log("用户信息", response.data);
+    // 从返回的数据中提取用户名和头像
+    username.value = response.data.data.username || '';  // 默认空字符串
+    userAvatar.value = response.data.data.avatarURL || '';  // 默认空字符串
+    console.log('用户名', username.value);
+    console.log('头像', userAvatar.value);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
+
+onMounted(async () => {
+  const userId = 1;
+  const userDetails = await getUserDetails(userId.toString());
+  console.log(userDetails);
+});
 // 路由和表单处理的基本设置
 const router = useRouter();
 const form = ref({
@@ -150,7 +181,9 @@ const handleCreateCategory = (newCategory: string) => {
     form.value.classification.push(newCategory); // 将自定义分类添加到分类数组中
   }
 };
-
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const userid = route.params.id;
 // 提交表单数据
 const handleSubmit = async () => {
   const { id, title, assignee, author, creationDate, publicationDate, abstract, classification, resultUrl, fileUrl } = form.value;
@@ -176,7 +209,7 @@ const handleSubmit = async () => {
 
   // 创建专利请求对象，并将 PatentStd 对象赋值给 patentRequest
   const uploadPatentRequest = {
-    userId: 2, // 假设当前用户的 ID 是 1
+    userId: Number(userid), // 假设当前用户的 ID 是 1
     patent: patentStd, // 将 PatentStd 对象传递给 patentRequest
   };
 
@@ -184,7 +217,8 @@ const handleSubmit = async () => {
     const response = await axiosInstance.post('/academic/patent/upload', uploadPatentRequest);
     console.log('专利上传成功：', response);
     ElMessage.success('专利上传成功！');
-    router.push('/AchiManage/:1');
+    console.log('跳转到用户管理页面',userid);
+    router.push({ name: 'AchiManage' , params: { userId: userid } });
   } catch (error) {
     console.error('专利上传失败:', error);
     ElMessage.error('专利上传失败，请重试。');

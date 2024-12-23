@@ -1,14 +1,16 @@
 <template>
-  <div class="h-screen flex" >
+  <div class="h-screen flex mt-20" >
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
       style="height: 92%; width: 16%;">
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
-        <el-avatar :size="80" :src="circleUrl" shape="circle" class="mb-4" />
+        <el-avatar :size="80" :src="userAvatar || ''" shape="circle" class="mb-4">
+          {{ username.charAt(0).toUpperCase() }} <!-- 使用用户名的首字母 -->
+        </el-avatar>
         <!-- 用户昵称 -->
-        <div class="text-center font-semibold text-lg">用户昵称</div>
+        <div class="text-center font-semibold text-lg">{{ username }}</div>
       </div>
 
       <!-- 底部部分 -->
@@ -89,12 +91,40 @@
 <script setup lang="ts">
 import axiosInstance from '@/axiosConfig';
 import { ElMessage } from 'element-plus';
-import { reactive, toRefs, ref, computed } from 'vue'
-import { useRouter } from "vue-router"; // Vue Router for navigation
+import { reactive, toRefs, ref, computed, onMounted } from 'vue'
+import { useRouter,useRoute } from "vue-router"; // Vue Router for navigation
 const router = useRouter();
 const circleUrl = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-import { useRoute } from 'vue-router';
+const route = useRoute();
+const userAvatar = ref('');
+const username = ref('');
+const userId = route.params.id;
+// 获取指定用户详细信息
+const getUserDetails = async (userId: string) => {
+  try {
 
+    // 发起 GET 请求
+    const response = await axiosInstance.get(`/users/${userId}`, {
+    })
+
+    console.log("用户信息", response.data);
+    // 从返回的数据中提取用户名和头像
+    username.value = response.data.data.username || '';  // 默认空字符串
+    userAvatar.value = response.data.data.avatarURL || '';  // 默认空字符串
+    console.log('用户名', username.value);
+    console.log('头像', userAvatar.value);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
+
+onMounted(async () => {
+  const userId = 1;
+  const userDetails = await getUserDetails(userId.toString());
+  console.log(userDetails);
+});
 const form = ref({
   title: '',
   authors: '',
@@ -144,10 +174,10 @@ if (typeof form.value.downloadUrl === 'string') {
 
   const formattedDate = formatDate(form.value.publishedAt);  // 输出 "2024-12-01"
   console.log(formattedDate);
-
+  const userid=Number(userId);
   // 构建更新请求体
   const updatePaperRequest = {
-    userId: 1, // 假设当前用户的 ID 是 1
+    userId: userid, // 假设当前用户的 ID 是 1
     paperRequest: {
       title: form.value.title,
       author: form.value.authors,
@@ -164,19 +194,19 @@ if (typeof form.value.downloadUrl === 'string') {
 
   // 调用 API 更新论文信息
   try {
-    const response = await axiosInstance.post('/api/academic/upload', updatePaperRequest);
-    console.log('论文更新成功:', response.data);
+    const response = await axiosInstance.post('/academic/upload', updatePaperRequest);
+    console.log('论文上传成功:', response.data);
 
     // 显示成功弹窗
-    ElMessage.success('论文更新成功！');
+    ElMessage.success('论文上传成功！');
 
     // 跳转到 /AchiManage 页面
-    router.push('/AchiManage');
+    router.push({ name: 'AchiManage' , params: { userId: userId } });
   } catch (error) {
-    console.error('更新论文失败:', error);
+    console.error('上传论文失败:', error);
 
     // 显示错误弹窗
-    ElMessage.error('更新论文失败，请重试。');
+    ElMessage.error('上传论文失败，请重试。');
   }
 };
 const resetForm = () => {
