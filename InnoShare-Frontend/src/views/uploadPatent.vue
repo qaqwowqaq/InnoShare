@@ -112,6 +112,7 @@ import axiosInstance from '@/axiosConfig';
 import { ElMessage } from 'element-plus';
 import { onMounted, ref } from 'vue';
 import { useRouter } from "vue-router";
+const serverIP = 'http://113.44.223.168'
 const userAvatar = ref('');
 const username = ref('');
 
@@ -127,7 +128,7 @@ const getUserDetails = async (userId: string) => {
     console.log("用户信息", response.data);
     // 从返回的数据中提取用户名和头像
     username.value = response.data.data.username || '';  // 默认空字符串
-    userAvatar.value = response.data.data.avatarURL || '';  // 默认空字符串
+    userAvatar.value = serverIP + '/' + response.data.data.avatarURL || '';  // 默认空字符串
     console.log('用户名', username.value);
     console.log('头像', userAvatar.value);
     return response.data;
@@ -138,7 +139,7 @@ const getUserDetails = async (userId: string) => {
 };
 
 onMounted(async () => {
-  const userId = 1;
+  const userId = route.params.id;
   const userDetails = await getUserDetails(userId.toString());
   console.log(userDetails);
 });

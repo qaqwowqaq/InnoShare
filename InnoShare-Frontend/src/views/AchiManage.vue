@@ -179,6 +179,7 @@ import { ElMessageBox, ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed, onMounted, nextTick, Ref } from 'vue'
 import { useRoute,useRouter } from "vue-router"; // Vue Router for navigation
 // request function
+const serverIP = 'http://113.44.223.168'
 const urlBase: string = '/users';
 const route = useRoute();
 const userId = route.params.userId;
@@ -212,7 +213,7 @@ const getUserDetails = async (userId: string) => {
     console.log("用户信息", response.data);
     // 从返回的数据中提取用户名和头像
     username.value = response.data.data.username || '';  // 默认空字符串
-    userAvatar.value = response.data.data.avatarURL || '';  // 默认空字符串
+    userAvatar.value = serverIP + '/' + response.data.data.avatarURL || '';  // 默认空字符串
     console.log('用户名', username.value);
     console.log('头像', userAvatar.value);
     return response.data;
