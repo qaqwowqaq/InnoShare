@@ -10,7 +10,8 @@
                     <h3 class="text-2xl font-bold mb-4 text-center">研究主题</h3>
                     <ul class="overflow-y-auto h-80 fixxed custom-scrollbar border border-gray-200 rounded-md p-2 ">
                         <li v-for="subject in subjects" :key="subject.link" class="mb-5 ">
-                            <a :href="subject.link" class="text-gray-300 hover:text-blue-600 underline">
+                            <a @click="searchBySubject(subject.name)"
+                                class="text-gray-300 hover:text-blue-600 underline">
                                 {{ subject.name }}
                             </a>
                         </li>
@@ -61,7 +62,7 @@
                                     <span class="font-bold">发布日期：</span>
                                     <span>{{ patent.publicationDate }}</span>
                                 </div>
-                        
+
                             </div>
                         </div>
 
@@ -101,8 +102,26 @@
 import { ref, onMounted } from "vue";
 import axiosInstance from '@/axiosConfig';
 import PdfPreview from '@/components/PdfPreview/index.vue';
-import { useRoute,useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const pdfUrl = ref();
+const searchQuery = ref(''); // your search query value
+const selectType = ref('patent'); // or 'patent' based on your logic
+
+const router = useRouter(); // to navigate using the router
+const searchBySubject = (subjectName) => {
+    router.push({
+        path: '/search',
+        query: {
+            type: selectType.value === 'paper' ? 'achievements' : 'patents',
+            query: subjectName,
+            subject: subjectName, // pass the clicked subject as a query parameter
+            subjectLevel: 1,
+            sortBy: '_score',
+            order: 'desc',
+            page: 0,
+        },
+    });
+};
 const patent = ref({
     id: '',
     title: '',

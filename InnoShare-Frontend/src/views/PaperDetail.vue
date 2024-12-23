@@ -13,7 +13,7 @@
           <h3 class="text-2xl font-bold mb-4 text-center">研究主题</h3>
           <ul class="overflow-y-auto h-80 fixxed custom-scrollbar border border-gray-200 rounded-md p-2 ">
             <li v-for="subject in subjects" :key="subject.link" class="mb-5 ">
-              <a :href="subject.link" class="text-gray-300 hover:text-blue-600 underline">
+              <a @click="searchBySubject(subject.name)" class="text-gray-300 hover:text-blue-600 underline">
                 {{ subject.name }}
               </a>
             </li>
@@ -150,7 +150,7 @@
               </li>
             </ul>
 
-            <span v-else>加载中...</span>
+            <span v-else>无引用文献</span>
 
           </div>
 
@@ -159,15 +159,17 @@
             <div v-if="selectedReferences.loading">Loading secondary citations...</div>
 
             <!-- 确保 selectedReferences.value 和 secondaryCitations 已经定义且是数组 -->
-            <ul v-else-if="paperData.thisPaper.secondaryRefs ">
-              
+            <ul v-else-if="paperData.thisPaper.secondaryRefs">
+
               <li v-for="(cit, index) in paperData.thisPaper.secondaryRefs" :key="index" class="mb-2">
                 【{{ index + 1 }}】{{ cit.citedTitle }}
               </li>
             </ul>
 
             <!-- 如果没有二级参考文献 -->
-            <div v-else><div>{{paperData.thisPaper.secondaryRefs}}</div>No secondary citations available.</div>
+            <div v-else>
+              <div>{{ paperData.thisPaper.secondaryRefs }}</div>No secondary citations available.
+            </div>
           </div>
 
 
@@ -204,16 +206,35 @@
 <script setup>
 import { ref, onMounted, nextTick, computed, watch, watchEffect, reactive } from "vue";
 import PdfPreview from '@/components/PdfPreview/index.vue';
-import { useRoute,useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const pdfUrl = ref();
 import * as echarts from 'echarts'; // 引入echarts库
 import { useTransition } from '@vueuse/core'
 import axiosInstance from '@/axiosConfig';
 const route = useRoute();
+
+const searchQuery = ref(''); // your search query value
+const selectType = ref('paper'); // or 'patent' based on your logic
+const subjects = ref([]); // to store the list of subjects
+
+const router = useRouter(); // to navigate using the router
+const searchBySubject = (subjectName) => {
+  router.push({
+    path: '/search',
+    query: {
+      type: selectType.value === 'paper' ? 'achievements' : 'patents',
+      query: subjectName,
+      subject: subjectName, // pass the clicked subject as a query parameter
+      subjectLevel: 1,
+      sortBy: '_score',
+      order: 'desc',
+      page: 0,
+    },
+  });
+};
 const doi = route.params.id;//路由跳转需要的参数
 // 定义响应式的 `paper` 和 `paperData`
 const renderedAbstract = ref('');
-const subjects = ref([]);
 const paperData = ref({
   thisPaper: {
     id: '',
@@ -250,7 +271,7 @@ const fetchPaper = async (paperDoiValue) => {
       author: response.data.data.paper.author,
       publishedDate: new Date(response.data.data.paper.createdAt).toLocaleDateString('zh-CN'),
       citation: `[1]${response.data.data.paper.author}.${response.data.data.paper.title}[J/OL].arXiv, ${response.data.data.paper.createdAt}.${response.data.data.paper.doi}.`,
-      citationSource: 21,
+      citationSource: response.data.data.paper.citationCount || 0,
       // citationSource:response.data.data.paper.citationCount,
       downloadSource: response.data.data.paper.downloadCount
     };
@@ -266,9 +287,9 @@ const fetchPaper = async (paperDoiValue) => {
     subjects.value = response.data.data.paper.subjects.map(subject => {
       return {
         name: subject,
-        link: `/subjects/${subject.toLowerCase().replace(/\s+/g, '-').replace(/\(.*\)/, '')}`,
       };
     });
+
     console.log('学科信息:', subjects.value);
   } catch (error) {
     console.error('获取论文基本信息失败:', error);
@@ -434,7 +455,7 @@ onMounted(() => {
     window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, document.body]);
   }
 });
-const paperDoi = ref(null);  
+const paperDoi = ref(null);
 // 动态监听 `route.query` 的变化，并触发数据加载
 watchEffect(async () => {
   console.log('路由变化:', route.params.id);
@@ -474,8 +495,7 @@ onMounted(async () => {
 
 
   await fetchPaper(paperDoi.value);
-console.log("21321321321",paper.value.downloadSource,paper.value.citationSource);
-// 动态过渡效果，分别对下载量和引用量进行设置
+  // 动态过渡效果，分别对下载量和引用量进行设置
   // 动态过渡效果，分别对下载量和引用量进行设置
   downloadValue.value = useTransition(paper.value.downloadSource, {
     duration: 1500,
@@ -779,8 +799,8 @@ async function setSelection(selection) {
           secondaryCitations: secondaryCitations.flat() || [] // 确保它是一个空数组
         };
         // 确保视图更新后再执行
-       // 在 DOM 更新后执行回调
-       nextTick(() => {
+        // 在 DOM 更新后执行回调
+        nextTick(() => {
           console.log('更新后的二级参考文献:', selectedReferences.value.secondaryCitations);
         });
         console.log('二级参考文献121:', selectedReferences.value.secondaryCitations);
@@ -844,7 +864,7 @@ onMounted(() => {
       }
     }
   });
-console.log("000"+selectedReferences.value);
+  console.log("000" + selectedReferences.value);
   chartInstance.setOption(chartOptions);
 });
 // const paper = ref({
@@ -936,7 +956,7 @@ const onLoaded = () => {
 
 <style scoped>
 /*调整了一下视图*/
-.h-screen-flex{
+.h-screen-flex {
   padding-top: 70px;
 }
 
