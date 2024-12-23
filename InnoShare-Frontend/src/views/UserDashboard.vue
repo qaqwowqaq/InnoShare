@@ -135,7 +135,7 @@
                      @click="routerToUploadingAchivementList">
             上传学术成果
           </el-button>
-          <el-button v-if="isCurrentUser" 
+          <el-button v-if="isCurrentUser && personalInfo.isVerified == 1" 
                      @click="onShowInivitationCode"
                      class="!rounded-full">
             查看邀请码
