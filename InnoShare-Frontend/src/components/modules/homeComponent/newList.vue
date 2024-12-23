@@ -20,11 +20,18 @@ export default {
     return{
       newPapers:[],
       interval:60000,//1min
+      intervalId: null,
     }
   },
   mounted() {
 
     this.update();
+  },
+  beforeDestroy() {
+    // 组件销毁时清除定时器
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods:{
     update(){
@@ -34,9 +41,9 @@ export default {
         this.newPapers = JSON.parse(localData); // 解析 JSON 字符串
       }
       // 每隔一定时间获取新的数据
-      setInterval(() => {
+      this.intervalId=setInterval(() => {
         this.fetch();
-        console.log("获取new数据")
+        //console.log("获取new数据")
       }, this.interval);
     },
     fetch(){

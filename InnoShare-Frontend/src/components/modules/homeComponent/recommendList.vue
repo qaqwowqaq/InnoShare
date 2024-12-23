@@ -19,12 +19,19 @@ export default {
   data(){
     return{
       recPapers:[],
-      interval:15000,//15秒更新一次
+      interval:30000,//30秒更新一次
+      intervalId: null,
     }
   },
   mounted() {
     //推荐列表15s更新一次
     this.update();
+  },
+  beforeDestroy() {
+    // 组件销毁时清除定时器
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods:{
     //获取推荐文档
@@ -35,9 +42,9 @@ export default {
         this.recPapers = JSON.parse(localData); // 解析 JSON 字符串
       }
       // 每隔一定时间获取新的数据
-      setInterval(() => {
+      this.intervalId=setInterval(() => {
         this.fetch();
-        console.log("获取rec数据")
+        //console.log(this.intervalId+"获取rec数据")
       }, this.interval);
     },
     fetch(){

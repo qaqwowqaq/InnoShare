@@ -177,8 +177,8 @@ export default {
       this.$router.push({
         path: '/search',
         query: {
-          type: "",
-          query: "",//占位
+          type: "paper",
+          query: "default",//占位
           subject: `paper`, //  占位
           subjectLevel: 1,
           sortBy: '_score',

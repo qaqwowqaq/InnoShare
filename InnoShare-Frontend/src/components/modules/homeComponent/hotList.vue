@@ -18,10 +18,22 @@ export default {
     return{
       hotPapers:[],
       interval:60000,//1分钟更新一次
+      intervalId: null,
     }
   },
   mounted() {
     this.update();
+    // 每隔一定时间获取新的数据
+    this.intervalId = setInterval(() => {
+      this.fetch();
+      console.log("获取hot数据"+this.interval)
+    }, this.interval);
+  },
+  beforeDestroy() {
+    // 组件销毁时清除定时器
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods:{
     update(){
@@ -30,11 +42,8 @@ export default {
       if (localData) {
         this.hotPapers = JSON.parse(localData); // 解析 JSON 字符串
       }
-      // 每隔一定时间获取新的数据
-      setInterval(() => {
-        this.fetch();
-        console.log("获取hot数据")
-      }, this.interval);
+      else this.fetch();
+
     },
     fetch(){
       axiosInstance.get('/api/recommendations/hot').then((response)=>{
