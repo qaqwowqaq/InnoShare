@@ -19,19 +19,43 @@ export default {
   data(){
     return{
       newPapers:[],
+      interval:60000,//1min
+      intervalId: null,
     }
   },
   mounted() {
+
     this.update();
+  },
+  beforeDestroy() {
+    // 组件销毁时清除定时器
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods:{
     update(){
+      // 使用本地缓存，如果存在就读取，否则设置定时获取数据
+      const localData = this.getFromLocal();
+      if (localData) {
+        this.newPapers = JSON.parse(localData); // 解析 JSON 字符串
+      }
+      // 每隔一定时间获取新的数据
+      this.intervalId=setInterval(() => {
+        this.fetch();
+        //console.log("获取new数据")
+      }, this.interval);
+    },
+    fetch(){
       axiosInstance.get('/api/recommendations/new').then((response)=>{
         //最新文档
-          this.newPapers=response.data.papers;
-
+        this.newPapers=response.data.papers;
+        localStorage.setItem("newPapers",JSON.stringify(this.newPapers))
       });
-
+    },
+    getFromLocal(){
+      //从本地读取
+      return localStorage.getItem("newPapers");
     }
 
   }

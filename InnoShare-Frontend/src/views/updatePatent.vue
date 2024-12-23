@@ -5,9 +5,11 @@
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
-        <el-avatar :size="80" :src="circleUrl" shape="circle" class="mb-4" />
+        <el-avatar :size="80" :src="userAvatar || ''" shape="circle" class="mb-4">
+          {{ username.charAt(0).toUpperCase() }} <!-- 使用用户名的首字母 -->
+        </el-avatar>
         <!-- 用户昵称 -->
-        <div class="text-center font-semibold text-lg">用户昵称</div>
+        <div class="text-center font-semibold text-lg">{{ username }}</div>
       </div>
 
       <!-- 底部部分 -->
@@ -108,7 +110,37 @@ import axiosInstance from '@/axiosConfig';
 import { ElMessage } from 'element-plus';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from "vue-router";
+const serverIP = 'http://113.44.223.168'
+const userAvatar = ref('');
+const username = ref('');
 
+// 获取指定用户详细信息
+const getUserDetails = async (userId: string) => {
+  try {
+    // 发起 GET 请求
+    const response = await axiosInstance.get(`/users/${userId}`, {
+
+    })
+    //get(`/users/${userId}`, { headers });
+
+    console.log("用户信息", response.data);
+    // 从返回的数据中提取用户名和头像
+    username.value = response.data.data.username || '';  // 默认空字符串
+    userAvatar.value = serverIP + '/' + response.data.data.avatarURL || '';  // 默认空字符串
+    console.log('用户名', username.value);
+    console.log('头像', userAvatar.value);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
+
+onMounted(async () => {
+  // const userId = 1;
+  const userDetails = await getUserDetails(userId.toString());
+  console.log(userDetails);
+});
 // 路由和表单处理的基本设置
 const router = useRouter();
 const form = ref({
@@ -129,7 +161,7 @@ const isEdit = ref(false);
 const route = useRoute();
 // 假设使用 DOI 获取专利 ID（根据实际情况替换）
 const patentId = route.params.id; // 这里需要从 URL 或其他方式获取 patentId
-
+const userId = route.params.userId; // 这里需要从 URL 或其他方式获取 userId
 const predefinedCategories = [
   "技术", "工程", "医疗", "化学", "其他"
 ];
@@ -208,8 +240,9 @@ const handleSubmit = async () => {
     const response = await axiosInstance.post('/academic/patent/update', patent); // 更新专利数据
 
     console.log('专利上传成功：', response);
-    ElMessage.success('专利更新成功！');
-    router.push('/AchiManage/:1');
+    ElMessage.success('专利上传成功！');
+    router.push({ name: 'AchiManage' , params: { userId: userId } });
+
   } catch (error) {
     console.error('专利上传失败:', error);
     ElMessage.error('专利上传失败，请重试。');

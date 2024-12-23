@@ -69,25 +69,25 @@ const routes: Array<RouteRecordRaw> = [
     component: Register
   },
   {
-    path: '/UploadPaper',
+    path: '/UploadPaper/:id',
     name: 'UploadPaper',
     component: UploadPaper,
     props: true
   },
   {
-    path: '/UploadPatent',
+    path: '/UploadPatent/:id',
     name: 'UploadPatent',
     component: UploadPatent,
     props: true
   },
   {
-    path: '/UpdatePaper/:id',
+    path: '/UpdatePaper/:id/:userId',
     name: 'UpdatePaper',
     component: UpdatePaper,
     props: true
   },
   {
-    path: '/UpdatePatent/:id',
+    path: '/UpdatePatent/:id/:userId',
     name: 'UpdatePatent',
     component: UpdatePatent,
     props: true

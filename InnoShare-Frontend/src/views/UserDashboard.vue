@@ -22,6 +22,7 @@
                       :show-file-list="false"
                       :before-upload="validateAndUpdateAvatarFile">
               <img :src="personalInfo.profileURL"
+                  @error="onImageError"
                    class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mx-auto"
                    :alt="personalInfo.fullname"/>
             </el-upload>
@@ -135,7 +136,7 @@
                      @click="routerToUploadingAchivementList">
             上传学术成果
           </el-button>
-          <el-button v-if="isCurrentUser" 
+          <el-button v-if="isCurrentUser && personalInfo.isVerified == 1" 
                      @click="onShowInivitationCode"
                      class="!rounded-full">
             查看邀请码
@@ -185,6 +186,8 @@ const router = useRouter();
 const userStore = useUserStore();
 const userId: string = Array.isArray(route.params.userId) ? route.params.userId[0] : route.params.userId;
 
+const serverIP = 'http://113.44.223.168'
+
 // information of user
 class PersonInfo {
   username: string = 'PlutoFX';
@@ -198,7 +201,7 @@ class PersonInfo {
   institution: string = 'Beihang University';
   experience: string = 'Working / Studying Experience';
   fieldOfStudy: string = 'Software Engineer';
-  inivitationCode: string = 'f1i6VJzl8MlUVNO7uVRCDmMWvCfWX8Ed';
+  inivitationCode: string = 'ERRORJzl8MlUVNO7uVRCDmMWvCfWX8Ed';
 
   constructor(other?: PersonInfo) {
     if (other !== undefined) {
@@ -263,7 +266,7 @@ onMounted(() => {
     personalInfo.fieldOfStudy = resultData.fieldOfStudy;
     personalInfo.experience = resultData.experience;
     personalInfo.isVerified = resultData.isVerified;
-  personalInfo.profileURL = resultData.avatarURL;
+    personalInfo.profileURL = serverIP + '/' + resultData.avatarURL;
   }).catch(() => {
     // not sure
     ElMessage({
@@ -275,11 +278,10 @@ onMounted(() => {
 });
 
 
-// 为了展示静态逻辑，暂时先默认为true
 const isCurrentUser = computed(() => {
   console.log(userStore.userInfo?.username);
-  // return userStore.userInfo?.username == personalInfo.username;
-  return true;
+  return userStore.userInfo?.username == personalInfo.username;
+  // return true;
 })
 const isEditMode = ref(false);
 const copyInvitationCodeVisible = ref(false);
@@ -318,6 +320,7 @@ const editSave = (): void => {
 }
 
 const onCancelEdit = (): void => {
+  backedPersonalInfo.profileURL = personalInfo.profileURL;
   personalInfo.deepClone(backedPersonalInfo);
   isEditMode.value = false;
   editSaveVisible.value = false;
@@ -326,7 +329,8 @@ const onCancelEdit = (): void => {
 const onConfirmEditting = (): void => {
   // send the edit request
   updateUserDetails(personalInfo2UpdatableInfo(personalInfo)).then((result) => {
-    console.log(result.message)
+    console.log(result)
+    if (result.success) {
       ElMessage({
         message: "个人信息修改成功！",
         type: "success",
@@ -334,6 +338,15 @@ const onConfirmEditting = (): void => {
       });
       isEditMode.value = false;
       editSaveVisible.value = false;
+      // location.reload();
+    } else {
+      ElMessage({
+        message: "个人信息修改失败：" + (result.message == 'Validation errors.' ? "请申请认证或等待审核通过": result.message),
+        type: "error",
+        offset: 100
+      });
+    }
+      
     }
   ).catch((error) => {
     // personalInfo.deepClone(backedPersonalInfo);
@@ -363,13 +376,13 @@ const validateAndUpdateAvatarFile: UploadProps['beforeUpload'] = (rawFile): bool
     });
     return false;
   }
-  // personalInfo.profileURL = URL.createObjectURL(rawFile);
 
   // request
   updateUserAvatar(rawFile).then(
     (result) => {
       console.log(result);
-      personalInfo.profileURL = result.avatarURL
+      personalInfo.profileURL = URL.createObjectURL(rawFile);
+      // personalInfo.profileURL = urlBase + "/" + result.avatarURL
       ElMessage({
         message: "头像上传成功！",
         type: "success",
@@ -433,7 +446,7 @@ const routerToAchivementList = (): void => {
 }
 
 const routerToUploadingAchivementList = (): void => {
-  router.push(`/UploadPaper`)
+  router.push(`/UploadPaper/${userId}`)
 }
 
 const routerToVerify = (): void => {

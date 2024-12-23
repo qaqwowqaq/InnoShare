@@ -113,7 +113,6 @@ export default {
       return index === array.length - 1 ? author.trim() : author.trim() + ',';
     });
     this.title=this.message.title;
-    console.log(this.message.subject)
     //处理标签格式
     if(this.message.subject.match(/\((.*?)\)/)){
       //存在括号

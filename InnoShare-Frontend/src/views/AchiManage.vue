@@ -1,14 +1,16 @@
 <template>
-  <div class="h-screen flex mt-20 " style="overflow: hidden;">
+  <div class="flex  " style="overflow: hidden;margin-top: 4%;">
     <!-- 左侧固定栏 -->
     <div class="sidebar bg-gray-800 text-white p-4 fixed flex flex-col justify-between "
-         style="height: 92%; width: 16%;">
+      style="height: 96%; width: 16%;">
       <!-- 顶部部分 -->
       <div class="flex flex-col items-center space-y-4">
         <!-- 用户头像 -->
-        <el-avatar :size="80" :src="circleUrl" shape="circle" class="mb-4" />
+        <el-avatar :size="80" :src="userAvatar || ''" shape="circle" class="mb-4">
+          {{ username.charAt(0).toUpperCase() }} <!-- 使用用户名的首字母 -->
+        </el-avatar>
         <!-- 用户昵称 -->
-        <div class="text-center font-semibold text-lg">用户昵称</div>
+        <div class="text-center font-semibold text-lg">{{ username }}</div>
       </div>
 
       <!-- 底部部分 -->
@@ -16,8 +18,8 @@
 
         <!-- 上传按钮 -->
         <el-button type="primary"
-                   class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
-                   @click="handleUploadClick1">
+          class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
+          @click="handleUploadClick1">
           上传专利
         </el-button>
       </div>
@@ -25,8 +27,8 @@
 
         <!-- 上传按钮 -->
         <el-button type="primary"
-                   class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
-                   @click="handleUploadClick">
+          class="w-full rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-700"
+          @click="handleUploadClick">
           上传论文
         </el-button>
       </div>
@@ -34,7 +36,7 @@
     <div class="flex-col" style="height:100%;padding-bottom: 20%; padding-left: 16%; width: 120%;overflow:auto;">
       <div>
         <el-menu :default-active="activeTab" class="fixed w-full el-menu-demo bg-gray-800 z-10" mode="horizontal"
-                 @select="handleTabChange">
+          @select="handleTabChange">
           <el-menu-item style="color:darkgray; ;" index="section2">专利部分</el-menu-item>
           <el-menu-item style="color: darkgray;" index="section1">论文部分</el-menu-item>
 
@@ -48,11 +50,11 @@
         <section v-if="activeTab === 'section1'" id="section1" class="w-full flex flex-col space-y-10 items-center ">
           <!-- 动态渲染每一页的卡片 -->
           <div v-for="(paper, index) in currentPapers" :key="index"
-               class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
-               style="background:whitesmoke;">
+            class=" w-3/4 h-full bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            style="background:whitesmoke;">
             <div class="p-6 ">
               <h3 class="h-2/5 text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
-                  @click="navigateToPaper(paper.doi)">
+                @click="navigateToPaper(paper.doi)">
                 {{ paper.title }}
               </h3>
               <div class="flex flex-col items-start text-sm text-gray-500 text-left">
@@ -97,11 +99,11 @@
           </div>
           <!-- 分页组件 -->
           <el-pagination background layout="prev, pager, next" :total="papers.length" :page-size="4"
-                         @current-change="handlePageChange" />
+            @current-change="handlePageChange" />
         </section>
         <!-- 专利部分 -->
         <section v-if="activeTab === 'section2'" id="section2" class="flex flex-col space-y-10 items-center"
-                 style="width: 100%;">
+          style="width: 100%;">
           <div class="w-4/5 flex flex-col px-8 h-full">
             <el-card class="p-8 shadow-lg rounded-lg" :row-class-name="rowClassName">
               <el-table :data="paginatedPatents" style="width: 100%; --row-height: 50px;">
@@ -111,13 +113,13 @@
                     <div class="flex flex-col items-center space-y-2">
                       <!-- 设置按钮宽度，确保一致；去掉不必要的偏移 -->
                       <el-button type="primary" size="small"
-                                 style="width: 40px; text-align: center; padding-left: 0; padding-right: 0;"
-                                 @click="handleEdit1(scope.row)">
+                        style="width: 40px; text-align: center; padding-left: 0; padding-right: 0;"
+                        @click="handleEdit1(scope.row)">
                         <i class="fas fa-edit"></i>
                       </el-button>
 
                       <el-button type="danger" size="small" style="width: 40px; text-align: center;margin-left: 0px;"
-                                 @click="handleDelete1(scope.row)">
+                        @click="handleDelete1(scope.row)">
                         <i class="fas fa-trash"></i>
                       </el-button>
 
@@ -158,7 +160,7 @@
             </el-card>
             <!-- 分页组件 -->
             <el-pagination background layout="prev, pager, next" :total="patents.length" :page-size="pageSize1"
-                           @current-change="handlePageChange1" :current-page="currentPage1" class="mt-6" />
+              @current-change="handlePageChange1" :current-page="currentPage1" class="mt-6" />
 
           </div>
         </section>
@@ -175,9 +177,12 @@
 import axiosInstance from '@/axiosConfig';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { reactive, toRefs, ref, computed, onMounted, nextTick, Ref } from 'vue'
-import { useRouter } from "vue-router"; // Vue Router for navigation
+import { useRoute,useRouter } from "vue-router"; // Vue Router for navigation
 // request function
-const urlBase : string = '/users'
+const serverIP = 'http://113.44.223.168'
+const urlBase: string = '/users';
+const route = useRoute();
+const userId = route.params.userId;
 function getCookie(name: string): string | null {
   const value = `; ${document.cookie}`;
 
@@ -185,6 +190,8 @@ function getCookie(name: string): string | null {
   if (parts.length === 2) return parts.pop()?.split(';').shift() ?? null;
   return null;
 }
+const userAvatar = ref('');
+const username = ref('');
 
 // 获取指定用户详细信息
 const getUserDetails = async (userId: string) => {
@@ -199,14 +206,16 @@ const getUserDetails = async (userId: string) => {
 
     // 发起 GET 请求
     const response = await axiosInstance.get(`/users/${userId}`, {
-      headers: {
-        Authorization: 'Bearer ' + localStorage.getItem('admin-jwt-token'),
-      },
 
     })
     //get(`/users/${userId}`, { headers });
 
     console.log("用户信息", response.data);
+    // 从返回的数据中提取用户名和头像
+    username.value = response.data.data.username || '';  // 默认空字符串
+    userAvatar.value = serverIP + '/' + response.data.data.avatarURL || '';  // 默认空字符串
+    console.log('用户名', username.value);
+    console.log('头像', userAvatar.value);
     return response.data;
   } catch (error) {
     console.error('Error fetching user details:', error);
@@ -215,7 +224,6 @@ const getUserDetails = async (userId: string) => {
 };
 
 onMounted(async () => {
-  const userId = 1;
   const userDetails = await getUserDetails(userId.toString());
   console.log(userDetails);
 });
@@ -280,7 +288,7 @@ const fetchPatents = async (userId: number) => {
   }
 };
 onMounted(() => {
-  fetchPatents(1); // 传递 userId
+  fetchPatents(Number(userId)); // 传递 userId
 });
 // 分页状态
 const currentPage1 = ref(1); // 当前页
@@ -326,21 +334,23 @@ const papers: Ref<Paper[]> = ref([]);
 const fetchPapers = async () => {
   try {
     const response = await axiosInstance.get('/academic/allPaper', {
-      params: { userId: 1 }, // 传递 userId 参数
+      params: { userId: userId }, // 传递 userId 参数
     });
     console.log('获取论文数据成功:', response.data.data);
 
     if (response.data.success) {
-      papers.value = response.data.data.map((item: { paper: { doi: any; title: any; author: any; abstractText: any; subjects: any; publishedAt: any; downloadUrl: any; }; }, index: number) => ({
+      papers.value = response.data.data.map((item: { paper: {
+[x: string]: any; doi: any; title: any; author: any; abstractText: any; subjects: any; publishedAt: any; downloadUrl: any; 
+}; }, index: number) => ({
         id: index, // 当前文献的序号作为 id
         doi: item.paper.doi,
         title: item.paper.title,
         authors: item.paper.author,
         abstract: item.paper.abstractText,
-        publishDate: item.paper.publishedAt,
-        uploadDate: "2023-07-20", // 固定日期或根据需要更新
-        citations: 120, // 引用量
-        downloads: 450, // 下载量
+        publishDate: new Date(item.paper.publishedAt).toISOString().split('T')[0],
+        uploadDate: new Date(item.paper.updatedAt).toISOString().split('T')[0], // 固定日期或根据需要更新
+        citations: item.paper.citationCount||0, // 引用量
+        downloads: item.paper.downloadCount, // 下载量
       }));
       console.log('papers:', papers.value);  // 调试打印
       // 使用 MathJax 渲染公式
@@ -413,7 +423,7 @@ const goToPatentDetail = (patentId: string) => {
 // 使用 TypeScript 类型断言
 const state = reactive({
   circleUrl:
-      'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+    'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
   // 使用 'as const' 进行类型断言，确保 sizeList 为只读数组
   sizeList: ['small', '', 'large'] as const,
 })
@@ -423,18 +433,18 @@ const { circleUrl, sizeList } = toRefs(state)
 const handleUploadClick = () => {
   console.log("上传论文按钮被点击");
   // 跳转到上传论文页面
-  router.push({ name: 'UploadPaper' });
+  router.push({ name: 'UploadPaper' , params: { id: userId } });
 };
 const handleUploadClick1 = () => {
   console.log("上传论文按钮被点击");
   // 跳转到上传论文页面
-  router.push({ name: 'UploadPatent' });
+  router.push({ name: 'UploadPatent' , params: { id: userId }});
 };
 // 处理更新按钮点击事件
 const handleUpdate = (paperId: string) => {
   console.log(`Updating paper with ID: ${paperId}`);
   // 跳转到更新论文页面，传递 paperId 参数
-  router.push({ name: 'UpdatePaper', params: { id: paperId } });
+  router.push({ name: 'UpdatePaper', params: { id: paperId, userId: userId } });
 };
 
 // 处理删除按钮点击事件
@@ -443,13 +453,13 @@ const handleDelete = async (paperDoi: string) => {
   try {
     // 询问是否确认删除
     const result = await ElMessageBox.confirm(
-        '您确定要删除这篇论文吗？',
-        '确认删除',
-        {
-          confirmButtonText: '删除',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
+      '您确定要删除这篇论文吗？',
+      '确认删除',
+      {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
     );
 
     // 如果用户点击了"删除"
@@ -485,7 +495,7 @@ const handleDelete = async (paperDoi: string) => {
 const handleEdit1 = (patent: Patent) => {
   console.log('修改专利:', patent);
   // 这里可以打开弹窗编辑专利内容，或者跳转到修改页面
-  router.push({ name: 'UpdatePatent', params: { id: patent.id } });
+  router.push({ name: 'UpdatePatent', params: { id: patent.id, userId: userId} });
 };
 
 // 删除专利
@@ -498,36 +508,36 @@ const handleDelete1 = (patent: Patent) => {
     cancelButtonText: '取消',
     type: 'warning',
   })
-      .then(async () => {
-        try {
-          // 调用删除接口
-          const userId = 2; // 假设当前用户的 ID 是 2
-          const patentId = patent.id;
+    .then(async () => {
+      try {
+        // 调用删除接口
+        const userId = 2; // 假设当前用户的 ID 是 2
+        const patentId = patent.id;
 
-          // 调用删除接口
-          const response = await axiosInstance.get('/academic/patent/delete', {
-            params: {
-              userId: 1, // 当前用户 ID
-              patentId: patentId, // 要删除的论文 DOI
-            },
-          });
+        // 调用删除接口
+        const response = await axiosInstance.get('/academic/patent/delete', {
+          params: {
+            userId: 1, // 当前用户 ID
+            patentId: patentId, // 要删除的论文 DOI
+          },
+        });
 
-          // 判断是否删除成功
-          if (response.data.success) {
-            // 从列表中删除
-            patents.value = patents.value.filter((item) => item.id !== patent.id);
-            ElMessage.success('删除成功');
-          } else {
-            ElMessage.error('删除失败，请重试');
-          }
-        } catch (error) {
-          console.error('删除专利失败:', error);
-          ElMessage.error('删除专利失败，请重试');
+        // 判断是否删除成功
+        if (response.data.success) {
+          // 从列表中删除
+          patents.value = patents.value.filter((item) => item.id !== patent.id);
+          ElMessage.success('删除成功');
+        } else {
+          ElMessage.error('删除失败，请重试');
         }
-      })
-      .catch(() => {
-        ElMessage.info('删除已取消');
-      });
+      } catch (error) {
+        console.error('删除专利失败:', error);
+        ElMessage.error('删除专利失败，请重试');
+      }
+    })
+    .catch(() => {
+      ElMessage.info('删除已取消');
+    });
 };
 
 </script>
@@ -561,8 +571,10 @@ const handleDelete1 = (patent: Patent) => {
 .demo-basic .el-col:not(:last-child) {
   border-right: 1px solid var(--el-border-color);
 }
+
 .custom-row {
-  height: 50px; /* 行高 */
+  height: 50px;
+  /* 行高 */
 }
 
 

@@ -19,20 +19,44 @@ export default {
   data(){
     return{
       recPapers:[],
+      interval:30000,//30秒更新一次
+      intervalId: null,
     }
   },
   mounted() {
-    //推荐列表1分钟更新一次
-    this.getRecommend();
+    //推荐列表15s更新一次
+    this.update();
+  },
+  beforeDestroy() {
+    // 组件销毁时清除定时器
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods:{
     //获取推荐文档
-    getRecommend(){
+    update(){
+      // 使用本地缓存，如果存在就读取，否则设置定时获取数据
+      const localData = this.getFromLocal();
+      if (localData) {
+        this.recPapers = JSON.parse(localData); // 解析 JSON 字符串
+      }
+      // 每隔一定时间获取新的数据
+      this.intervalId=setInterval(() => {
+        this.fetch();
+        //console.log(this.intervalId+"获取rec数据")
+      }, this.interval);
+    },
+    fetch(){
       axiosInstance.get('/api/recommendations/recommend').then((response)=>{
+        //最新文档
         this.recPapers=response.data.papers;
-        console.log(response.data)
-
+        localStorage.setItem("recPapers",JSON.stringify(this.recPapers))
       });
+    },
+    getFromLocal(){
+      //从本地读取
+      return localStorage.getItem("recPapers");
     }
   }
 }

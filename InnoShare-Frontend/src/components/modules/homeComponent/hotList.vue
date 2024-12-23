@@ -17,20 +17,44 @@ export default {
   data(){
     return{
       hotPapers:[],
+      interval:60000,//1分钟更新一次
+      intervalId: null,
     }
   },
   mounted() {
     this.update();
+    // 每隔一定时间获取新的数据
+    this.intervalId = setInterval(() => {
+      this.fetch();
+      console.log("获取hot数据")
+    }, this.interval);
+  },
+  beforeDestroy() {
+    // 组件销毁时清除定时器
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   },
   methods:{
     update(){
+      // 使用本地缓存，如果存在就读取，否则设置定时获取数据
+      const localData = this.getFromLocal();
+      if (localData) {
+        this.hotPapers = JSON.parse(localData); // 解析 JSON 字符串
+      }
+      else this.fetch();
+
+    },
+    fetch(){
       axiosInstance.get('/api/recommendations/hot').then((response)=>{
-        //最新文档
+        //最热文档
         this.hotPapers=response.data.papers;
-        console.log(response.data)
-
+        localStorage.setItem("hotPapers",JSON.stringify(this.hotPapers))
       });
-
+    },
+    getFromLocal(){
+      //从本地读取
+      return localStorage.getItem("hotPapers");
     }
 
   }
