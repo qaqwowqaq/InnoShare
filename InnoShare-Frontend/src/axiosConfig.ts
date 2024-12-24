@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useUserStore } from './store/modules/user';
 // 创建一个 Axios 实例
 const axiosInstance = axios.create({
-  baseURL: 'http://113.44.223.168:8888', // 后端接口的基础 URL
+  baseURL: '', // 后端接口的基础 URL
   timeout: 10000, // 请求超时时间
   withCredentials: true, // 携带 cookie
 });
