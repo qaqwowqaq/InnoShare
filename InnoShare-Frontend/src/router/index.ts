@@ -14,7 +14,7 @@ import AdminPanel from '@/views/AdminPanel.vue'
 import UserReview from '@/views/UserReview.vue'
 import UserManagement from '@/views/UserManagement.vue'
 import DataStatistics from '@/views/DataStatistics.vue'
-
+import AuthorDetail from '@/views/AuthorDetail.vue';
 import PaperDetail from '@/views/PaperDetail.vue';
 import PatentDetail from '@/views/PatentDetail.vue';
 const routes: Array<RouteRecordRaw> = [
@@ -123,6 +123,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/search',
     name: 'SearchResults',
     component: SearchResults
+  },
+  {
+    path: '/author/:name',
+    name: 'AuthorDetail',
+    component: AuthorDetail,
   },
   {
     path: '/admin',

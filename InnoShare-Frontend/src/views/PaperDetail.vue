@@ -90,7 +90,17 @@
               <div class="flex flex-col items-start text-lg text-gray-500 text-left">
                 <div>
                   <span class="font-bold">作者：</span>
-                  <span>{{ paper.author }}</span>
+                  <span>
+                    <template v-for="(author, index) in splitAuthors" :key="index">
+                      <a 
+                        @click="navigateToAuthor(author)" 
+                        class="text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
+                      >
+                        {{ author.trim() }}
+                      </a>
+                      <span v-if="index < splitAuthors.length - 1">&nbsp;|&nbsp;</span>
+                    </template>
+                  </span>
                 </div>
                 <div>
                   <span class="font-bold">出版时间：</span>
@@ -968,6 +978,23 @@ const onLoaded = () => {
   loading.value = false;
 };
 
+// 将作者字符串按照逗号拆分为数组，并去除多余的空格
+const splitAuthors = computed(() => {
+  return paper.value.author
+    ? paper.value.author
+        .split(',')
+        .map(author => author.trim())
+        .filter(author => author.length > 0)
+    : [];
+});
+
+// 导航到作者详情页面
+const navigateToAuthor = (authorName) => {
+  router.push({
+    name: 'AuthorDetail',
+    params: { name: authorName.trim() }
+  });
+};
 
 </script>
 

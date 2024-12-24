@@ -231,7 +231,7 @@ export default {
           subjectLevel: 1,
           sortBy: '_score',
           order: 'desc',
-          page: 1,
+          page: 0,
         }
       });
     },
