@@ -1,7 +1,8 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <div class="mt-16 min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <!-- 作者信息卡片 -->
-      <div class="max-w-7xl mx-auto">
+      <div class="max-w-7xl mx-auto ">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-12">
           <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-32"></div>
           <div class="relative px-6 pb-8">
@@ -23,7 +24,7 @@
         </div>
   
         <!-- 论文列表和关系网络 -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class=" grid grid-cols-1 lg:grid-cols-2 gap-8 " style="min-height: 500px;">
           <!-- 论文列表 -->
           <div class="bg-white rounded-xl shadow-lg p-6">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">发表论文</h2>
@@ -48,7 +49,7 @@
           <!-- 专家关系网络图 -->
           <div class="bg-white rounded-xl shadow-lg p-6">
             <h2 class="text-2xl font-semibold mb-6 text-gray-800">合作关系网络</h2>
-            <div ref="chartRef" class="w-full h-[500px]"></div>
+            <div ref="networkChart" class="w-full h-full" style="min-height: 400px;"></div>
           </div>
         </div>
       </div>
@@ -56,21 +57,22 @@
   </template>
   
   <script setup>
-  import { ref, onMounted, watchEffect } from 'vue';
+  import { ref, onMounted, watchEffect ,nextTick,onUnmounted} from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import axiosInstance from '@/axiosConfig';
   import * as echarts from 'echarts';
   
   const route = useRoute();
   const router = useRouter();
-  const chartRef = ref(null);
+  const networkChart = ref(null); // 更改ref名称
+  let chart = null;
   const authorInfo = ref({
     authorName: '',
     papers: [],
     coAuthors: []
   });
   
-  const defaultAvatar = 'https://api.dicebear.com/7.x/initials/svg?seed=Expert';
+  const defaultAvatar = 'https://img.51miz.com/Element/00/88/08/84/72f298b9_E880884_d0f63115.png';
   
   // 格式化日期
   const formatDate = (dateString) => {
@@ -82,90 +84,142 @@
     router.push({ name: 'PaperDetail', params: { id: doi } });
   };
   
-  // 初始化关系网络图
-  const initNetworkChart = () => {
-    if (!chartRef.value) return;
-  
-    const chart = echarts.init(chartRef.value);
-    const option = {
-      tooltip: {
-        show: true
+  const resizeHandler = () => {
+  if (chart) {
+    chart.resize();
+  }
+};
+
+const initNetworkChart = () => {
+
+  if (!networkChart.value) return;
+
+  if (chart) {
+    chart.dispose();
+    console.log('chart disposed');
+  }
+
+  chart = echarts.init(networkChart.value);
+  const option = {
+    backgroundColor: '#ffffff',
+    tooltip: {
+      trigger: 'item',
+      formatter: '{b}'
+    },
+    series: [{
+      type: 'graph',
+      layout: 'force',
+      animation: true,
+      draggable: true,
+      roam: true,
+      label: {
+        show: true,
+        position: 'right',
+        color: '#333',
+        fontSize: 14,
+        fontWeight: 'bold'
       },
-      series: [{
-        type: 'graph',
-        layout: 'force',
-        animation: true,
-        label: {
-          show: true,
-          position: 'inside',
-          color: '#fff',
-          fontSize: 12
-        },
-        force: {
-          repulsion: 300,
-          gravity: 0.1,
-          edgeLength: 120
-        },
-        data: [
-          {
-            name: authorInfo.value.authorName,
-            value: 60,
-            itemStyle: {
-              color: '#5470c6'
-            },
-            symbolSize: 60
+      force: {
+        repulsion: 1000,
+        gravity: 0.1,
+        edgeLength: 200,
+        layoutAnimation: true
+      },
+      data: [
+        {
+          name: authorInfo.value.authorName,
+          value: 100,
+          itemStyle: {
+            color: '#3b82f6',
+            borderColor: '#2563eb',
+            borderWidth: 2,
+            shadowBlur: 10,
+            shadowColor: 'rgba(59, 130, 246, 0.5)'
           },
-          ...authorInfo.value.coAuthors.map((author, index) => ({
-            name: author,
-            value: 40,
-            itemStyle: {
-              color: ['#91cc75', '#fac858', '#ee6666', '#73c0de'][index % 4]
-            },
-            symbolSize: 40
-          }))
-        ],
-        links: authorInfo.value.coAuthors.map(author => ({
-          source: authorInfo.value.authorName,
-          target: author,
-          lineStyle: {
-            color: '#ccc',
-            width: 2
-          }
+          symbolSize: 80,
+          symbol: 'circle'
+        },
+        ...authorInfo.value.coAuthors.map((author, index) => ({
+          name: author,
+          value: 60,
+          itemStyle: {
+            color: [
+              '#10b981',
+              '#f59e0b',
+              '#ef4444',
+              '#6366f1'
+            ][index % 4],
+            borderWidth: 1,
+            borderColor: '#fff'
+          },
+          symbolSize: 50,
+          symbol: 'circle'
         }))
-      }]
-    };
-  
-    chart.setOption(option);
-    window.addEventListener('resize', () => chart.resize());
+      ],
+      links: authorInfo.value.coAuthors.map(author => ({
+        source: authorInfo.value.authorName,
+        target: author,
+        lineStyle: {
+          color: '#94a3b8',
+          width: 2,
+          curveness: 0.3,
+          opacity: 0.7
+        },
+        symbol: ['none', 'arrow'],
+        symbolSize: [5, 8]
+      })),
+      emphasis: {
+        focus: 'adjacency',
+        lineStyle: {
+          width: 4
+        }
+      }
+    }]
   };
-  
-  // 获取作者信息
-  const fetchAuthorInfo = async (authorName) => {
-    try {
-      const response = await axiosInstance.get('/academic/portal/get', {
-        params: { authorName }
-      });
-      authorInfo.value = response.data.data;
-      nextTick(() => {
-        initNetworkChart();
-      });
-    } catch (error) {
-      console.error('Failed to fetch author info:', error);
-    }
-  };
-  
-  // 监听路由变化
-  watchEffect(() => {
-    const authorName = route.params.name;
-    if (authorName) {
-      fetchAuthorInfo(authorName);
-    }
-  });
-  
-  onMounted(() => {
-    const authorName = route.params.name;
-    if (authorName) {
-      fetchAuthorInfo(authorName);
-    }
-  });
-  </script>
+
+  console.log('option:', option);
+
+  chart.setOption(option);
+  window.addEventListener('resize', resizeHandler);
+};
+
+const fetchAuthorInfo = async (authorName) => {
+  try {
+    const response = await axiosInstance.get('/academic/portal/get', {
+      params: { authorName }
+    });
+    authorInfo.value = response.data.data;
+    await nextTick();
+    initNetworkChart();
+  } catch (error) {
+    console.error('获取作者信息失败:', error);
+  }
+};
+
+watchEffect(() => {
+  const authorName = route.params.name;
+  if (authorName) {
+    fetchAuthorInfo(authorName);
+  }
+});
+
+onMounted(() => {
+  const authorName = route.params.name;
+  if (authorName) {
+    fetchAuthorInfo(authorName);
+  }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', resizeHandler);
+  if (chart) {
+    chart.dispose();
+  }
+});
+</script>
+
+<style scoped>
+.network-chart {
+  transition: all 0.3s ease;
+}
+</style>
