@@ -24,8 +24,9 @@ export default {
     }
   },
   mounted() {
+    if(this.getFromLocal())this.newPapers = JSON.parse(this.getFromLocal());
+    else this.fetch().then(this.update);
 
-    this.update();
   },
   beforeDestroy() {
     // 组件销毁时清除定时器
@@ -46,12 +47,10 @@ export default {
         //console.log("获取new数据")
       }, this.interval);
     },
-    fetch(){
-      axiosInstance.get('/api/recommendations/new').then((response)=>{
-        //最新文档
-        this.newPapers=response.data.papers;
-        localStorage.setItem("newPapers",JSON.stringify(this.newPapers))
-      });
+    async fetch() {
+      const response = await axiosInstance.get('/api/recommendations/new');
+      this.newPapers = response.data.papers;
+      localStorage.setItem("newPapers", JSON.stringify(this.newPapers))
     },
     getFromLocal(){
       //从本地读取

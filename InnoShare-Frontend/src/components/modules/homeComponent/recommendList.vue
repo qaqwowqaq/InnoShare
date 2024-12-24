@@ -10,7 +10,7 @@
 
 <script>
 import paperComponent from "../../paperComponent.vue";
-import axiosInstance from '../../../axiosConfig';
+import axiosInstance from '@/axiosConfig';
 export default {
   name: "recommendList",
   components:{
@@ -24,8 +24,8 @@ export default {
     }
   },
   mounted() {
-    //推荐列表15s更新一次
-    this.update();
+    if(this.getFromLocal())this.recPapers = JSON.parse(this.getFromLocal());
+    else this.fetch().then(this.update);
   },
   beforeDestroy() {
     // 组件销毁时清除定时器
@@ -38,7 +38,8 @@ export default {
     update(){
       // 使用本地缓存，如果存在就读取，否则设置定时获取数据
       const localData = this.getFromLocal();
-      if (localData) {
+
+      if (localData!==null&&localData!==undefined) {
         this.recPapers = JSON.parse(localData); // 解析 JSON 字符串
       }
       // 每隔一定时间获取新的数据
@@ -47,12 +48,15 @@ export default {
         //console.log(this.intervalId+"获取rec数据")
       }, this.interval);
     },
-    fetch(){
-      axiosInstance.get('/api/recommendations/recommend').then((response)=>{
-        //最新文档
-        this.recPapers=response.data.papers;
-        localStorage.setItem("recPapers",JSON.stringify(this.recPapers))
-      });
+    async fetch() {
+      // axiosInstance.get('/api/recommendations/recommend').then((response) => {
+      //   //最新文档
+      //   this.recPapers = response.data.papers;
+      //   localStorage.setItem("recPapers", JSON.stringify(this.recPapers))
+      // });
+      const response = await axiosInstance.get('/api/recommendations/recommend');
+      this.recPapers = response.data.papers;
+      localStorage.setItem("recPapers", JSON.stringify(this.recPapers))
     },
     getFromLocal(){
       //从本地读取

@@ -9,7 +9,8 @@
     </div>
     <div class="paper_author">
       <span class="paper_author_list" style="display: flex;flex-direction: row;column-gap: 10px;flex-wrap: wrap">
-        <span v-for="item in this.author" style="text-decoration: underline;color: rgba(19,19,19,0.89)">
+        <span v-for="item in this.author" @click="jumpToAuthor(item)" style="text-decoration: underline;
+        cursor: pointer" class="author_hover">
           {{ item }}
         </span>
       </span>
@@ -38,11 +39,6 @@
 
       </div>
       <div class="paper_like">
-        <div class="paper_like_view">
-          <!-- > 阅读量 <-->
-          <div ref="view" v-html="this.icons[2].svg" style="display: flex;align-items: center;justify-content: center"></div>
-          <span>{{ this.formatNumber(this.views) }}</span>
-        </div>
         <div class="paper_like_like">
           <!-- > 下载量 <-->
           <div  ref="like" v-html="this.icons[0].svg" style="display: flex;align-items: center;justify-content: center;transition: 0.5s"></div>
@@ -135,13 +131,19 @@ export default {
         path: '/search',
         query: {
           type: "paper",
-          query: "",
+          query: "default",
           subject: `${tag}`, // 可根据需要添加更多参数
           subjectLevel: 1,
           sortBy: '_score',
           order: 'desc',
           page: 1,
         }
+      });
+    },
+    jumpToAuthor(name){
+      this.$router.push({
+        name: 'AuthorDetail',
+        params: { name: name.split(',')[0] }
       });
     },
     handleMath(abstractText){
@@ -242,6 +244,11 @@ text-overflow: ellipsis; /* 超出部分用省略号表示 */
 .paper_author_list span{
   height: 26px;
   text-wrap: none;
+  color: rgba(19,19,19,0.89);
+  transition: 0.5s;
+}
+.paper_author_list span:hover{
+  color: #7a7777;
 }
 .paper_content{
   display: flex;
@@ -314,4 +321,5 @@ text-overflow: ellipsis; /* 超出部分用省略号表示 */
 
   border: #575656 1px solid;
 }
+
 </style>
