@@ -231,6 +231,7 @@ export default {
         } else {
           this.status = '未通过';
           this.reason = response.data.message || '认证失败';
+          console.error('认证失败:', response.data);
           alert(`认证失败：${this.reason}`);
         }
       } catch (error) {
