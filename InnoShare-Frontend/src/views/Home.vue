@@ -83,7 +83,7 @@ export default {
   },
   data() {
     return{
-      index:1,
+      index:0,
       rotated: 0,
       viewHeight: 0,
       pageNum: 2,
@@ -131,13 +131,14 @@ export default {
 
   },
   mounted() {
+    this.init();
     //初始时，获取基本数据
     this.myStore.changeStyle(0);//初始为透明背景
     this.viewHeight = document.documentElement.clientHeight;
     const container = this.$el.querySelector('.home');
     this.sections  = document.querySelectorAll(".section")
     this.currentPosition = 0;
-    this.handlerWheel = this.throttle(this.scrollMove, 1000);
+    this.handlerWheel = this.throttle(this.scrollMove, 100);
     if (navigator.userAgent.toLowerCase().indexOf('firefox') === -1) {
       document.addEventListener('mousewheel', this.handlerWheel);
     } else {
@@ -253,12 +254,23 @@ export default {
         }
       };
     },
+    init(){
+      this.index=Math.floor(Math.random() * 9) + 1;
+      //console.log(this.index)
+      const image= document.getElementsByClassName("backImage");
+      image.item(0).style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
+    },
     changePaper() {
       this.rotated++;
-      this.index++;
-      if (this.index === 3) this.index = 1;
+      let randomInt =Math.floor(Math.random() * 9) + 1;
+
+      while (this.index === randomInt){
+        randomInt = Math.floor(Math.random() * 9) + 1;
+      }
+      this.index = randomInt;
+      //console.log(this.index)
       const img = this.$refs.Img;
-      //img.style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
+      //随机图片
       const image= document.getElementsByClassName("backImage");
       image.item(0).style.backgroundImage = "url(\'src/assets/BackgroundImg/back" + this.index + ".jpg\')";
       //切换搜索标签
@@ -266,6 +278,7 @@ export default {
     },
     changeTitle(type){
       if(type===1){
+
         this.$router.push({ path: '/home/recommend' });
       }else if(type===2){
         this.$router.push({ path: '/home/new' });

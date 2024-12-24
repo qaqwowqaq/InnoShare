@@ -14,7 +14,7 @@
       </div>
 
       <!-- 底部部分 -->
-      <div class="mt-auto pb-6">
+      <div class="mt-auto pb-6" >
 
         <!-- 上传按钮 -->
         <el-button type="primary"

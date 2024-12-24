@@ -22,12 +22,9 @@ export default {
     }
   },
   mounted() {
-    this.update();
-    // 每隔一定时间获取新的数据
-    this.intervalId = setInterval(() => {
-      this.fetch();
-      console.log("获取hot数据")
-    }, this.interval);
+    if(this.getFromLocal())this.hotPapers = JSON.parse(this.getFromLocal());
+    else this.fetch().then(this.update);
+
   },
   beforeDestroy() {
     // 组件销毁时清除定时器
@@ -42,15 +39,17 @@ export default {
       if (localData) {
         this.hotPapers = JSON.parse(localData); // 解析 JSON 字符串
       }
-      else this.fetch();
+      // 每隔一定时间获取新的数据
+      this.intervalId = setInterval(() => {
+        this.fetch();
+        //console.log("获取hot数据")
+      }, this.interval);
 
     },
-    fetch(){
-      axiosInstance.get('/api/recommendations/hot').then((response)=>{
-        //最热文档
-        this.hotPapers=response.data.papers;
-        localStorage.setItem("hotPapers",JSON.stringify(this.hotPapers))
-      });
+    async fetch() {
+      const response = await axiosInstance.get('/api/recommendations/hot');
+      this.hotPapers = response.data.papers;
+      localStorage.setItem("hotPapers", JSON.stringify(this.hotPapers))
     },
     getFromLocal(){
       //从本地读取

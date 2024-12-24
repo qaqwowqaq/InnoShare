@@ -455,7 +455,7 @@ export default defineComponent({
     // 查看详情跳转
     const viewDetails = (result: any) => {
       if (searchType.value === 'patents') {
-        router.push({ name: "PatentDetail", params: { id: result.id } });
+        window.open(result.result_url, '_blank');
       } else {
         router.push({ name: "PaperDetail", params: { id: result.doi } });
       }
