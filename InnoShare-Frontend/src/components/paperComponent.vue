@@ -172,9 +172,9 @@ export default {
     },
     jump_detail(){
       this.$router.push({
-          path:`/paper/${this.message.paperId}`,
-          query: {
-            id: this.message.paperId
+          name:"PaperDetail",
+          params: {
+            id: this.message.doi
           }
       });
     }

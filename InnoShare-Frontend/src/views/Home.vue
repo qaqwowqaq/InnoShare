@@ -161,8 +161,10 @@ export default {
     if (savedRoute) {
       next(savedRoute); // 重定向到保存的路由
       localStorage.removeItem('savedRoute'); // 移除保存的路由
+      return;
     } else {
       next(); // 继续导航
+      return;
     }
     next(); // 继续路由切换
   },
