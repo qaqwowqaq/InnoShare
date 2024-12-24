@@ -919,7 +919,12 @@ const downloadPDF = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    const response1 =  await axiosInstance.post('/academic/download', null, {
+      params: {
+        paperDoi: doi,  // 将 paperDoi 作为查询参数传递
+      },
+    });
+    console.log(response1.data);
     // 将响应转换为 Blob
     const blob = await response.blob();
 
@@ -933,9 +938,21 @@ const downloadPDF = async () => {
     // 移除链接并释放 Blob URL
     document.body.removeChild(link);
     URL.revokeObjectURL(link.href);
-  } catch (error) {
-    console.error("下载失败：", error);
+  }catch (error) {
+    if (error.response) {
+      // 服务器响应了错误状态码
+      console.error('Error Response:', error.response.data); // 打印响应的详细内容
+      console.error('Error Status:', error.response.status);
+      console.error('Error Headers:', error.response.headers);
+    } else if (error.request) {
+      // 请求已发出，但没有响应
+      console.error('Error Request:', error.request);
+    } else {
+      // 其他错误
+      console.error('Error Message:', error.message);
+    }
   }
+
 };
 
 // 预览窗口
